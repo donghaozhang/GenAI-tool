@@ -10,16 +10,18 @@ export interface FeaturedModel {
 }
 
 export const featuredModels: FeaturedModel[] = [
+  // Text to Image models first
   {
-    id: 'fal-ai/veo-3',
-    title: 'Veo 3',
-    description: 'Veo 3 by Google, the most advanced AI video generation model in the world. With sound too!',
-    category: 'text-to-video',
-    categoryLabel: 'Text to Video',
+    id: 'fal-ai/imagen-4-preview',
+    title: 'Imagen 4 Preview',
+    description: "Google's highest quality image generation model with exceptional detail, photorealism, and creative capabilities for professional-grade image creation.",
+    category: 'text-to-image',
+    categoryLabel: 'Text to Image',
     image: '',
     isNew: true,
-    tags: ['video', 'google', 'sound'],
+    tags: ['google', 'imagen', 'quality', 'photorealistic'],
   },
+  // Image to Video models second
   {
     id: 'fal-ai/kling-video/v2.1/master/image-to-video',
     title: 'Kling Video 2.1 Master',
@@ -41,6 +43,17 @@ export const featuredModels: FeaturedModel[] = [
     tags: ['image-to-video', 'cost-efficient', 'affordable'],
   },
   {
+    id: 'fal-ai/pixverse/v4.5',
+    title: 'PixVerse v4.5',
+    description: 'Generate high quality video clips from text and image prompts using PixVerse v4.5 with advanced motion control and stylistic transformations.',
+    category: 'image-to-video',
+    categoryLabel: 'Image to Video',
+    image: '',
+    isNew: false,
+    tags: ['pixverse', 'stylized', 'transform', 'motion'],
+  },
+  // Other categories
+  {
     id: 'fal-ai/flux-pro/kontext',
     title: 'FLUX Pro Kontext',
     description: 'FLUX.1 Kontext [pro] handles both text and reference images as inputs, seamlessly enabling targeted, local editing and enhancement of specific image regions.',
@@ -51,24 +64,14 @@ export const featuredModels: FeaturedModel[] = [
     tags: ['flux', 'kontext', 'reference', 'editing'],
   },
   {
-    id: 'fal-ai/imagen-4-preview',
-    title: 'Imagen 4 Preview',
-    description: "Google's highest quality image generation model with exceptional detail, photorealism, and creative capabilities for professional-grade image creation.",
-    category: 'text-to-image',
-    categoryLabel: 'Text to Image',
+    id: 'fal-ai/veo-3',
+    title: 'Veo 3',
+    description: 'Veo 3 by Google, the most advanced AI video generation model in the world. With sound too!',
+    category: 'text-to-video',
+    categoryLabel: 'Text to Video',
     image: '',
     isNew: true,
-    tags: ['google', 'imagen', 'quality', 'photorealistic'],
-  },
-  {
-    id: 'fal-ai/pixverse/v4.5',
-    title: 'PixVerse v4.5',
-    description: 'Generate high quality video clips from text and image prompts using PixVerse v4.5 with advanced motion control and stylistic transformations.',
-    category: 'image-to-video',
-    categoryLabel: 'Image to Video',
-    image: '',
-    isNew: false,
-    tags: ['pixverse', 'stylized', 'transform', 'motion'],
+    tags: ['video', 'google', 'sound'],
   },
 ];
 

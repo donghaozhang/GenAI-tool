@@ -28,9 +28,20 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
   const [inputMethod, setInputMethod] = useState<'text' | 'upload'>('text');
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageCount, setImageCount] = useState(1);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const currentModel = models.find(model => model.id === selectedModel) || models[0];
   const IconComponent = currentModel.icon;
+
+  // Update input method when model changes
+  React.useEffect(() => {
+    const requiresImageUpload = currentModel.type === 'Image to Image' || currentModel.type === 'Image to Video';
+    if (requiresImageUpload) {
+      setInputMethod('upload');
+    } else {
+      setInputMethod('text');
+    }
+  }, [currentModel.type]);
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -53,6 +64,11 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
       return;
     }
 
+    if (inputMethod === 'upload' && !uploadedFile) {
+      toast.error('Please upload an image first');
+      return;
+    }
+
     setIsGenerating(true);
     try {
       // Simulate API call - replace with actual implementation
@@ -63,7 +79,7 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
         `https://picsum.photos/512/512?random=${Date.now()}-${i}`
       );
       
-      onImagesGenerated(mockImages, prompt);
+      onImagesGenerated(mockImages, prompt || 'Image transformation');
       toast.success(`Generated ${imageCount} image(s) successfully!`);
     } catch (error) {
       toast.error('Failed to generate images');
@@ -75,8 +91,14 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setUploadedFile(file);
       onFileUploaded(file);
-      toast.success('File uploaded successfully!');
+      
+      // Create URL for the uploaded image and display it immediately
+      const imageUrl = URL.createObjectURL(file);
+      onImagesGenerated([imageUrl], `Uploaded: ${file.name}`);
+      
+      toast.success('File uploaded and displayed successfully!');
     }
   };
 
@@ -94,6 +116,7 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
   };
 
   const requiresImageUpload = currentModel.type === 'Image to Image' || currentModel.type === 'Image to Video';
+  const canGenerate = inputMethod === 'text' ? prompt.trim() : uploadedFile !== null;
 
   return (
     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 mb-6">
@@ -153,9 +176,12 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
         <div className="flex gap-4">
           <button
             onClick={() => setInputMethod('text')}
+            disabled={requiresImageUpload}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
               inputMethod === 'text'
                 ? 'bg-blue-600 border-blue-500 text-white'
+                : requiresImageUpload
+                ? 'bg-gray-600 border-gray-500 text-gray-400 cursor-not-allowed'
                 : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'
             }`}
           >
@@ -163,31 +189,39 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
             Text Prompt
           </button>
           
-          {requiresImageUpload && (
-            <label className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
-              inputMethod === 'upload'
-                ? 'bg-blue-600 border-blue-500 text-white'
-                : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'
-            }`}>
-              <Upload className="w-4 h-4" />
-              Upload Image
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-                onClick={() => setInputMethod('upload')}
-              />
-            </label>
-          )}
+          <label className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition-colors ${
+            inputMethod === 'upload'
+              ? 'bg-blue-600 border-blue-500 text-white'
+              : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'
+          }`}>
+            <Upload className="w-4 h-4" />
+            Upload Image
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="hidden"
+              onClick={() => setInputMethod('upload')}
+            />
+          </label>
         </div>
       </div>
 
+      {/* Show uploaded file info */}
+      {uploadedFile && (
+        <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+          <div className="flex items-center gap-2 text-green-400">
+            <Upload className="w-4 h-4" />
+            <span className="text-sm">Uploaded: {uploadedFile.name}</span>
+          </div>
+        </div>
+      )}
+
       {/* Text Input */}
-      {inputMethod === 'text' && (
+      {(inputMethod === 'text' || (requiresImageUpload && uploadedFile)) && (
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Prompt
+            {requiresImageUpload ? 'Transformation Prompt' : 'Prompt'}
           </label>
           <Textarea
             value={prompt}
@@ -221,8 +255,8 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
         <div className="flex items-end">
           <Button 
             onClick={handleGenerate}
-            disabled={isGenerating || (inputMethod === 'text' && !prompt.trim())}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={isGenerating || !canGenerate}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
           >
             {isGenerating ? (
               <>
@@ -232,7 +266,7 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
             ) : (
               <>
                 <Sparkles className="w-4 h-4 mr-2" />
-                Generate
+                {requiresImageUpload ? 'Transform' : 'Generate'}
               </>
             )}
           </Button>
@@ -241,9 +275,14 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
 
       {/* Status */}
       <div className="flex items-center gap-2">
-        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-        <span className="text-xs text-green-400">
-          Ready to generate with {currentModel.name} • {currentModel.type}
+        <div className={`w-2 h-2 rounded-full animate-pulse ${canGenerate ? 'bg-green-400' : 'bg-yellow-400'}`}></div>
+        <span className={`text-xs ${canGenerate ? 'text-green-400' : 'text-yellow-400'}`}>
+          {canGenerate 
+            ? `Ready to generate with ${currentModel.name} • ${currentModel.type}`
+            : requiresImageUpload 
+            ? 'Upload an image to continue'
+            : 'Enter a prompt to continue'
+          }
         </span>
       </div>
 

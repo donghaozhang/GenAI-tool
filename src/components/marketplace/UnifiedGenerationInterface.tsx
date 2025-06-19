@@ -93,11 +93,13 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
     if (file) {
       setUploadedFile(file);
       
-      // Create URL for the uploaded image and display it immediately
-      const imageUrl = URL.createObjectURL(file);
-      onImagesGenerated([imageUrl], `Uploaded: ${file.name}`);
-      
-      toast.success('File uploaded and displayed successfully!');
+      // Convert file to data URL for external API compatibility
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        onImagesGenerated([dataUrl], `Uploaded: ${file.name}`);
+      };
+      reader.readAsDataURL(file);
     }
   };
 

@@ -70,7 +70,24 @@ export const ImagePipeline: React.FC<ImagePipelineProps> = ({ sourceImageUrl, so
       toast.success(`${selectedModel?.name} processing completed!`);
     } catch (error) {
       console.error('Pipeline processing error:', error);
-      toast.error('Pipeline processing failed. Please try again.');
+      
+      // Extract error message for better user feedback
+      let errorMessage = 'Pipeline processing failed. Please try again.';
+      if (error instanceof Error) {
+        if (error.message.includes('Source image URL is required')) {
+          errorMessage = 'Please upload an image first before running the pipeline.';
+        } else if (error.message.includes('Unsupported model')) {
+          errorMessage = 'This model is not currently supported. Please try a different model.';
+        } else if (error.message.includes('FAL_API_KEY')) {
+          errorMessage = 'API configuration error. Please contact support.';
+        } else if (error.message.includes('500')) {
+          errorMessage = 'Server error occurred. Please try again in a moment.';
+        } else {
+          errorMessage = `Pipeline error: ${error.message}`;
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setIsProcessing(false);
     }

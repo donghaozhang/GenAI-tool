@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -37,17 +36,21 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
 
     setIsUploading(true);
     try {
-      // Create a data URL for preview
+      // Create a data URL for preview and API compatibility
       const reader = new FileReader();
       reader.onload = (e) => {
         setUploadedImageUrl(e.target?.result as string);
-        toast.success('File uploaded successfully!');
+        toast.success('File uploaded successfully! (Ready for pipeline processing)');
+      };
+      reader.onerror = () => {
+        console.error('Error reading file');
+        toast.error('Failed to read file');
+        setIsUploading(false);
       };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error uploading file:', error);
       toast.error('Failed to upload file');
-    } finally {
       setIsUploading(false);
     }
   };
@@ -114,6 +117,7 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
           accept="image/*,video/*"
           onChange={handleFileInputChange}
           className="hidden"
+          aria-label="Change uploaded image or video file"
         />
         
         <div className="mt-3 space-y-2">
@@ -168,6 +172,7 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
           accept="image/*,video/*"
           onChange={handleFileInputChange}
           className="hidden"
+          aria-label="Upload image or video file"
         />
 
         <div className="space-y-4">

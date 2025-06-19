@@ -12,25 +12,21 @@ const AIModelMarketplace = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [generationPrompt, setGenerationPrompt] = useState('');
   const [showPipeline, setShowPipeline] = useState(false);
 
   const handleImagesGenerated = (imageUrls: string[], prompt: string) => {
-    setGeneratedImages(imageUrls);
+    setGeneratedImages(prev => [...prev, ...imageUrls]);
     setGenerationPrompt(prompt);
-    toast.success(`Generated ${imageUrls.length} image(s) successfully!`);
+    toast.success(`${imageUrls.length === 1 ? 'Image' : imageUrls.length + ' images'} ${prompt.includes('Uploaded:') ? 'uploaded' : 'generated'} successfully!`);
   };
 
   const handleFileUploaded = (file: File) => {
-    setUploadedFiles(prev => [...prev, file]);
-    toast.success('File uploaded successfully!');
+    // This callback is no longer needed since we handle uploads via onImagesGenerated
+    console.log('File uploaded callback - not used');
   };
 
-  const allImages = [
-    ...generatedImages,
-    ...uploadedFiles.map(file => URL.createObjectURL(file))
-  ];
+  const allImages = generatedImages;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">

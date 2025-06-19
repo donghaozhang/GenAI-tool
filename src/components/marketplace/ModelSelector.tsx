@@ -1,31 +1,29 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { featuredModels } from '@/constants/models';
 
 interface ModelSelectorProps {
   selectedModel: string;
   onModelChange: (model: string) => void;
 }
 
-const models = [
-  { id: 'fal-ai/flux/schnell', name: 'FLUX Schnell', description: 'Fast high-quality generation', type: 'Text to Image' },
-  { id: 'fal-ai/flux-pro', name: 'FLUX Pro', description: 'Premium quality images', type: 'Text to Image' },
-  { id: 'fal-ai/imagen-4-preview', name: 'Imagen 4', description: 'Google\'s latest model', type: 'Text to Image' },
-  { id: 'fal-ai/kling-video/v2.1/standard/image-to-video', name: 'Kling Video', description: 'Image to video generation', type: 'Image to Video' },
-];
-
 export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelChange }) => {
-  const currentModel = models.find(model => model.id === selectedModel) || models[0];
+  const currentModel = featuredModels.find(model => model.id === selectedModel) || featuredModels[0];
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
+  const getTypeColor = (categoryLabel: string) => {
+    switch (categoryLabel) {
       case 'Text to Image':
-        return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
-      case 'Image to Video':
         return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
       case 'Image to Image':
         return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'Text to Video':
+      case 'Image to Video':
         return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+      case 'Text to Video':
+        return 'bg-pink-500/20 text-pink-400 border-pink-500/30';
+      case 'Image to 3D':
+        return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30';
+      case 'Video to Audio':
+        return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
       default:
         return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
@@ -35,8 +33,8 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onM
     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 mb-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-white">Select AI Model</h2>
-        <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(currentModel.type)}`}>
-          {currentModel.type}
+        <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(currentModel.categoryLabel)}`}>
+          {currentModel.categoryLabel}
         </div>
       </div>
       
@@ -50,15 +48,20 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onM
               <SelectValue placeholder="Choose a model" />
             </SelectTrigger>
             <SelectContent className="bg-gray-700 border-gray-600">
-              {models.map((model) => (
+              {featuredModels.map((model) => (
                 <SelectItem 
                   key={model.id} 
                   value={model.id}
                   className="text-white hover:bg-gray-600"
                 >
                   <div className="flex items-center justify-between w-full">
-                    <span>{model.name}</span>
-                    <span className="text-xs text-gray-400 ml-2">{model.type}</span>
+                    <div className="flex-1">
+                      <div className="font-medium">{model.title}</div>
+                      <div className="text-xs text-gray-400">{model.description.slice(0, 60)}...</div>
+                    </div>
+                    <div className={`ml-2 px-2 py-1 rounded text-xs font-medium border ${getTypeColor(model.categoryLabel)}`}>
+                      {model.categoryLabel}
+                    </div>
                   </div>
                 </SelectItem>
               ))}
@@ -78,7 +81,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onM
       
       <div className="mt-4 flex items-center gap-2">
         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-        <span className="text-xs text-green-400">Ready to generate with {currentModel.name}</span>
+        <span className="text-xs text-green-400">Ready to generate with {currentModel.title}</span>
       </div>
     </div>
   );

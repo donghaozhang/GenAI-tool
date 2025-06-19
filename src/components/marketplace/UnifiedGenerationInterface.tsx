@@ -6,26 +6,33 @@ import { Upload, Sparkles, Image, Video, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateImageWithModel } from '@/services/imageGeneration';
 import { processImagePipeline } from '@/utils/pipelineProcessing';
+import { featuredModels } from '@/constants/models';
 
 interface UnifiedGenerationInterfaceProps {
   onImagesGenerated: (imageUrls: string[], prompt: string) => void;
   onFileUploaded: (file: File) => void;
 }
 
-const models = [
-  { id: 'fal-ai/flux/schnell', name: 'FLUX Schnell', description: 'Fast high-quality generation', type: 'Text to Image', icon: Image },
-  { id: 'fal-ai/flux-pro', name: 'FLUX Pro', description: 'Premium quality images', type: 'Text to Image', icon: Image },
-  { id: 'fal-ai/imagen-4-preview', name: 'Imagen 4', description: 'Google\'s latest model', type: 'Text to Image', icon: Image },
-  { id: 'fal-ai/flux-pro/kontext', name: 'FLUX Pro Kontext', description: 'Image-to-image transformation', type: 'Image to Image', icon: Wand2 },
-  { id: 'fal-ai/kling-video/v2.1/standard/image-to-video', name: 'Kling Video Standard', description: 'Image to video generation', type: 'Image to Video', icon: Video },
-  { id: 'fal-ai/kling-video/v2.1/master/image-to-video', name: 'Kling Video Master', description: 'High-quality image to video', type: 'Image to Video', icon: Video },
-];
+// Map model categories to icons
+const getModelIcon = (categoryLabel: string) => {
+  switch (categoryLabel) {
+    case 'Text to Image':
+      return Image;
+    case 'Image to Image':
+      return Wand2;
+    case 'Image to Video':
+    case 'Text to Video':
+      return Video;
+    default:
+      return Image;
+  }
+};
 
 export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProps> = ({ 
   onImagesGenerated, 
   onFileUploaded 
 }) => {
-  const [selectedModel, setSelectedModel] = useState('fal-ai/flux/schnell');
+  const [selectedModel, setSelectedModel] = useState('fal-ai/imagen-4-preview');
   const [prompt, setPrompt] = useState('');
   const [inputMethod, setInputMethod] = useState<'text' | 'upload'>('text');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -33,29 +40,31 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedImageDataUrl, setUploadedImageDataUrl] = useState<string | null>(null);
 
-  const currentModel = models.find(model => model.id === selectedModel) || models[0];
-  const IconComponent = currentModel.icon;
+  const currentModel = featuredModels.find(model => model.id === selectedModel) || featuredModels[0];
+  const IconComponent = getModelIcon(currentModel.categoryLabel);
 
   // Update input method when model changes
   React.useEffect(() => {
-    const requiresImageUpload = currentModel.type === 'Image to Image' || currentModel.type === 'Image to Video';
+    const requiresImageUpload = currentModel.categoryLabel === 'Image to Image' || currentModel.categoryLabel === 'Image to Video';
     if (requiresImageUpload) {
       setInputMethod('upload');
     } else {
       setInputMethod('text');
     }
-  }, [currentModel.type]);
+  }, [currentModel.categoryLabel]);
 
-  const getTypeColor = (type: string) => {
-    switch (type) {
+  const getTypeColor = (categoryLabel: string) => {
+    switch (categoryLabel) {
       case 'Text to Image':
-        return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
-      case 'Image to Video':
         return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
       case 'Image to Image':
         return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'Text to Video':
+      case 'Image to Video':
         return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+      case 'Text to Video':
+        return 'bg-pink-500/20 text-pink-400 border-pink-500/30';
+      case 'Image to 3D':
+        return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30';
       default:
         return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
@@ -74,7 +83,7 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
 
     setIsGenerating(true);
     try {
-      const isTextToImage = currentModel.type === 'Text to Image';
+      const isTextToImage = currentModel.categoryLabel === 'Text to Image';
       
       if (isTextToImage) {
         // Use generateImageWithModel for text-to-image models
@@ -122,19 +131,21 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
   };
 
   const getInputPlaceholder = () => {
-    switch (currentModel.type) {
+    switch (currentModel.categoryLabel) {
       case 'Text to Image':
         return 'Describe the image you want to generate...';
       case 'Image to Image':
         return 'Describe how you want to transform the uploaded image...';
       case 'Image to Video':
         return 'Describe the video motion you want to create...';
+      case 'Text to Video':
+        return 'Describe the video you want to create...';
       default:
         return 'Enter your prompt...';
     }
   };
 
-  const requiresImageUpload = currentModel.type === 'Image to Image' || currentModel.type === 'Image to Video';
+  const requiresImageUpload = currentModel.categoryLabel === 'Image to Image' || currentModel.categoryLabel === 'Image to Video';
   const canGenerate = inputMethod === 'text' ? prompt.trim() : uploadedFile !== null;
 
   return (
@@ -145,8 +156,8 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
           <IconComponent className="w-6 h-6 text-blue-400" />
           <h2 className="text-xl font-bold text-white">AI Generation Studio</h2>
         </div>
-        <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(currentModel.type)}`}>
-          {currentModel.type}
+        <div className={`px-3 py-1 rounded-full text-sm font-medium border ${getTypeColor(currentModel.categoryLabel)}`}>
+          {currentModel.categoryLabel}
         </div>
       </div>
 
@@ -161,15 +172,20 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
               <SelectValue placeholder="Choose a model" />
             </SelectTrigger>
             <SelectContent className="bg-gray-700 border-gray-600">
-              {models.map((model) => (
+              {featuredModels.map((model) => (
                 <SelectItem 
                   key={model.id} 
                   value={model.id}
                   className="text-white hover:bg-gray-600"
                 >
                   <div className="flex items-center justify-between w-full">
-                    <span>{model.name}</span>
-                    <span className="text-xs text-gray-400 ml-2">{model.type}</span>
+                    <div className="flex-1">
+                      <div className="font-medium">{model.title}</div>
+                      <div className="text-xs text-gray-400">{model.description.slice(0, 50)}...</div>
+                    </div>
+                    <div className={`ml-2 px-2 py-1 rounded text-xs font-medium border ${getTypeColor(model.categoryLabel)}`}>
+                      {model.categoryLabel}
+                    </div>
                   </div>
                 </SelectItem>
               ))}
@@ -220,6 +236,7 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
               accept="image/*"
               onChange={handleFileUpload}
               className="hidden"
+              data-testid="file-input"
               onClick={() => setInputMethod('upload')}
             />
           </label>
@@ -297,7 +314,7 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
         <div className={`w-2 h-2 rounded-full animate-pulse ${canGenerate ? 'bg-green-400' : 'bg-yellow-400'}`}></div>
         <span className={`text-xs ${canGenerate ? 'text-green-400' : 'text-yellow-400'}`}>
           {canGenerate 
-            ? `Ready to generate with ${currentModel.name} • ${currentModel.type}`
+            ? `Ready to generate with ${currentModel.title} • ${currentModel.categoryLabel}`
             : requiresImageUpload 
             ? 'Upload an image to continue'
             : 'Enter a prompt to continue'
@@ -309,11 +326,15 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
       <div className="mt-4 p-3 bg-gray-700/50 rounded border border-gray-600">
         <p className="text-xs text-gray-400">
           <strong>Tip:</strong> {
-            currentModel.type === 'Text to Image' 
+            currentModel.categoryLabel === 'Text to Image' 
               ? 'Be descriptive in your prompts for better results'
-              : currentModel.type === 'Image to Image'
+              : currentModel.categoryLabel === 'Image to Image'
               ? 'Upload an image first, then describe the transformation'
-              : 'Upload an image and describe the motion you want to create'
+              : currentModel.categoryLabel === 'Image to Video'
+              ? 'Upload an image and describe the motion you want to create'
+              : currentModel.categoryLabel === 'Text to Video'
+              ? 'Describe the video scene and action you want to create'
+              : 'Follow the model-specific guidelines for best results'
           }
         </p>
       </div>

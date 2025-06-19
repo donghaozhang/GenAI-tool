@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -14,6 +13,26 @@ interface PipelineControlsProps {
   currentSourceImage: string | null;
   onPipelineProcess: () => void;
 }
+
+// Helper function to get type badge color
+const getTypeBadgeColor = (type: string) => {
+  switch (type) {
+    case 'text-to-image':
+      return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+    case 'image-to-image':
+      return 'bg-green-500/20 text-green-400 border-green-500/30';
+    case 'image-to-video':
+      return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+    case 'text-to-video':
+      return 'bg-pink-500/20 text-pink-400 border-pink-500/30';
+    case 'image-to-3d':
+      return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30';
+    case 'video-to-audio':
+      return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+    default:
+      return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+  }
+};
 
 export const PipelineControls: React.FC<PipelineControlsProps> = ({
   selectedPipelineModel,
@@ -36,7 +55,14 @@ export const PipelineControls: React.FC<PipelineControlsProps> = ({
         <label className="text-sm font-medium text-gray-300 mb-2 block">Select Pipeline Model</label>
         <Select value={selectedPipelineModel} onValueChange={setSelectedPipelineModel}>
           <SelectTrigger className="w-full bg-gray-700 border-gray-600 text-white">
-            <SelectValue placeholder="Choose pipeline model" />
+            <SelectValue placeholder="Choose pipeline model">
+              {selectedModel && (
+                <div>
+                  <div className="font-medium">{selectedModel.name}</div>
+                  <div className="text-xs text-gray-400">{selectedModel.typeLabel}</div>
+                </div>
+              )}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent className="bg-gray-700 border-gray-600">
             {pipelineModels.map((model) => (
@@ -45,9 +71,14 @@ export const PipelineControls: React.FC<PipelineControlsProps> = ({
                 value={model.id}
                 className="text-white hover:bg-gray-600"
               >
-                <div>
-                  <div className="font-medium">{model.name}</div>
-                  <div className="text-xs text-gray-400">{model.description}</div>
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex-1">
+                    <div className="font-medium">{model.name}</div>
+                    <div className="text-xs text-gray-400">{model.description}</div>
+                  </div>
+                  <div className={`ml-2 px-2 py-1 rounded text-xs font-medium border ${getTypeBadgeColor(model.type)}`}>
+                    {model.typeLabel}
+                  </div>
                 </div>
               </SelectItem>
             ))}
@@ -58,11 +89,12 @@ export const PipelineControls: React.FC<PipelineControlsProps> = ({
       {selectedModel && (
         <div className="bg-gray-700 rounded p-3">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-            <span className="text-sm font-medium text-purple-400">{selectedModel.type}</span>
+            <div className={`px-2 py-1 rounded text-xs font-medium border ${getTypeBadgeColor(selectedModel.type)}`}>
+              {selectedModel.typeLabel}
+            </div>
           </div>
           <p className="text-sm text-gray-300">{selectedModel.description}</p>
-          {selectedModel.id === 'flux-pro-kontext' && (
+          {selectedModel.id === 'fal-ai/flux-pro/kontext' && (
             <p className="text-xs text-yellow-400 mt-1">
               ✨ Advanced context-aware image modification and enhancement
             </p>
@@ -72,7 +104,7 @@ export const PipelineControls: React.FC<PipelineControlsProps> = ({
               🎯 Automatically removes background using AI segmentation
             </p>
           )}
-          {selectedModel.id === 'aura-sr' && (
+          {selectedModel.id === 'fal-ai/aura-sr' && (
             <p className="text-xs text-green-400 mt-1">
               🚀 AI-powered super-resolution for enhanced image quality and upscaling
             </p>
@@ -82,12 +114,12 @@ export const PipelineControls: React.FC<PipelineControlsProps> = ({
               🎵 Generate realistic sound effects from video content using ElevenLabs AI
             </p>
           )}
-          {selectedModel.id === 'seedance-text-to-video' && (
+          {selectedModel.id === 'fal-ai/bytedance/seedance/v1/lite/text-to-video' && (
             <p className="text-xs text-pink-400 mt-1">
               🎬 Generate high-quality videos from text descriptions using SeeeDance AI
             </p>
           )}
-          {selectedModel.id === 'hunyuan3d-v21' && (
+          {selectedModel.id === 'fal-ai/hunyuan3d-v21' && (
             <p className="text-xs text-cyan-400 mt-1">
               🎮 Generate detailed 3D models from 2D images using advanced AI
             </p>
@@ -95,7 +127,7 @@ export const PipelineControls: React.FC<PipelineControlsProps> = ({
         </div>
       )}
 
-      {selectedModel?.id !== 'background-removal' && selectedModel?.id !== 'aura-sr' && selectedModel?.id !== 'video-to-sound' && (
+      {selectedModel?.id !== 'background-removal' && selectedModel?.id !== 'fal-ai/aura-sr' && selectedModel?.id !== 'video-to-sound' && (
         <div>
           <label className="text-sm font-medium text-gray-300 mb-2 block">Pipeline Prompt</label>
           <input
@@ -103,11 +135,11 @@ export const PipelineControls: React.FC<PipelineControlsProps> = ({
             value={pipelinePrompt}
             onChange={(e) => setPipelinePrompt(e.target.value)}
             placeholder={
-              selectedModel?.id === 'flux-pro-kontext' 
+              selectedModel?.id === 'fal-ai/flux-pro/kontext' 
                 ? "Describe how you want to modify the image..." 
-                : selectedModel?.id === 'seedance-text-to-video'
+                : selectedModel?.id === 'fal-ai/bytedance/seedance/v1/lite/text-to-video'
                 ? "Describe the video you want to create..."
-                : selectedModel?.id === 'hunyuan3d-v21'
+                : selectedModel?.id === 'fal-ai/hunyuan3d-v21'
                 ? "Describe the 3D model characteristics..."
                 : "Add instructions for the pipeline process..."
             }

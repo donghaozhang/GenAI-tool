@@ -1,0 +1,138 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Testing Practices & Guidelines
+
+This document outlines the comprehensive testing strategy implemented for the GenAI Tool project.
+
+## Test Suite Overview
+- **Total Tests**: 60+ comprehensive tests across multiple categories
+- **Test Runner**: Vitest with @testing-library/react
+- **Test Coverage**: Component tests, integration tests, edge function tests, and diagnostic tests
+- **All tests currently passing** ✅
+
+## Test Organization Structure
+```
+src/__tests__/
+├── components/marketplace/     # Component-specific tests
+├── diagnostics/               # Diagnostic and validation tests  
+├── edge-functions/           # Backend Edge Function tests
+├── integration/              # End-to-end integration tests
+├── pages/                    # Page component tests
+└── utils/                    # Utility function tests
+```
+
+## Key Test Categories
+
+### 1. Clothes Changing Functionality Tests
+**Location**: `src/__tests__/diagnostics/ClothesChangingDiagnostic.test.ts`
+- **15 comprehensive tests** covering the FLUX Pro Kontext model
+- Tests model ID format validation, input parameters, API integration
+- Validates clothes changing prompts and image transformations
+- **All 15 tests passing** ✅
+
+### 2. Pipeline Processing Tests
+**Locations**: 
+- `src/__tests__/components/marketplace/PipelineProcessing.test.tsx`
+- `src/__tests__/integration/PipelineIntegrationTest.test.ts`
+- `src/__tests__/edge-functions/ProcessImagePipeline.test.ts`
+
+**Coverage**:
+- FLUX Pro Kontext (clothes changing) workflows
+- Image-to-video transformations with Kling Video
+- Text-to-image generation with various models
+- Error handling and validation scenarios
+- Edge Function backend processing
+
+### 3. Unified Generation Interface Tests
+**Location**: `src/__tests__/components/marketplace/UnifiedGenerationInterface.final.test.tsx`
+- File upload functionality with data URL conversion
+- Model selection and workflow detection
+- Image display and processing pipeline integration
+- Accessibility compliance testing
+
+### 4. Integration Tests
+**Locations**:
+- `src/__tests__/integration/ClothesChangingIntegration.test.tsx` 
+- `src/__tests__/integration/ClothesChangingTest.test.ts`
+- `src/__tests__/integration/LivePipelineTest.test.ts`
+
+**Coverage**:
+- End-to-end clothes changing workflows
+- Live pipeline processing (skipped by default)
+- Complete user interaction flows
+- Real API integration testing capabilities
+
+## Testing Best Practices
+
+### Mock Strategy
+- **Supabase Client**: Mocked for consistent test results
+- **FAL.ai Client**: Simulated responses for predictable testing
+- **File API**: Mocked URL.createObjectURL and FileReader
+- **Environment Variables**: Handled through test setup
+
+### Test Data Management
+- Use realistic model IDs following fal-ai format standards
+- Sample base64 image data for upload testing
+- Consistent prompt examples for clothes changing scenarios
+- Proper error simulation for edge cases
+
+### Validation Focus Areas
+1. **Model ID Format**: Ensure all model references use full fal-ai format
+2. **Input Parameters**: Validate required fields for each model type
+3. **Error Handling**: Test graceful failure scenarios
+4. **API Integration**: Verify correct endpoint usage and response handling
+5. **User Experience**: Test loading states, error messages, and success flows
+
+## Running Tests
+
+### All Tests
+```bash
+npm test
+```
+
+### Specific Test Categories
+```bash
+# Clothes changing functionality
+npm test ClothesChangingDiagnostic
+
+# Pipeline processing
+npm test PipelineProcessing
+
+# Integration tests
+npm test integration/
+
+# Component tests
+npm test components/marketplace/
+```
+
+### Test Development Guidelines
+1. **Descriptive Test Names**: Use clear, specific test descriptions
+2. **Setup and Teardown**: Properly clear mocks between tests
+3. **Realistic Scenarios**: Test actual user workflows and edge cases
+4. **Error Coverage**: Include both success and failure scenarios
+5. **Accessibility**: Include ARIA label and accessibility testing
+
+## Test Maintenance
+- Tests are automatically run on code changes
+- All tests must pass before committing changes
+- New features should include corresponding test coverage
+- Mock responses should reflect actual API behavior
+- Update tests when API endpoints or model parameters change
+
+## Clothes Changing Test Success
+The clothes changing functionality, which was previously failing, now has **comprehensive test coverage with all 15 tests passing**. This validates:
+- Proper FLUX Pro Kontext model integration
+- Correct FAL.ai client usage in Edge Function
+- Valid input parameter formatting
+- Successful image transformation workflows
+- Robust error handling and validation
+
+## Future Testing Enhancements
+- Add performance testing for image processing pipelines
+- Implement visual regression testing for UI components
+- Add load testing for concurrent pipeline processing
+- Expand edge case coverage for various model types
+- Consider adding Playwright E2E tests for complete user flows

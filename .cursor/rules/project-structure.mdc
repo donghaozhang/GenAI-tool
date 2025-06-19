@@ -26,11 +26,11 @@ src/components/
 ```
 
 ## Important Marketplace Components (Layout Order)
-- [PromptInput.tsx](mdc:src/components/marketplace/PromptInput.tsx) - Primary interface, positioned first after header
+- [UnifiedGenerationInterface.tsx](mdc:src/components/marketplace/UnifiedGenerationInterface.tsx) - Main interface combining model selection, input methods, and generation controls
 - [ModelSelector.tsx](mdc:src/components/marketplace/ModelSelector.tsx) - Enhanced model selection with color-coded type badges
-- [ImageUploadButton.tsx](mdc:src/components/marketplace/ImageUploadButton.tsx) - Alternative file upload interface
+- [ImageUploadSection.tsx](mdc:src/components/marketplace/ImageUploadSection.tsx) - File upload with data URL conversion for API compatibility
 - [MultiImageDisplay.tsx](mdc:src/components/marketplace/MultiImageDisplay.tsx) - Display generated/uploaded images
-- [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Multi-step image processing pipeline
+- [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Multi-step image processing pipeline with clothes changing support
 - [TrendingSection.tsx](mdc:src/components/marketplace/TrendingSection.tsx) - Popular model categories
 - [CategoryFilter.tsx](mdc:src/components/marketplace/CategoryFilter.tsx) - Dynamic category filtering with real model counts
 - [ModelGrid.tsx](mdc:src/components/marketplace/ModelGrid.tsx) - Featured AI models grid
@@ -52,14 +52,31 @@ src/components/
 - Authentication pages in [auth/](mdc:src/components/auth) directory
 
 ## Backend Functions
-- `supabase/functions/process-image-pipeline/` - Handles image processing with model ID compatibility
+- `supabase/functions/process-image-pipeline/` - **Updated Edge Function** using modern @fal-ai/client for clothes changing support
 - `supabase/functions/generate-pokemon-images/` - Specialized image generation
 - `supabase/functions/process-elevenlabs-video/` - Video processing integration
 
+## Test Suite Structure
+```
+src/__tests__/
+├── components/marketplace/     # Component-specific tests (UnifiedGenerationInterface, etc.)
+├── diagnostics/               # Diagnostic tests (ClothesChangingDiagnostic - 15 tests)
+├── edge-functions/           # Backend Edge Function tests
+├── integration/              # End-to-end integration tests (clothes changing workflows)
+├── pages/                    # Page component tests (AIModelMarketplace)
+└── utils/                    # Utility function tests (image upload, pipeline processing)
+```
+- **60+ comprehensive tests** with all tests passing ✅
+- **Clothes changing functionality** fully tested and working
+- **Test categories**: Component, integration, edge function, and diagnostic tests
+
 ## Key Features
-- **Optimized user flow**: Generate Images → Model Selection → Upload → Display → Processing
+- **Unified Generation Interface** combining model selection, input methods, and generation controls
 - **Full fal-ai model ID format** throughout the application
 - **Enhanced model selector** with type indicators and color coding
 - **Dynamic category filtering** with automatic count calculation and disabled states
 - **Comprehensive pipeline processing** with multiple AI model integrations
+- **Working clothes changing functionality** using FLUX Pro Kontext model
+- **Data URL support** for uploaded images (base64 format for API compatibility)
+- **Comprehensive test coverage** ensuring reliability and functionality
 

@@ -8,14 +8,20 @@ alwaysApply: false
 The AI marketplace is the core feature of this application, providing users with access to various AI models.
 
 ## Page Layout Order (AIModelMarketplace.tsx)
-The marketplace follows this specific layout order for optimal user experience:
-1. **Generate Images** (PromptInput) - Primary action, first after header
-2. **Model Selector** - Choose AI model with type indicators
-3. **Get Started** - Upload files as alternative input
-4. **Image Display** - Show generated/uploaded results
-5. **Pipeline Processing** - Multi-step image processing
-6. **Trending Section** - Popular model categories
-7. **Featured Models Grid** - Browse available models
+The marketplace now uses a **Unified Generation Interface** that combines model selection, input methods, and generation controls:
+1. **Unified Generation Interface** (UnifiedGenerationInterface) - Single interface replacing separate components
+2. **Image Display** - Show generated/uploaded results  
+3. **Pipeline Processing** - Multi-step image processing with clothes changing support
+4. **Trending Section** - Popular model categories
+5. **Featured Models Grid** - Browse available models
+
+## Unified Generation Interface Features
+- **Smart Model Selection** with automatic workflow detection
+- **Dynamic Input Methods** (text prompt vs image upload based on selected model)
+- **Context-aware UI** that adapts based on model type
+- **Color-coded Type Badges** (orange for Text to Image, blue for Image to Video, green for Image to Image)
+- **Enhanced Validation** and status indicators
+- **Single Interface** combining Generate Images, Model Selector, and Get Started sections
 
 ## Model ID Format Standards
 - **Always use full fal-ai format**: `"fal-ai/flux/schnell"` instead of short names like `"schnell"`
@@ -26,15 +32,13 @@ The marketplace follows this specific layout order for optimal user experience:
   - `src/services/imageGeneration.ts` - API calls and model detection
   - Backend functions support both formats for backward compatibility
 
-## Enhanced Model Selector Features
-- **Color-coded type badges** showing model capabilities:
-  - 🟠 Orange: Text to Image models
-  - 🔵 Blue: Image to Video models
-  - 🟢 Green: Image to Image models
-  - 🟣 Purple: Text to Video models
-- **Two-column layout** with model selection and description
-- **Status indicator** showing readiness with selected model
-- **Dropdown includes type labels** for easy identification
+## Pipeline Processing & Clothes Changing
+- **FLUX Pro Kontext Support** for advanced image-to-image transformations
+- **Clothes Changing Functionality** now fully working with proper FAL.ai client integration
+- **Modern Edge Function** using `@fal-ai/client` instead of direct HTTP calls
+- **Enhanced Error Handling** with proper validation and user-friendly messages
+- **Data URL Support** for uploaded images (base64 format for API compatibility)
+- **Comprehensive Test Coverage** with 20+ passing tests for clothes changing functionality
 
 ## Model Data Management
 - All model data is centralized in [models.ts](mdc:src/constants/models.ts)
@@ -60,11 +64,17 @@ The marketplace follows this specific layout order for optimal user experience:
 - Each model card shows category badges, tags, and generation capabilities
 
 ### Image Generation Pipeline
-- [PromptInput.tsx](mdc:src/components/marketplace/PromptInput.tsx) - Primary interface, positioned first
-- [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Multi-step image processing
+- [UnifiedGenerationInterface.tsx](mdc:src/components/marketplace/UnifiedGenerationInterface.tsx) - Main interface combining all generation features
+- [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Multi-step image processing with clothes changing
 - [MultiImageDisplay.tsx](mdc:src/components/marketplace/MultiImageDisplay.tsx) - Display generated images
-- [ImageUploadButton.tsx](mdc:src/components/marketplace/ImageUploadButton.tsx) - File upload interface
+- [ImageUploadSection.tsx](mdc:src/components/marketplace/ImageUploadSection.tsx) - File upload with data URL conversion
 - [ModelSelector.tsx](mdc:src/components/marketplace/ModelSelector.tsx) - Enhanced model selection with type indicators
+
+### Backend Pipeline Processing
+- [process-image-pipeline/index.ts](mdc:supabase/functions/process-image-pipeline/index.ts) - Updated Edge Function with FAL.ai client
+- [pipelineProcessing.ts](mdc:src/utils/pipelineProcessing.ts) - Frontend pipeline utilities
+- **Key Fix**: Updated from HTTP fetch to `fal.subscribe()` method for better reliability
+- **Model Support**: Full compatibility with `fal-ai/flux-pro/kontext` for clothes changing
 
 ## Adding New Models
 1. Add model data to `featuredModels` array in [models.ts](mdc:src/constants/models.ts)

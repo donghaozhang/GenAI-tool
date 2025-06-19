@@ -1,35 +1,17 @@
-
 import React from 'react';
+import { getCategoryCounts } from '../../constants/models';
 
 interface CategoryFilterProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
 }
 
-const categories = [
-  { name: 'Audio to Audio', count: 6 },
-  { name: 'Audio to Video', count: 1 },
-  { name: 'Image to 3D', count: 12 },
-  { name: 'Image to Image', count: 180 },
-  { name: 'Image to JSON', count: 1 },
-  { name: 'Image to Video', count: 71 },
-  { name: 'JSON', count: 2 },
-  { name: 'Large Language Models', count: 2 },
-  { name: 'Speech to Speech', count: 2 },
-  { name: 'Speech to Text', count: 8 },
-  { name: 'Text to Audio', count: 25 },
-  { name: 'Text to Image', count: 91 },
-  { name: 'Text to Speech', count: 9 },
-  { name: 'Text to Video', count: 56 },
-  { name: 'Training', count: 12 },
-  { name: 'Video to Video', count: 41 },
-  { name: 'Vision', count: 22 },
-];
-
 export const CategoryFilter: React.FC<CategoryFilterProps> = ({
   selectedCategory,
   onCategoryChange,
 }) => {
+  const categories = getCategoryCounts();
+
   return (
     <div className="bg-gray-800 rounded-lg p-6">
       <h3 className="text-lg font-semibold mb-4">Category</h3>

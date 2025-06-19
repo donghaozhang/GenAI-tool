@@ -4,6 +4,8 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Upload, Sparkles, Image, Video, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateImageWithModel } from '@/services/imageGeneration';
+import { processImagePipeline } from '@/utils/pipelineProcessing';
 
 interface UnifiedGenerationInterfaceProps {
   onImagesGenerated: (imageUrls: string[], prompt: string) => void;
@@ -14,7 +16,7 @@ const models = [
   { id: 'fal-ai/flux/schnell', name: 'FLUX Schnell', description: 'Fast high-quality generation', type: 'Text to Image', icon: Image },
   { id: 'fal-ai/flux-pro', name: 'FLUX Pro', description: 'Premium quality images', type: 'Text to Image', icon: Image },
   { id: 'fal-ai/imagen-4-preview', name: 'Imagen 4', description: 'Google\'s latest model', type: 'Text to Image', icon: Image },
-  { id: 'fal-ai/flux-pro-kontext', name: 'FLUX Pro Kontext', description: 'Image-to-image transformation', type: 'Image to Image', icon: Wand2 },
+  { id: 'fal-ai/flux-pro/kontext', name: 'FLUX Pro Kontext', description: 'Image-to-image transformation', type: 'Image to Image', icon: Wand2 },
   { id: 'fal-ai/kling-video/v2.1/standard/image-to-video', name: 'Kling Video Standard', description: 'Image to video generation', type: 'Image to Video', icon: Video },
   { id: 'fal-ai/kling-video/v2.1/master/image-to-video', name: 'Kling Video Master', description: 'High-quality image to video', type: 'Image to Video', icon: Video },
 ];
@@ -29,6 +31,7 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageCount, setImageCount] = useState(1);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedImageDataUrl, setUploadedImageDataUrl] = useState<string | null>(null);
 
   const currentModel = models.find(model => model.id === selectedModel) || models[0];
   const IconComponent = currentModel.icon;
@@ -71,18 +74,30 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
 
     setIsGenerating(true);
     try {
-      // Simulate API call - replace with actual implementation
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const isTextToImage = currentModel.type === 'Text to Image';
       
-      // Mock generated images
-      const mockImages = Array(imageCount).fill(0).map((_, i) => 
-        `https://picsum.photos/512/512?random=${Date.now()}-${i}`
-      );
-      
-      onImagesGenerated(mockImages, prompt || 'Image transformation');
-      toast.success(`Generated ${imageCount} image(s) successfully!`);
+      if (isTextToImage) {
+        // Use generateImageWithModel for text-to-image models
+        console.log(`Generating ${imageCount} images with ${selectedModel}`);
+        const imageUrls = await generateImageWithModel(selectedModel, prompt, imageCount);
+        onImagesGenerated(imageUrls, prompt);
+        toast.success(`Generated ${imageCount} image(s) successfully!`);
+      } else {
+        // Use processImagePipeline for image-to-image and image-to-video models
+        if (!uploadedImageDataUrl) {
+          toast.error('Please upload an image first');
+          return;
+        }
+        
+        console.log(`Processing pipeline with ${selectedModel}`);
+        const outputUrl = await processImagePipeline(selectedModel, uploadedImageDataUrl, prompt);
+        onImagesGenerated([outputUrl], prompt || 'Image transformation');
+        toast.success('Image processing completed successfully!');
+      }
     } catch (error) {
-      toast.error('Failed to generate images');
+      console.error('Generation error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Failed to generate: ${errorMessage}`);
     } finally {
       setIsGenerating(false);
     }
@@ -92,11 +107,14 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
     const file = event.target.files?.[0];
     if (file) {
       setUploadedFile(file);
+      onFileUploaded(file);
       
-      // Convert file to data URL for external API compatibility
+      // Convert file to data URL for pipeline processing
       const reader = new FileReader();
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
+        setUploadedImageDataUrl(dataUrl);
+        // Also show the uploaded image in the display
         onImagesGenerated([dataUrl], `Uploaded: ${file.name}`);
       };
       reader.readAsDataURL(file);

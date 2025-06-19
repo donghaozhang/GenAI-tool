@@ -1,15 +1,25 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { fal } from "npm:@fal-ai/client";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 interface ProcessImagePipelineParams {
   modelId: string;
   sourceImageUrl?: string;
   prompt?: string;
+}
+
+interface StatusCheckParams {
+  action: 'status';
+  statusUrl: string;
+}
+
+interface ResultFetchParams {
+  action: 'result';
+  responseUrl: string;
 }
 
 // Helper function to validate image URL
@@ -28,202 +38,266 @@ const isValidImageUrl = (url: string): boolean => {
   }
 };
 
-serve(async (req) => {
-  // Handle CORS preflight requests
+serve(async (req: Request) => {
+  // Handle CORS preflight request
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders, status: 200 });
   }
 
   try {
+    // Check for required environment variables
     const FAL_API_KEY = Deno.env.get('FAL_API_KEY');
-    
     if (!FAL_API_KEY) {
-      throw new Error('FAL_API_KEY not found in environment variables');
+      console.error('FAL_API_KEY environment variable not set');
+      return new Response(
+        JSON.stringify({ error: 'FAL_API_KEY not configured' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 500 
+        }
+      );
     }
 
-    // Configure FAL client
-    fal.config({
-      credentials: FAL_API_KEY
-    });
+    const requestBody = await req.json();
+    
+    // Add a test endpoint to verify API key configuration
+    if (requestBody.action === 'test') {
+      return new Response(
+        JSON.stringify({ 
+          status: 'success',
+          success: true, 
+          message: 'FAL_API_KEY is configured',
+          keyLength: FAL_API_KEY.length,
+          keyPrefix: FAL_API_KEY.substring(0, 8) + '...'
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 200 
+        }
+      );
+    }
+    
+    // Check if this is a status check request with exact URL
+    if (requestBody.action === 'status' && requestBody.statusUrl) {
+      return await handleStatusCheckWithUrl(requestBody.statusUrl, FAL_API_KEY);
+    }
+    
+    // Check if this is a result fetch request with exact URL
+    if (requestBody.action === 'result' && requestBody.responseUrl) {
+      return await handleResultFetchWithUrl(requestBody.responseUrl, FAL_API_KEY);
+    }
 
-    const { modelId, sourceImageUrl, prompt }: ProcessImagePipelineParams = await req.json();
+    const { modelId, sourceImageUrl, prompt }: ProcessImagePipelineParams = requestBody;
 
     console.log(`Processing pipeline for model: ${modelId}`);
-    console.log(`Source image URL: ${sourceImageUrl ? 'provided' : 'not provided'}`);
-    console.log(`Source image URL type: ${sourceImageUrl?.startsWith('data:') ? 'data URL' : sourceImageUrl?.startsWith('http') ? 'HTTP URL' : 'unknown'}`);
+    console.log(`Source image URL provided: ${!!sourceImageUrl}`);
     console.log(`Prompt: ${prompt}`);
 
-    // Validate required inputs
+    // Validate inputs
     if (!modelId) {
-      throw new Error('Model ID is required');
+      return new Response(
+        JSON.stringify({ error: 'Model ID is required' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 400 
+        }
+      );
     }
 
-    // Validate source image URL format if provided
     if (sourceImageUrl && !isValidImageUrl(sourceImageUrl)) {
-      throw new Error('Invalid image URL format. Expected data URL or HTTP/HTTPS URL.');
+      return new Response(
+        JSON.stringify({ error: 'Invalid image URL format' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 400 
+        }
+      );
     }
 
-    let falModelId = '';
-    let input: any = {};
-
-    // Configure FAL model ID and input based on model
-    console.log('Configuring FAL model for:', modelId);
+    // Build the input for the FAL model
+    const input: any = {};
     
-    switch (modelId) {
-      case 'fal-ai/kling-video/v2.1/standard/image-to-video':
-      case 'kling-video':
-        if (!sourceImageUrl) {
-          throw new Error('Source image URL is required for image-to-video models');
-        }
-        falModelId = 'fal-ai/kling-video/v2.1/standard/image-to-video';
-        input = {
-          image_url: sourceImageUrl,
-          prompt: prompt || 'Convert this image to a smooth video with natural motion',
-          duration: 5,
-          aspect_ratio: '16:9'
-        };
-        break;
-      
-      case 'fal-ai/flux-pro':
-      case 'flux-pro':
-        if (!sourceImageUrl) {
-          throw new Error('Source image URL is required for image-to-image models');
-        }
-        falModelId = 'fal-ai/flux-pro';
-        input = {
-          image_url: sourceImageUrl,
-          prompt: prompt || 'Enhance this image with better quality and details',
-          image_size: 'square_hd',
-          num_inference_steps: 28,
-          guidance_scale: 3.5,
-          strength: 0.8
-        };
-        break;
-      
-      case 'fal-ai/flux-pro/kontext':
-      case 'flux-pro-kontext':
-        if (!sourceImageUrl) {
-          throw new Error('Source image URL is required for image-to-image models');
-        }
-        falModelId = 'fal-ai/flux-pro/kontext';
-        input = {
-          prompt: prompt || 'Modify and enhance this image with contextual understanding',
-          image_url: sourceImageUrl,
-          guidance_scale: 3.5,
-          num_images: 1,
-          safety_tolerance: 2,
-          output_format: 'jpeg'
-        };
-        break;
-      
-      case 'fal-ai/imagen-4-preview':
-      case 'imagen4':
-        // For Imagen 4, use it as text-to-image if no source image
-        if (sourceImageUrl) {
-          falModelId = 'fal-ai/flux/schnell';
-          input = {
-            image_url: sourceImageUrl,
-            prompt: prompt || 'Create a variation of this image with similar style and composition',
-            image_size: 'square_hd',
-            num_inference_steps: 4,
-            guidance_scale: 3.5,
-            strength: 0.75
-          };
-        } else {
-          falModelId = 'fal-ai/flux/schnell';
-          input = {
-            prompt: prompt || 'Create a high-quality image',
-            image_size: 'square_hd',
-            num_inference_steps: 4,
-            guidance_scale: 3.5
-          };
-        }
-        break;
-      
-      case 'fal-ai/aura-sr':
-      case 'aura-sr':
-        if (!sourceImageUrl) {
-          throw new Error('Source image URL is required for super-resolution models');
-        }
-        falModelId = 'fal-ai/aura-sr';
-        input = {
-          image_url: sourceImageUrl,
-          scale_factor: 4
-        };
-        break;
-      
-      case 'fal-ai/bytedance/seedance/v1/lite/text-to-video':
-      case 'seedance-text-to-video':
-        falModelId = 'fal-ai/bytedance/seedance/v1/lite/text-to-video';
-        input = {
-          prompt: prompt || 'Create a beautiful video with smooth motion',
-          duration: 5,
-          aspect_ratio: '16:9',
-          fps: 24
-        };
-        break;
-      
-      case 'fal-ai/hunyuan3d-v21':
-      case 'hunyuan3d-v21':
-        if (!sourceImageUrl) {
-          throw new Error('Source image URL is required for 3D generation models');
-        }
-        falModelId = 'fal-ai/hunyuan3d-v21';
-        input = {
-          input_image_url: sourceImageUrl,
-          num_inference_steps: 50,
-          guidance_scale: 7.5,
-          octree_resolution: 256,
-          textured_mesh: true
-        };
-        break;
-      
-      default:
-        console.error('Unsupported model ID:', modelId);
-        throw new Error(`Unsupported model: ${modelId}. Available models: fal-ai/kling-video/v2.1/standard/image-to-video, fal-ai/flux-pro, fal-ai/flux-pro/kontext, fal-ai/imagen-4-preview, fal-ai/aura-sr, fal-ai/bytedance/seedance/v1/lite/text-to-video, fal-ai/hunyuan3d-v21`);
+    if (prompt) {
+      input.prompt = prompt;
     }
 
-    console.log(`Making request with FAL model: ${falModelId}`);
-    console.log(`Input keys:`, Object.keys(input));
-    console.log(`Image URL format:`, sourceImageUrl ? (sourceImageUrl.startsWith('data:') ? 'data URL' : 'HTTP URL') : 'none');
+    // Add image URL for image-to-image models
+    if (sourceImageUrl) {
+      // For FLUX Pro Kontext and similar models, the image field might be named differently
+      if (modelId.includes('flux-pro/kontext')) {
+        input.image_url = sourceImageUrl;
+      } else {
+        input.image_url = sourceImageUrl;
+      }
+    }
 
-    // Use FAL client to subscribe to the model
-    const result = await fal.subscribe(falModelId, {
-      input: input,
-      logs: true
+    console.log(`Making request to FAL queue with model: ${modelId}`);
+    console.log(`Input payload:`, JSON.stringify(input, null, 2));
+
+    // Make request to FAL queue API
+    const falResponse = await fetch(`https://queue.fal.run/${modelId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Key ${FAL_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(input),
     });
 
-    console.log('Pipeline processing successful:', result);
-    const data = result.data;
+    console.log(`FAL API response status: ${falResponse.status}`);
 
-    // Extract the output URL based on the model type
-    let outputUrl = '';
-    if (modelId.includes('kling-video') || modelId.includes('seedance')) {
-      outputUrl = data.video?.url || data.video_url || '';
-    } else if (modelId.includes('hunyuan3d')) {
-      outputUrl = data.model_mesh?.url || '';
-    } else {
-      outputUrl = data.images?.[0]?.url || data.image?.url || '';
+    if (!falResponse.ok) {
+      const errorText = await falResponse.text();
+      console.error(`FAL API error: ${errorText}`);
+      return new Response(
+        JSON.stringify({ 
+          error: `FAL API request failed with status ${falResponse.status}`,
+          details: errorText
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: 500 
+        }
+      );
     }
 
-    if (!outputUrl) {
-      console.error('No output URL found in response data:', data);
-      throw new Error('No output URL found in response');
-    }
+    const queueResult = await falResponse.json();
+    console.log('FAL queue submission successful:', queueResult);
 
-    console.log('Successfully extracted output URL:', outputUrl);
-
-    return new Response(JSON.stringify({ outputUrl }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  } catch (error) {
-    console.error('Error in process-image-pipeline function:', error);
+    // The queue API returns a request_id and exact status URLs
+    // Return these exact URLs to be used by the client
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      JSON.stringify({
+        success: true,
+        requestId: queueResult.request_id,
+        statusUrl: queueResult.status_url,
+        responseUrl: queueResult.response_url,
+        message: 'Request submitted to FAL queue successfully'
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: 200 
+      }
+    );
+
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message 
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: 500 
       }
     );
   }
 });
+
+// Helper function to check status using exact URL from FAL
+async function handleStatusCheckWithUrl(statusUrl: string, apiKey: string) {
+  try {
+    console.log(`Checking status at URL: ${statusUrl}`);
+    console.log(`Using API key: ${apiKey.substring(0, 8)}...`);
+    
+    const statusResponse = await fetch(statusUrl, {
+      headers: {
+        'Authorization': `Key ${apiKey}`,
+      },
+    });
+
+    console.log(`Status response status: ${statusResponse.status}`);
+    console.log(`Status response headers:`, [...statusResponse.headers.entries()]);
+
+    if (!statusResponse.ok) {
+      const errorText = await statusResponse.text();
+      console.error(`Status check failed: ${statusResponse.status}`);
+      console.error(`Status check error details: ${errorText}`);
+      
+      // Return more detailed error information
+      return new Response(
+        JSON.stringify({ 
+          error: `Status check failed: ${statusResponse.status}`, 
+          details: errorText,
+          url: statusUrl,
+          apiKeyPrefix: apiKey.substring(0, 8) + '...'
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: statusResponse.status 
+        }
+      );
+    }
+
+    const statusData = await statusResponse.json();
+    console.log('Status check successful:', statusData);
+    
+    return new Response(
+      JSON.stringify(statusData),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: 200 
+      }
+    );
+  } catch (error) {
+    console.error('Error checking status:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: 'Failed to check status', 
+        details: error.message,
+        url: statusUrl
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: 500 
+      }
+    );
+  }
+}
+
+// Helper function to fetch results using exact URL from FAL
+async function handleResultFetchWithUrl(responseUrl: string, apiKey: string) {
+  try {
+    console.log(`Fetching result at URL: ${responseUrl}`);
+    
+    const resultResponse = await fetch(responseUrl, {
+      headers: {
+        'Authorization': `Key ${apiKey}`,
+      },
+    });
+
+    if (!resultResponse.ok) {
+      console.error(`Result fetch failed: ${resultResponse.status}`);
+      const errorText = await resultResponse.text();
+      console.error(`Result fetch error details: ${errorText}`);
+      return new Response(
+        JSON.stringify({ error: `Result fetch failed: ${resultResponse.status}`, details: errorText }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: resultResponse.status 
+        }
+      );
+    }
+
+    const resultData = await resultResponse.json();
+    console.log('Result fetch successful:', resultData);
+    
+    return new Response(
+      JSON.stringify(resultData),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: 200 
+      }
+    );
+  } catch (error) {
+    console.error('Error fetching result:', error);
+    return new Response(
+      JSON.stringify({ error: 'Failed to fetch result', details: error.message }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+        status: 500 
+      }
+    );
+  }
+}

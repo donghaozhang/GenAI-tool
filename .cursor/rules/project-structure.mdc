@@ -80,3 +80,4 @@ src/__tests__/
 - **Data URL support** for uploaded images (base64 format for API compatibility)
 - **Comprehensive test coverage** ensuring reliability and functionality
 
+

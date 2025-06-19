@@ -5,7 +5,6 @@ import { ModelGrid } from '../components/marketplace/ModelGrid';
 import { TrendingSection } from '../components/marketplace/TrendingSection';
 import { MultiImageDisplay } from '../components/marketplace/MultiImageDisplay';
 import { UnifiedGenerationInterface } from '../components/marketplace/UnifiedGenerationInterface';
-import { ImagePipeline } from '../components/marketplace/ImagePipeline';
 import { toast } from 'sonner';
 
 const AIModelMarketplace = () => {
@@ -13,7 +12,6 @@ const AIModelMarketplace = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [generationPrompt, setGenerationPrompt] = useState('');
-  const [showPipeline, setShowPipeline] = useState(false);
 
   const handleImagesGenerated = (imageUrls: string[], prompt: string) => {
     setGeneratedImages(prev => [...prev, ...imageUrls]);
@@ -50,30 +48,13 @@ const AIModelMarketplace = () => {
           onFileUploaded={handleFileUploaded}
         />
 
-        {/* Image Display */}
+        {/* Image Display with Built-in Pipeline */}
         {allImages.length > 0 && (
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white">Generated Images ({allImages.length})</h3>
-              <button
-                onClick={() => setShowPipeline(!showPipeline)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
-              >
-                <span>🔧</span>
-                {showPipeline ? 'Hide Pipeline' : 'Show Pipeline'}
-              </button>
-            </div>
             <MultiImageDisplay 
               images={allImages}
               prompt={generationPrompt}
             />
-          </div>
-        )}
-
-        {/* Pipeline Processing */}
-        {showPipeline && allImages.length > 0 && (
-          <div className="mb-8">
-            <ImagePipeline />
           </div>
         )}
 

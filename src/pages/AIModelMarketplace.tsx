@@ -56,7 +56,7 @@ const AIModelMarketplace = () => {
           <p className="text-gray-400">Discover and use cutting-edge AI models with pipeline capabilities</p>
         </div>
 
-        {/* Model Selector */}
+        {/* Model Selector - Moved to the very top */}
         <ModelSelector 
           selectedModel={selectedModel}
           onModelChange={handleModelChange}

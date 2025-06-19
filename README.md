@@ -1,33 +1,34 @@
-# Welcome to your Lovable project
+# GenAI-tool - AI Model Marketplace
 
-## Project info
+A comprehensive platform for discovering and using cutting-edge AI models with advanced pipeline capabilities.
 
-**URL**: https://lovable.dev/projects/729c2caa-46ac-45e9-bfcd-c99453b72fb8
+## 🚀 Project Overview
 
-## How can I edit this code?
+GenAI-tool is a modern web application that provides a marketplace for AI models, featuring:
+- **AI Model Discovery**: Browse and explore various AI models
+- **Image Generation**: Create images using state-of-the-art AI models
+- **Pipeline Processing**: Advanced AI processing workflows
+- **User Authentication**: Secure user management with Supabase
+- **Real-time Processing**: Dynamic AI model execution
 
-There are several ways of editing your application.
+**Repository**: https://github.com/donghaozhang/GenAI-tool
 
-**Use Lovable**
+## 🛠️ Getting Started
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/729c2caa-46ac-45e9-bfcd-c99453b72fb8) and start prompting.
+### Prerequisites
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js (v18 or higher)
+- npm or yarn
+- Git
 
-**Use your preferred IDE**
+### Installation
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```bash
+# Step 1: Clone the repository
+git clone https://github.com/donghaozhang/GenAI-tool.git
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Step 2: Navigate to the project directory
+cd GenAI-tool
 
 # Step 3: Set up environment variables.
 cp .env.example .env
@@ -40,19 +41,24 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 🎯 Features
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Core Functionality
+- **AI Model Marketplace**: Browse and discover various AI models
+- **Image Generation**: Generate images using FLUX, DALL-E, and other models
+- **Video Processing**: Create videos from images using Kling Video
+- **3D Model Generation**: Generate 3D models with Hunyuan3D
+- **Audio Generation**: Create audio using ElevenLabs
+- **Background Removal**: Remove backgrounds from images
+- **Upscaling**: Enhance image quality with Aura SR
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Technical Features
+- **Secure Authentication**: User management with Supabase
+- **Environment Variables**: Secure configuration management
+- **TypeScript**: Full type safety
+- **Modern UI**: Built with shadcn/ui and Tailwind CSS
+- **Responsive Design**: Works on desktop and mobile
+- **Real-time Processing**: Dynamic AI model execution
 
 ## Environment Setup
 
@@ -84,14 +90,43 @@ This project is built with:
 - Tailwind CSS
 - Supabase (Backend & Authentication)
 
-## How can I deploy this project?
+## 🚀 Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/729c2caa-46ac-45e9-bfcd-c99453b72fb8) and click on Share -> Publish.
+### Vercel (Recommended)
+1. Fork this repository
+2. Connect your GitHub account to Vercel
+3. Import the project
+4. Set up environment variables in Vercel dashboard
+5. Deploy
 
-## Can I connect a custom domain to my Lovable project?
+### Other Platforms
+- **Netlify**: Connect GitHub repo and set environment variables
+- **Railway**: Deploy directly from GitHub
+- **Render**: Connect repository and configure environment
 
-Yes, you can!
+## 📝 API Documentation
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+The project includes several Supabase Edge Functions:
+- `/functions/process-image-pipeline` - Main AI processing pipeline
+- `/functions/generate-pokemon-images` - Pokemon image generation
+- `/functions/process-elevenlabs-video` - Audio processing
+- `/functions/chat-with-gpt` - Chat completions
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Supabase](https://supabase.com) for backend services
+- [FAL.ai](https://fal.ai) for AI model APIs
+- [ElevenLabs](https://elevenlabs.io) for audio generation
+- [shadcn/ui](https://ui.shadcn.com) for UI components

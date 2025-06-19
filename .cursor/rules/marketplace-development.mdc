@@ -18,8 +18,10 @@ The AI marketplace is the core feature of this application, providing users with
 ### CategoryFilter Component
 - [CategoryFilter.tsx](mdc:src/components/marketplace/CategoryFilter.tsx) dynamically calculates category counts
 - Uses `getCategoryCounts()` function from [models.ts](mdc:src/constants/models.ts)
-- Categories with no models show "0" count
-- Supports checkbox-style filtering
+- Categories with no models show "0" count and are automatically disabled
+- Disabled categories have reduced opacity and cannot be selected
+- Supports checkbox-style filtering with proper accessibility features
+- Visual feedback for disabled states (cursor: not-allowed, opacity: 50%)
 
 ### ModelGrid and ModelCard
 - [ModelGrid.tsx](mdc:src/components/marketplace/ModelGrid.tsx) handles filtering and display logic
@@ -38,6 +40,7 @@ The AI marketplace is the core feature of this application, providing users with
 2. Ensure `categoryLabel` matches one of the categories in `allCategories`
 3. Category counts will update automatically
 4. Model will appear in the grid and be filterable
+5. Categories will be enabled/disabled based on model availability
 
 ## API Integration
 - Image generation services in [imageGeneration.ts](mdc:src/services/imageGeneration.ts)
@@ -49,3 +52,4 @@ The AI marketplace is the core feature of this application, providing users with
 - Dark theme with gray-800/gray-900 backgrounds
 - Blue accent colors for interactive elements
 - Consistent spacing and hover effects
+- Disabled states use opacity-50 and cursor-not-allowed

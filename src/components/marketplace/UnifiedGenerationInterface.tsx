@@ -92,7 +92,6 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
     const file = event.target.files?.[0];
     if (file) {
       setUploadedFile(file);
-      onFileUploaded(file);
       
       // Create URL for the uploaded image and display it immediately
       const imageUrl = URL.createObjectURL(file);

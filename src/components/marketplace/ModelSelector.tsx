@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface ModelSelectorProps {
   selectedModel: string;
@@ -8,10 +7,10 @@ interface ModelSelectorProps {
 }
 
 const models = [
-  { id: 'flux-schnell', name: 'FLUX Schnell', description: 'Fast high-quality generation' },
-  { id: 'flux-pro', name: 'FLUX Pro', description: 'Premium quality images' },
-  { id: 'imagen4', name: 'Imagen 4', description: 'Google\'s latest model' },
-  { id: 'kling-video', name: 'Kling Video', description: 'Image to video generation' },
+  { id: 'fal-ai/flux/schnell', name: 'FLUX Schnell', description: 'Fast high-quality generation' },
+  { id: 'fal-ai/flux-pro', name: 'FLUX Pro', description: 'Premium quality images' },
+  { id: 'fal-ai/imagen-4-preview', name: 'Imagen 4', description: 'Google\'s latest model' },
+  { id: 'fal-ai/kling-video/v2.1/standard/image-to-video', name: 'Kling Video', description: 'Image to video generation' },
 ];
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelChange }) => {
@@ -45,12 +44,8 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onM
         </Select>
       </div>
       
-      <div className="bg-gray-700 rounded p-3">
-        <p className="text-sm text-gray-300">{currentModel.description}</p>
-        <div className="mt-2 flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-          <span className="text-xs text-green-400">Model: {currentModel.name} selected</span>
-        </div>
+      <div className="text-sm text-gray-400">
+        {currentModel.description}
       </div>
     </div>
   );

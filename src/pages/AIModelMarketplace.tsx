@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SearchBar } from '../components/marketplace/SearchBar';
 import { CategoryFilter } from '../components/marketplace/CategoryFilter';
@@ -16,7 +15,7 @@ const AIModelMarketplace = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('Most relevant');
   const [generatedImageUrls, setGeneratedImageUrls] = useState<string[]>([]);
-  const [selectedModel, setSelectedModel] = useState('flux-schnell');
+  const [selectedModel, setSelectedModel] = useState('fal-ai/flux/schnell');
   const [currentPrompt, setCurrentPrompt] = useState('');
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
   const [showPipeline, setShowPipeline] = useState(false);
@@ -83,42 +82,49 @@ const AIModelMarketplace = () => {
           />
         </div>
 
-        {/* Generated Images Display with Pipeline */}
-        {generatedImageUrls.length > 0 && (
+        {/* Image Display Section */}
+        {(generatedImageUrls.length > 0 || uploadedFile) && (
           <div className="mb-8">
             <MultiImageDisplay 
-              imageUrls={generatedImageUrls} 
+              imageUrls={generatedImageUrls}
               prompt={currentPrompt}
+              uploadedFile={uploadedFile}
             />
           </div>
         )}
 
-        {/* Uploaded File Pipeline */}
-        {uploadedFile && showPipeline && (
+        {/* Pipeline Section */}
+        {(generatedImageUrls.length > 0 || uploadedFile) && (
           <div className="mb-8">
-            <ImagePipeline sourceImageUrl={uploadedFile} />
+            <ImagePipeline 
+              sourceImages={generatedImageUrls.length > 0 ? generatedImageUrls : (uploadedFile ? [uploadedFile] : [])}
+              isVisible={showPipeline}
+              onToggle={() => setShowPipeline(!showPipeline)}
+            />
           </div>
         )}
 
         {/* Trending Section */}
-        <TrendingSection />
+        <div className="mb-8">
+          <TrendingSection />
+        </div>
 
-        {/* Main Content */}
-        <div className="flex gap-8 mt-12">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
-          <div className="w-80 flex-shrink-0">
-            <SearchBar 
-              value={searchQuery} 
-              onChange={setSearchQuery} 
-            />
+          <div className="lg:col-span-1">
+            <div className="mb-6">
+              <SearchBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+            </div>
+            
             <CategoryFilter 
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
             />
           </div>
 
-          {/* Main Content Area */}
-          <div className="flex-1">
+          {/* Main Content */}
+          <div className="lg:col-span-3">
             {/* Featured Models Header */}
             <div className="flex justify-between items-center mb-6">
               <div>
@@ -126,8 +132,9 @@ const AIModelMarketplace = () => {
                 <p className="text-gray-400">Check out some of our most popular models</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-gray-400">Sort by</span>
+                <label htmlFor="sort-by" className="text-gray-400">Sort by</label>
                 <select 
+                  id="sort-by"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   className="bg-gray-800 border border-gray-700 rounded px-3 py-1 text-white"

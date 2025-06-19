@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -36,6 +35,7 @@ serve(async (req) => {
 
     // Configure API endpoint and request body based on model
     switch (modelId) {
+      case 'fal-ai/kling-video/v2.1/standard/image-to-video':
       case 'kling-video':
         apiEndpoint = 'https://fal.run/fal-ai/kling-video/v2.1/standard/image-to-video';
         requestBody = {
@@ -46,6 +46,7 @@ serve(async (req) => {
         };
         break;
       
+      case 'fal-ai/flux-pro':
       case 'flux-pro':
         apiEndpoint = 'https://fal.run/fal-ai/flux-pro';
         requestBody = {
@@ -58,6 +59,7 @@ serve(async (req) => {
         };
         break;
       
+      case 'fal-ai/flux-pro/kontext':
       case 'flux-pro-kontext':
         apiEndpoint = 'https://fal.run/fal-ai/flux-pro/kontext';
         requestBody = {
@@ -70,6 +72,7 @@ serve(async (req) => {
         };
         break;
       
+      case 'fal-ai/imagen-4-preview':
       case 'imagen4':
         apiEndpoint = 'https://fal.run/fal-ai/flux/schnell';
         requestBody = {
@@ -80,6 +83,7 @@ serve(async (req) => {
         };
         break;
       
+      case 'fal-ai/aura-sr':
       case 'aura-sr':
         apiEndpoint = 'https://fal.run/fal-ai/aura-sr';
         requestBody = {
@@ -88,6 +92,7 @@ serve(async (req) => {
         };
         break;
       
+      case 'fal-ai/bytedance/seedance/v1/lite/text-to-video':
       case 'seedance-text-to-video':
         apiEndpoint = 'https://fal.run/fal-ai/bytedance/seedance/v1/lite/text-to-video';
         requestBody = {
@@ -98,6 +103,7 @@ serve(async (req) => {
         };
         break;
       
+      case 'fal-ai/hunyuan3d-v21':
       case 'hunyuan3d-v21':
         apiEndpoint = 'https://fal.run/fal-ai/hunyuan3d-v21';
         requestBody = {
@@ -136,9 +142,9 @@ serve(async (req) => {
 
     // Extract the output URL based on the model type
     let outputUrl = '';
-    if (modelId === 'kling-video' || modelId === 'seedance-text-to-video') {
+    if (modelId.includes('kling-video') || modelId.includes('seedance')) {
       outputUrl = data.video?.url || data.video_url || '';
-    } else if (modelId === 'hunyuan3d-v21') {
+    } else if (modelId.includes('hunyuan3d')) {
       outputUrl = data.model_mesh?.url || '';
     } else {
       outputUrl = data.images?.[0]?.url || data.image?.url || '';

@@ -8,27 +8,50 @@ export interface GenerateImageParams {
   count?: number;
 }
 
-export const generatePokemonImage = async (pokemonType: string): Promise<string> => {
+export interface PokemonType {
+  id: string;
+  name: string;
+  color: string;
+  description: string;
+}
+
+export const pokemonTypes: PokemonType[] = [
+  { id: 'pikachu', name: 'Pikachu', color: 'bg-yellow-500', description: 'Electric mouse Pokemon' },
+  { id: 'squirtle', name: 'Squirtle', color: 'bg-blue-500', description: 'Water turtle Pokemon' },
+  { id: 'charmander', name: 'Charmander', color: 'bg-red-500', description: 'Fire lizard Pokemon' },
+  { id: 'bulbasaur', name: 'Bulbasaur', color: 'bg-green-500', description: 'Grass/poison Pokemon' },
+  { id: 'eevee', name: 'Eevee', color: 'bg-amber-600', description: 'Evolution Pokemon' },
+  { id: 'meowth', name: 'Meowth', color: 'bg-orange-400', description: 'Scratch cat Pokemon' },
+  { id: 'psyduck', name: 'Psyduck', color: 'bg-yellow-400', description: 'Duck Pokemon' },
+  { id: 'jigglypuff', name: 'Jigglypuff', color: 'bg-pink-400', description: 'Balloon Pokemon' },
+];
+
+export const generatePokemonImage = async (pokemonType: string, customPrompt?: string, count: number = 1): Promise<string[]> => {
   try {
-    console.log(`Generating image for ${pokemonType}...`);
+    console.log(`Generating ${count} Pokemon images for ${pokemonType}...`);
     
     const { data, error } = await supabase.functions.invoke('generate-pokemon-images', {
-      body: { pokemonType }
+      body: { 
+        pokemonType,
+        customPrompt,
+        count
+      }
     });
 
     if (error) {
       console.error('Supabase function error:', error);
-      throw new Error(`Failed to generate image: ${error.message}`);
+      throw new Error(`Failed to generate Pokemon images: ${error.message}`);
     }
 
-    if (!data?.imageUrl) {
-      throw new Error('No image URL returned from the function');
+    if (!data?.imageUrls && !data?.imageUrl) {
+      throw new Error('No image URLs returned from the function');
     }
 
-    console.log(`Image generated successfully for ${pokemonType}`);
-    return data.imageUrl;
+    const imageUrls = data.imageUrls || [data.imageUrl];
+    console.log(`${imageUrls.length} Pokemon images generated successfully`);
+    return imageUrls;
   } catch (error) {
-    console.error('Error generating Pokemon image:', error);
+    console.error('Error generating Pokemon images:', error);
     throw error;
   }
 };

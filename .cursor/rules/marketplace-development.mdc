@@ -7,10 +7,40 @@ alwaysApply: false
 
 The AI marketplace is the core feature of this application, providing users with access to various AI models.
 
+## Page Layout Order (AIModelMarketplace.tsx)
+The marketplace follows this specific layout order for optimal user experience:
+1. **Generate Images** (PromptInput) - Primary action, first after header
+2. **Model Selector** - Choose AI model with type indicators
+3. **Get Started** - Upload files as alternative input
+4. **Image Display** - Show generated/uploaded results
+5. **Pipeline Processing** - Multi-step image processing
+6. **Trending Section** - Popular model categories
+7. **Featured Models Grid** - Browse available models
+
+## Model ID Format Standards
+- **Always use full fal-ai format**: `"fal-ai/flux/schnell"` instead of short names like `"schnell"`
+- This applies to all model references in:
+  - `src/constants/models.ts` - Featured models array
+  - `src/constants/pipelineModels.ts` - Pipeline model configurations
+  - `src/components/marketplace/ModelSelector.tsx` - Model options
+  - `src/services/imageGeneration.ts` - API calls and model detection
+  - Backend functions support both formats for backward compatibility
+
+## Enhanced Model Selector Features
+- **Color-coded type badges** showing model capabilities:
+  - 🟠 Orange: Text to Image models
+  - 🔵 Blue: Image to Video models
+  - 🟢 Green: Image to Image models
+  - 🟣 Purple: Text to Video models
+- **Two-column layout** with model selection and description
+- **Status indicator** showing readiness with selected model
+- **Dropdown includes type labels** for easy identification
+
 ## Model Data Management
 - All model data is centralized in [models.ts](mdc:src/constants/models.ts)
 - Use the `FeaturedModel` interface for type safety
 - Category counts are automatically calculated from actual model data
+- Model ordering prioritizes: Text to Image → Image to Video → Others
 - To add new models, update the `featuredModels` array in [models.ts](mdc:src/constants/models.ts)
 
 ## Key Marketplace Components
@@ -30,26 +60,32 @@ The AI marketplace is the core feature of this application, providing users with
 - Each model card shows category badges, tags, and generation capabilities
 
 ### Image Generation Pipeline
-- [PromptInput.tsx](mdc:src/components/marketplace/PromptInput.tsx) - Text-to-image generation interface
+- [PromptInput.tsx](mdc:src/components/marketplace/PromptInput.tsx) - Primary interface, positioned first
 - [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Multi-step image processing
 - [MultiImageDisplay.tsx](mdc:src/components/marketplace/MultiImageDisplay.tsx) - Display generated images
 - [ImageUploadButton.tsx](mdc:src/components/marketplace/ImageUploadButton.tsx) - File upload interface
+- [ModelSelector.tsx](mdc:src/components/marketplace/ModelSelector.tsx) - Enhanced model selection with type indicators
 
 ## Adding New Models
 1. Add model data to `featuredModels` array in [models.ts](mdc:src/constants/models.ts)
-2. Ensure `categoryLabel` matches one of the categories in `allCategories`
-3. Category counts will update automatically
-4. Model will appear in the grid and be filterable
-5. Categories will be enabled/disabled based on model availability
+2. **Use full fal-ai format** for model ID (e.g., `"fal-ai/model-name"`)
+3. Include `type` field indicating model capability (Text to Image, Image to Video, etc.)
+4. Ensure `categoryLabel` matches one of the categories in `allCategories`
+5. Category counts will update automatically
+6. Model will appear in the grid and be filterable
+7. Categories will be enabled/disabled based on model availability
 
 ## API Integration
 - Image generation services in [imageGeneration.ts](mdc:src/services/imageGeneration.ts)
 - Pipeline processing utilities in [pipelineProcessing.ts](mdc:src/utils/pipelineProcessing.ts)
 - Background removal in [backgroundRemoval.ts](mdc:src/utils/backgroundRemoval.ts)
+- Backend functions in `supabase/functions/` support both full and short model ID formats
 
 ## Styling Guidelines
 - Use Tailwind CSS classes consistently
 - Dark theme with gray-800/gray-900 backgrounds
+- Color-coded badges for model types (orange, blue, green, purple)
 - Blue accent colors for interactive elements
 - Consistent spacing and hover effects
 - Disabled states use opacity-50 and cursor-not-allowed
+- Enhanced visual hierarchy with proper headings and status indicators

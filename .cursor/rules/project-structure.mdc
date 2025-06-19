@@ -13,7 +13,7 @@ This is a React + TypeScript + Vite application focused on AI model marketplace 
 - [Index.tsx](mdc:src/pages/Index.tsx) - Landing page that redirects authenticated users to marketplace
 
 ## Key Pages
-- [AIModelMarketplace.tsx](mdc:src/pages/AIModelMarketplace.tsx) - Main marketplace interface
+- [AIModelMarketplace.tsx](mdc:src/pages/AIModelMarketplace.tsx) - Main marketplace interface with optimized layout
 - [NotFound.tsx](mdc:src/pages/NotFound.tsx) - 404 page with AI marketplace theme
 
 ## Core Components Structure
@@ -25,19 +25,41 @@ src/components/
 └── UserProfile.tsx - User profile component
 ```
 
-## Important Marketplace Components
+## Important Marketplace Components (Layout Order)
+- [PromptInput.tsx](mdc:src/components/marketplace/PromptInput.tsx) - Primary interface, positioned first after header
+- [ModelSelector.tsx](mdc:src/components/marketplace/ModelSelector.tsx) - Enhanced model selection with color-coded type badges
+- [ImageUploadButton.tsx](mdc:src/components/marketplace/ImageUploadButton.tsx) - Alternative file upload interface
+- [MultiImageDisplay.tsx](mdc:src/components/marketplace/MultiImageDisplay.tsx) - Display generated/uploaded images
+- [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Multi-step image processing pipeline
+- [TrendingSection.tsx](mdc:src/components/marketplace/TrendingSection.tsx) - Popular model categories
 - [CategoryFilter.tsx](mdc:src/components/marketplace/CategoryFilter.tsx) - Dynamic category filtering with real model counts
-- [ModelGrid.tsx](mdc:src/components/marketplace/ModelGrid.tsx) - Displays featured AI models
+- [ModelGrid.tsx](mdc:src/components/marketplace/ModelGrid.tsx) - Featured AI models grid
 - [ModelCard.tsx](mdc:src/components/marketplace/ModelCard.tsx) - Individual model display cards
-- [PromptInput.tsx](mdc:src/components/marketplace/PromptInput.tsx) - Text-to-image generation interface
-- [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Image processing pipeline
 
 ## Data & Configuration
-- [models.ts](mdc:src/constants/models.ts) - Shared model data and category count calculations
+- [models.ts](mdc:src/constants/models.ts) - Centralized model data with full fal-ai format IDs
+- [pipelineModels.ts](mdc:src/constants/pipelineModels.ts) - Pipeline-specific model configurations
 - [env.ts](mdc:src/config/env.ts) - Centralized environment configuration
 - [client.ts](mdc:src/integrations/supabase/client.ts) - Supabase client setup
+
+## Service Layer
+- [imageGeneration.ts](mdc:src/services/imageGeneration.ts) - AI image generation with full model ID support
+- [pipelineProcessing.ts](mdc:src/utils/pipelineProcessing.ts) - Multi-step image processing
+- [backgroundRemoval.ts](mdc:src/utils/backgroundRemoval.ts) - Background removal utilities
 
 ## Authentication
 - [AuthContext.tsx](mdc:src/contexts/AuthContext.tsx) - Authentication state management
 - Authentication pages in [auth/](mdc:src/components/auth) directory
+
+## Backend Functions
+- `supabase/functions/process-image-pipeline/` - Handles image processing with model ID compatibility
+- `supabase/functions/generate-pokemon-images/` - Specialized image generation
+- `supabase/functions/process-elevenlabs-video/` - Video processing integration
+
+## Key Features
+- **Optimized user flow**: Generate Images → Model Selection → Upload → Display → Processing
+- **Full fal-ai model ID format** throughout the application
+- **Enhanced model selector** with type indicators and color coding
+- **Dynamic category filtering** with automatic count calculation and disabled states
+- **Comprehensive pipeline processing** with multiple AI model integrations
 

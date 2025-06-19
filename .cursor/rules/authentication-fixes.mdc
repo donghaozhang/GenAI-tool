@@ -1,0 +1,174 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Authentication and Pipeline Fixes
+
+This document contains critical fixes and patterns for the GenAI Tool authentication and image pipeline functionality.
+
+## 🔑 Authentication Architecture
+
+### FAL API Integration Pattern
+The application uses a **server-side proxy pattern** for FAL API authentication:
+
+1. **Client** → Supabase Edge Function → FAL API (with authentication)
+2. **Never** make direct client-side calls to FAL API endpoints
+3. **Always** use exact URLs returned by FAL API responses
+
+### Required Environment Variables
+- `FAL_API_KEY` must be set in Supabase Dashboard → Project Settings → Edge Functions → Environment Variables
+- Format: `key_id:secret_key` (from fal.ai dashboard)
+
+## 🛠 Critical Implementation Patterns
+
+### Edge Function Structure (`process-image-pipeline`)
+```typescript
+// REQUIRED: Support multiple action types
+if (requestBody.action === 'test') {
+  return { status: 'success', success: true };
+}
+
+if (requestBody.action === 'status' && requestBody.statusUrl) {
+  return await handleStatusCheckWithUrl(requestBody.statusUrl, FAL_API_KEY);
+}
+
+if (requestBody.action === 'result' && requestBody.responseUrl) {
+  return await handleResultFetchWithUrl(requestBody.responseUrl, FAL_API_KEY);
+}
+```
+
+### Client-Side Pipeline Processing
+```typescript
+// ✅ CORRECT: Use Edge Function for all FAL API calls
+const { data, error } = await supabase.functions.invoke('process-image-pipeline', {
+  body: { action: 'status', statusUrl: exactUrlFromFAL }
+});
+
+// ❌ WRONG: Direct client calls to FAL API
+const response = await fetch('https://queue.fal.run/requests/123/status');
+```
+
+## 🔗 URL Handling Rules
+
+### FAL API URL Format Requirements
+- **NEVER** construct FAL URLs manually
+- **ALWAYS** use exact URLs from FAL responses
+- URLs are model-specific: `https://queue.fal.run/fal-ai/flux-pro/requests/{id}/status`
+
+```typescript
+// ✅ CORRECT: Use exact URLs from FAL response
+const queueResult = await falResponse.json();
+const statusUrl = queueResult.status_url;  // Use this exact URL
+const responseUrl = queueResult.response_url;  // Use this exact URL
+
+// ❌ WRONG: Constructing URLs
+const statusUrl = `https://queue.fal.run/requests/${requestId}/status`;
+```
+
+## 🔧 Image Generation Routing
+
+### Model Type Detection
+```typescript
+const isTextToImage = currentModel.type === 'Text to Image';
+
+if (isTextToImage) {
+  // Text-to-image models → generateImageWithModel()
+  const imageUrls = await generateImageWithModel(selectedModel, prompt, imageCount);
+} else {
+  // Image-to-image/video models → processImagePipeline()
+  const outputUrl = await processImagePipeline(selectedModel, uploadedImageDataUrl, prompt);
+}
+```
+
+### Supported Model Types
+- **Text to Image**: FLUX Schnell, FLUX Pro, Imagen 4
+- **Image to Image**: FLUX Pro Kontext (`fal-ai/flux-pro/kontext`)
+- **Image to Video**: Kling Video models
+
+## 📁 File Upload Requirements
+
+### Data URL Conversion
+```typescript
+// REQUIRED: Convert files to data URLs for pipeline compatibility
+const reader = new FileReader();
+reader.onload = (e) => {
+  const dataUrl = e.target?.result as string;
+  setUploadedImageDataUrl(dataUrl);
+};
+reader.readAsDataURL(file);
+```
+
+## 🐛 Common Issues and Solutions
+
+### 401 Authentication Errors
+- **Cause**: Direct client calls to FAL API
+- **Solution**: Route all calls through Edge Function
+- **Check**: FAL_API_KEY environment variable is set
+
+### Wrong Model IDs
+- **Correct**: `fal-ai/flux-pro/kontext` (with forward slash)
+- **Wrong**: `fal-ai/flux-pro-kontext` (with hyphen)
+
+### Status Polling Failures
+- **Cause**: Using constructed URLs instead of exact FAL URLs
+- **Solution**: Pass exact `status_url` from FAL response to Edge Function
+
+## 🧪 Diagnostic Tools
+
+### Browser Console Test
+Location: `src/__tests__/diagnostics/PipelineDiagnostic.js`
+
+```javascript
+// Run in browser console to test pipeline
+runBrowserPipelineTest()
+```
+
+Tests:
+1. FAL API key configuration
+2. Pipeline submission
+3. Status polling with authentication
+4. Result fetching
+5. Complete end-to-end workflow
+
+## ⚠️ Security Requirements
+
+### API Key Handling
+- **NEVER** expose FAL API keys in client-side code
+- **ALWAYS** use server-side Edge Functions for API calls
+- **STORE** API keys only in Supabase environment variables
+
+### Error Response Handling
+```typescript
+// ✅ SAFE: Don't expose internal details
+return new Response(JSON.stringify({ 
+  error: 'Authentication failed',
+  // Don't include: API key, internal URLs, etc.
+}), { status: 401 });
+```
+
+## 🚀 Deployment Checklist
+
+Before deploying:
+1. ✅ FAL_API_KEY set in Supabase environment variables
+2. ✅ Edge Function deployed with latest authentication proxy code
+3. ✅ All model IDs use correct fal-ai format
+4. ✅ Pipeline routes through Edge Function (no direct FAL calls)
+5. ✅ File uploads convert to data URLs
+6. ✅ Diagnostic test passes in browser console
+
+## 📝 Implementation Notes
+
+### Edge Function Deployment
+```bash
+# Deploy updated Edge Function
+supabase functions deploy process-image-pipeline
+```
+
+### Testing Pipeline
+1. Run diagnostic script in browser console
+2. Upload image and test image-to-image models
+3. Test text-to-image generation
+4. Verify no 401 errors in network tab
+
+This pattern ensures secure, reliable AI image generation with proper authentication and error handling.

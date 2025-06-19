@@ -8,7 +8,19 @@ This directory contains comprehensive tests for the GenAI tool application, focu
 src/__tests__/
 ├── components/
 │   └── marketplace/
-│       └── UnifiedGenerationInterface.final.test.tsx
+│       ├── PipelineProcessing.test.tsx
+│       ├── UnifiedGenerationInterface.final.test.tsx
+│       └── UnifiedGenerationInterface.test.tsx
+├── diagnostics/
+│   ├── ClothesChangingDiagnostic.test.ts
+│   └── PipelineDiagnostic.js            # Browser console diagnostic tool
+├── edge-functions/
+│   └── ProcessImagePipeline.test.ts
+├── integration/
+│   ├── ClothesChangingIntegration.test.tsx
+│   ├── ClothesChangingTest.test.ts
+│   ├── LivePipelineTest.test.ts
+│   └── PipelineIntegrationTest.test.ts
 ├── pages/
 │   └── AIModelMarketplace.test.tsx
 ├── utils/
@@ -30,7 +42,30 @@ The test suite uses:
 
 ## Test Coverage
 
-### 1. Image Upload Utilities (`utils/imageUpload.test.ts`)
+### 1. Browser Console Diagnostic Tool (`diagnostics/PipelineDiagnostic.js`)
+**Purpose**: Real-time pipeline debugging in browser console
+- Tests FAL API key configuration
+- Validates complete image generation pipeline
+- Monitors request status and result fetching
+- Provides fallback HTTP testing methods
+
+**Usage:**
+```javascript
+// In browser console (F12):
+// 1. Type 'allow pasting' and press Enter
+// 2. Copy and paste the script content
+// 3. The test will run automatically or call: runBrowserPipelineTest()
+```
+
+**What it tests:**
+- Supabase Edge Function connectivity
+- FAL API authentication and key validation
+- Image submission to queue
+- Status polling with proper authentication
+- Result fetching and image URL generation
+- Complete end-to-end pipeline workflow
+
+### 2. Image Upload Utilities (`utils/imageUpload.test.ts`)
 Tests core functionality related to image uploads:
 - `URL.createObjectURL` behavior
 - File object creation and validation
@@ -42,7 +77,7 @@ Tests core functionality related to image uploads:
 - File handling with special characters and edge cases
 - Complete upload workflow simulation
 
-### 2. UnifiedGenerationInterface Component (`components/marketplace/UnifiedGenerationInterface.final.test.tsx`)
+### 3. UnifiedGenerationInterface Component (`components/marketplace/UnifiedGenerationInterface.final.test.tsx`)
 Comprehensive tests for the main image upload component:
 - Component rendering and UI elements
 - File upload functionality and callbacks
@@ -63,7 +98,7 @@ Comprehensive tests for the main image upload component:
 - Support for multiple image formats
 - Proper error handling
 
-### 3. AIModelMarketplace Page (`pages/AIModelMarketplace.test.tsx`)
+### 4. AIModelMarketplace Page (`pages/AIModelMarketplace.test.tsx`)
 Tests the main marketplace page and its integration with child components:
 - Page layout and component integration
 - Image display and management

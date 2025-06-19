@@ -1,9 +1,11 @@
-// Browser Console Pipeline Test Script
-// This version uses the same method as the actual app
+// Browser Console Pipeline Diagnostic Test Script
+// This script can be run in the browser console to test the image pipeline
+// Location: src/__tests__/diagnostics/PipelineDiagnostic.js
 
 async function runBrowserPipelineTest() {
-    console.log('🔧 === BROWSER PIPELINE TEST ===');
+    console.log('🔧 === BROWSER PIPELINE DIAGNOSTIC TEST ===');
     console.log('This test uses the same Supabase client as your app');
+    console.log('Copy and paste this script into your browser console to run diagnostics');
     
     try {
         // First, let's check if we can access the Supabase client from the global scope
@@ -154,7 +156,7 @@ async function runBrowserPipelineTest() {
         console.error('❌ Test failed with error:', error);
     }
     
-    console.log('\n🏁 Browser pipeline test completed!');
+    console.log('\n🏁 Browser pipeline diagnostic test completed!');
 }
 
 // Fallback method using direct HTTP calls
@@ -191,6 +193,12 @@ async function runDirectHttpTest() {
     }
 }
 
-// Auto-run the test
-console.log('🚀 Starting browser pipeline test...');
-runBrowserPipelineTest(); 
+// Instructions for use
+console.log('🔧 PIPELINE DIAGNOSTIC TOOL');
+console.log('To run the diagnostic test, execute: runBrowserPipelineTest()');
+console.log('This script is located at: src/__tests__/diagnostics/PipelineDiagnostic.js');
+
+// Export for potential use in other contexts
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { runBrowserPipelineTest, runDirectHttpTest };
+} 

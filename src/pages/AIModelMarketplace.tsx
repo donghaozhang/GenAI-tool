@@ -56,13 +56,21 @@ const AIModelMarketplace = () => {
           <p className="text-gray-400">Discover and use cutting-edge AI models with pipeline capabilities</p>
         </div>
 
-        {/* Model Selector - Moved to the very top */}
+        {/* Model Selector - At the very top */}
         <ModelSelector 
           selectedModel={selectedModel}
           onModelChange={handleModelChange}
         />
 
-        {/* Action Buttons Section */}
+        {/* Generate Images Section - Moved to second position */}
+        <div className="mb-8">
+          <PromptInput 
+            onImagesGenerated={handleImagesGenerated}
+            selectedModel={selectedModel}
+          />
+        </div>
+
+        {/* Action Buttons Section - Now third */}
         <div className="mb-8 bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h3 className="text-lg font-semibold text-white mb-4">Get Started</h3>
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
@@ -70,16 +78,8 @@ const AIModelMarketplace = () => {
             <div className="flex items-center gap-2 text-gray-400">
               <span>or</span>
             </div>
-            <div className="text-blue-400 text-sm">Use text prompt below to generate images</div>
+            <div className="text-blue-400 text-sm">Use text prompt above to generate images</div>
           </div>
-        </div>
-
-        {/* Prompt Input Section */}
-        <div className="mb-8">
-          <PromptInput 
-            onImagesGenerated={handleImagesGenerated}
-            selectedModel={selectedModel}
-          />
         </div>
 
         {/* Image Display Section */}

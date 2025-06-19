@@ -1,0 +1,40 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Security Practices
+
+This project implements comprehensive security measures for protecting sensitive information.
+
+## Environment Variables
+- **NEVER** hardcode API keys, database URLs, or sensitive credentials in source code
+- All sensitive values are stored in [.env](mdc:.env) file (not committed to git)
+- Use [.env.example](mdc:.env.example) as a template for required environment variables
+- Environment variables are validated in [env.ts](mdc:src/config/env.ts)
+
+## Required Environment Variables
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_FAL_API_KEY=your_fal_api_key
+VITE_ELEVENLABS_API_KEY=your_elevenlabs_api_key
+VITE_OPENROUTER_API_KEY=your_openrouter_api_key
+```
+
+## Security Configuration Files
+- [env.ts](mdc:src/config/env.ts) - Centralized environment variable access with validation
+- [client.ts](mdc:src/integrations/supabase/client.ts) - Secure Supabase client configuration
+- [.gitignore](mdc:.gitignore) - Ensures sensitive files are not committed
+
+## Security Best Practices
+1. Always use environment variables for API keys and sensitive data
+2. Validate environment variables at application startup
+3. Use TypeScript types for environment variables in [env.ts](mdc:src/types/env.ts)
+4. Keep [.env.example](mdc:.env.example) updated when adding new environment variables
+5. Review [SECURITY.md](mdc:SECURITY.md) for comprehensive security guidelines
+
+## API Integration Security
+- FAL.ai API calls use environment-based API keys
+- ElevenLabs integration secured with environment variables
+- OpenRouter API access properly configured with environment variables

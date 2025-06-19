@@ -1,0 +1,51 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# AI Marketplace Development Guide
+
+The AI marketplace is the core feature of this application, providing users with access to various AI models.
+
+## Model Data Management
+- All model data is centralized in [models.ts](mdc:src/constants/models.ts)
+- Use the `FeaturedModel` interface for type safety
+- Category counts are automatically calculated from actual model data
+- To add new models, update the `featuredModels` array in [models.ts](mdc:src/constants/models.ts)
+
+## Key Marketplace Components
+
+### CategoryFilter Component
+- [CategoryFilter.tsx](mdc:src/components/marketplace/CategoryFilter.tsx) dynamically calculates category counts
+- Uses `getCategoryCounts()` function from [models.ts](mdc:src/constants/models.ts)
+- Categories with no models show "0" count
+- Supports checkbox-style filtering
+
+### ModelGrid and ModelCard
+- [ModelGrid.tsx](mdc:src/components/marketplace/ModelGrid.tsx) handles filtering and display logic
+- [ModelCard.tsx](mdc:src/components/marketplace/ModelCard.tsx) renders individual model cards
+- Supports search, category filtering, and sorting
+- Each model card shows category badges, tags, and generation capabilities
+
+### Image Generation Pipeline
+- [PromptInput.tsx](mdc:src/components/marketplace/PromptInput.tsx) - Text-to-image generation interface
+- [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Multi-step image processing
+- [MultiImageDisplay.tsx](mdc:src/components/marketplace/MultiImageDisplay.tsx) - Display generated images
+- [ImageUploadButton.tsx](mdc:src/components/marketplace/ImageUploadButton.tsx) - File upload interface
+
+## Adding New Models
+1. Add model data to `featuredModels` array in [models.ts](mdc:src/constants/models.ts)
+2. Ensure `categoryLabel` matches one of the categories in `allCategories`
+3. Category counts will update automatically
+4. Model will appear in the grid and be filterable
+
+## API Integration
+- Image generation services in [imageGeneration.ts](mdc:src/services/imageGeneration.ts)
+- Pipeline processing utilities in [pipelineProcessing.ts](mdc:src/utils/pipelineProcessing.ts)
+- Background removal in [backgroundRemoval.ts](mdc:src/utils/backgroundRemoval.ts)
+
+## Styling Guidelines
+- Use Tailwind CSS classes consistently
+- Dark theme with gray-800/gray-900 backgrounds
+- Blue accent colors for interactive elements
+- Consistent spacing and hover effects

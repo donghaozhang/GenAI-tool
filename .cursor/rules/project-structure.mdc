@@ -1,0 +1,43 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# GenAI Tool Project Structure
+
+This is a React + TypeScript + Vite application focused on AI model marketplace functionality.
+
+## Main Entry Points
+- [main.tsx](mdc:src/main.tsx) - Application entry point
+- [App.tsx](mdc:src/App.tsx) - Main app component with routing
+- [Index.tsx](mdc:src/pages/Index.tsx) - Landing page that redirects authenticated users to marketplace
+
+## Key Pages
+- [AIModelMarketplace.tsx](mdc:src/pages/AIModelMarketplace.tsx) - Main marketplace interface
+- [NotFound.tsx](mdc:src/pages/NotFound.tsx) - 404 page with AI marketplace theme
+
+## Core Components Structure
+```
+src/components/
+├── auth/ - Authentication components
+├── marketplace/ - AI marketplace components (main focus)
+├── ui/ - Reusable UI components (shadcn/ui)
+└── UserProfile.tsx - User profile component
+```
+
+## Important Marketplace Components
+- [CategoryFilter.tsx](mdc:src/components/marketplace/CategoryFilter.tsx) - Dynamic category filtering with real model counts
+- [ModelGrid.tsx](mdc:src/components/marketplace/ModelGrid.tsx) - Displays featured AI models
+- [ModelCard.tsx](mdc:src/components/marketplace/ModelCard.tsx) - Individual model display cards
+- [PromptInput.tsx](mdc:src/components/marketplace/PromptInput.tsx) - Text-to-image generation interface
+- [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Image processing pipeline
+
+## Data & Configuration
+- [models.ts](mdc:src/constants/models.ts) - Shared model data and category count calculations
+- [env.ts](mdc:src/config/env.ts) - Centralized environment configuration
+- [client.ts](mdc:src/integrations/supabase/client.ts) - Supabase client setup
+
+## Authentication
+- [AuthContext.tsx](mdc:src/contexts/AuthContext.tsx) - Authentication state management
+- Authentication pages in [auth/](mdc:src/components/auth) directory
+

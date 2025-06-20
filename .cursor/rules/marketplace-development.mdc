@@ -120,6 +120,7 @@ The marketplace now uses a **Unified Generation Interface** that combines model 
 - **MiniMax Hailuo 02 Pro** (`fal-ai/minimax/hailuo-02/pro/image-to-video`) - 1080p image-to-video generation
 - **MiniMax Hailuo 02 Standard** (`fal-ai/minimax/hailuo-02/standard/image-to-video`) - 768p image-to-video generation
 - **Luma Photon Reframe** (`fal-ai/luma-photon/reframe`) - Intelligent image extension and reframing
+- **MMAudio V2** (`fal-ai/mmaudio-v2`) - Video-to-video model that generates synchronized audio for videos based on text prompts
 
 ## API Integration
 - Image generation services in [imageGeneration.ts](mdc:src/services/imageGeneration.ts)

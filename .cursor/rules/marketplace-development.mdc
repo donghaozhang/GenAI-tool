@@ -36,6 +36,8 @@ The marketplace now uses a **Unified Generation Interface** that combines model 
 - **Mixed Model Type Support** - Handles both text-to-image and image-to-video models in the same batch
 - **Conditional Image Upload** - Shows image upload interface when Image-to-Video or Image-to-Image models are selected
 - **Smart Validation** - Ensures image upload when required models are selected, with specific error messages
+- **Video Display Support** - Automatically detects and displays video outputs (.mp4, .mov, .webm, .avi) with proper video controls
+- **Media Type Indicators** - Visual distinction between images (🖼️) and videos (🎥) in all display components
 
 ## Model ID Format Standards
 - **Always use full fal-ai format**: `"fal-ai/flux/schnell"` instead of short names like `"schnell"`
@@ -82,9 +84,10 @@ The marketplace now uses a **Unified Generation Interface** that combines model 
 ### Image Generation Pipeline
 - [UnifiedGenerationInterface.tsx](mdc:src/components/marketplace/UnifiedGenerationInterface.tsx) - Main interface combining all generation features with batch mode support
 - [ModelSelector.tsx](mdc:src/components/marketplace/ModelSelector.tsx) - Enhanced model selection with single/multi-select modes
-- [BatchResultsDisplay.tsx](mdc:src/components/marketplace/BatchResultsDisplay.tsx) - Dedicated component for batch generation results
+- [BatchResultsDisplay.tsx](mdc:src/components/marketplace/BatchResultsDisplay.tsx) - Dedicated component for batch generation results with video support
 - [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Multi-step image processing with clothes changing
-- [MultiImageDisplay.tsx](mdc:src/components/marketplace/MultiImageDisplay.tsx) - Display generated images
+- [MultiImageDisplay.tsx](mdc:src/components/marketplace/MultiImageDisplay.tsx) - Display generated images and videos
+- [ImageItem.tsx](mdc:src/components/marketplace/ImageItem.tsx) - Individual media display component with automatic video detection
 - [ImageUploadSection.tsx](mdc:src/components/marketplace/ImageUploadSection.tsx) - File upload with data URL conversion
 
 ### Backend Pipeline Processing

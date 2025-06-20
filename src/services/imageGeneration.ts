@@ -69,6 +69,8 @@ export const generateImageWithModel = async (modelId: string, prompt?: string, c
         generationPrompt = 'A modern abstract artwork with geometric patterns';
       } else if (modelId.includes('kling')) {
         generationPrompt = 'A serene nature scene with mountains and water';
+      } else if (modelId.includes('minimax/hailuo-02')) {
+        generationPrompt = 'A person walking through a beautiful winter landscape with falling snow';
       } else {
         generationPrompt = 'A creative digital artwork showcasing AI capabilities';
       }

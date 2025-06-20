@@ -121,7 +121,7 @@ serve(async (req: Request) => {
       input.prompt = prompt;
     }
 
-    // Add image URL for image-to-image models
+    // Add image URL for image-to-image and image-to-video models
     if (sourceImageUrl) {
       // For FLUX Pro Kontext and similar models, the image field might be named differently
       if (modelId.includes('flux-pro/kontext')) {
@@ -129,6 +129,13 @@ serve(async (req: Request) => {
       } else {
         input.image_url = sourceImageUrl;
       }
+    }
+
+    // Add model-specific parameters
+    if (modelId.includes('minimax/hailuo-02')) {
+      // MiniMax Hailuo 02 specific parameters
+      input.duration = "6"; // Default to 6 seconds
+      input.prompt_optimizer = true; // Enable prompt optimization by default
     }
 
     console.log(`Making request to FAL queue with model: ${modelId}`);

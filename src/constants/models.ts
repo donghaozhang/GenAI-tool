@@ -83,6 +83,18 @@ export const featuredModels: FeaturedModel[] = [
   
   // Image to Video models
   {
+    id: 'fal-ai/minimax/hailuo-02/standard/image-to-video',
+    title: 'fal-ai/minimax/hailuo-02/standard/image-to-video',
+    description: 'MiniMax Hailuo-02 Image To Video API (Standard, 768p): Advanced image-to-video generation model with 768p resolution',
+    category: 'image-to-video',
+    categoryLabel: 'Image to Video',
+    image: '',
+    isNew: true,
+    tags: ['minimax', 'hailuo', 'image-to-video', '768p'],
+    type: 'image-to-video',
+    typeLabel: 'Image to Video',
+  },
+  {
     id: 'fal-ai/kling-video/v2.1/master/image-to-video',
     title: 'fal-ai/kling-video/v2.1/master/image-to-video',
     description: 'The premium endpoint for Kling 2.1, designed for top-tier image-to-video generation with exceptional quality and detail.',

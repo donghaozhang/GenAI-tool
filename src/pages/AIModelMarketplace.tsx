@@ -5,6 +5,7 @@ import { ModelGrid } from '../components/marketplace/ModelGrid';
 import { TrendingSection } from '../components/marketplace/TrendingSection';
 import { MultiImageDisplay } from '../components/marketplace/MultiImageDisplay';
 import { UnifiedGenerationInterface } from '../components/marketplace/UnifiedGenerationInterface';
+import { BatchGenerationResult } from '../services/imageGeneration';
 import { toast } from 'sonner';
 
 const AIModelMarketplace = () => {
@@ -12,6 +13,7 @@ const AIModelMarketplace = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [generationPrompt, setGenerationPrompt] = useState('');
+  const [batchResults, setBatchResults] = useState<BatchGenerationResult[]>([]);
 
   const handleImagesGenerated = (imageUrls: string[], prompt: string) => {
     setGeneratedImages(prev => [...prev, ...imageUrls]);
@@ -22,6 +24,11 @@ const AIModelMarketplace = () => {
   const handleFileUploaded = (file: File) => {
     // This callback is no longer needed since we handle uploads via onImagesGenerated
     console.log('File uploaded callback - not used');
+  };
+
+  const handleBatchResults = (results: BatchGenerationResult[]) => {
+    setBatchResults(results);
+    console.log('Batch results received:', results);
   };
 
   const allImages = generatedImages;
@@ -43,10 +50,11 @@ const AIModelMarketplace = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Unified Generation Interface */}
-        <UnifiedGenerationInterface 
-          onImagesGenerated={handleImagesGenerated}
-          onFileUploaded={handleFileUploaded}
-        />
+              <UnifiedGenerationInterface
+        onImagesGenerated={handleImagesGenerated}
+        onFileUploaded={handleFileUploaded}
+        onBatchResults={handleBatchResults}
+      />
 
         {/* Image Display with Built-in Pipeline */}
         {allImages.length > 0 && (

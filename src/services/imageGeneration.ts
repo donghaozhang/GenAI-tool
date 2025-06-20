@@ -124,3 +124,69 @@ export const generateAllPokemonImages = async (): Promise<Record<string, string>
 
   return images;
 };
+
+export interface BatchGenerationResult {
+  modelId: string;
+  modelTitle: string;
+  success: boolean;
+  imageUrls?: string[];
+  error?: string;
+  duration?: number;
+}
+
+export const generateImagesBatch = async (
+  modelIds: string[], 
+  prompt: string, 
+  count: number = 1
+): Promise<BatchGenerationResult[]> => {
+  console.log(`Starting batch generation for ${modelIds.length} models...`);
+  
+  const startTime = Date.now();
+  const promises = modelIds.map(async (modelId): Promise<BatchGenerationResult> => {
+    const modelStartTime = Date.now();
+    try {
+      const imageUrls = await generateImageWithModel(modelId, prompt, count);
+      const duration = Date.now() - modelStartTime;
+      
+      return {
+        modelId,
+        modelTitle: modelId, // Will be enhanced with actual model title
+        success: true,
+        imageUrls,
+        duration
+      };
+    } catch (error) {
+      const duration = Date.now() - modelStartTime;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      return {
+        modelId,
+        modelTitle: modelId,
+        success: false,
+        error: errorMessage,
+        duration
+      };
+    }
+  });
+
+  const results = await Promise.allSettled(promises);
+  const batchResults = results.map((result, index) => {
+    if (result.status === 'fulfilled') {
+      return result.value;
+    } else {
+      return {
+        modelId: modelIds[index],
+        modelTitle: modelIds[index],
+        success: false,
+        error: result.reason?.message || 'Promise rejected',
+        duration: 0
+      };
+    }
+  });
+
+  const totalDuration = Date.now() - startTime;
+  const successCount = batchResults.filter(r => r.success).length;
+  console.log(`Batch generation completed: ${successCount}/${modelIds.length} successful in ${totalDuration}ms`);
+  
+  return batchResults;
+};

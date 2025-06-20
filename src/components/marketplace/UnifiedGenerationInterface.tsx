@@ -54,7 +54,9 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
   // Update input method when model changes (only in single mode)
   React.useEffect(() => {
     if (!batchMode) {
-      const requiresImageUpload = currentModel.categoryLabel === 'Image to Image' || currentModel.categoryLabel === 'Image to Video';
+      const requiresImageUpload = currentModel.categoryLabel === 'Image to Image' || 
+                                 currentModel.categoryLabel === 'Image to Video' ||
+                                 currentModel.categoryLabel === 'Video to Video';
       if (requiresImageUpload) {
         setInputMethod('upload');
       } else {
@@ -82,6 +84,10 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
         return 'bg-pink-500/20 text-pink-400 border-pink-500/30';
       case 'Image to 3D':
         return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30';
+      case 'Video to Video':
+        return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+      case 'Video to Audio':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
       default:
         return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
@@ -150,16 +156,18 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
           onImagesGenerated(imageUrls, prompt);
           toast.success(`Generated ${imageCount} image(s) successfully!`);
         } else {
-          // Use processImagePipeline for image-to-image and image-to-video models
+          // Use processImagePipeline for image-to-image, image-to-video, and video-to-video models
           if (!uploadedImageDataUrl) {
-            toast.error('Please upload an image first');
+            const mediaType = currentModel.categoryLabel === 'Video to Video' ? 'video' : 'image';
+            toast.error(`Please upload a ${mediaType} first`);
             return;
           }
           
           console.log(`Processing pipeline with ${selectedModel}`);
           const outputUrl = await processImagePipeline(selectedModel, uploadedImageDataUrl, prompt);
-          onImagesGenerated([outputUrl], prompt || 'Image transformation');
-          toast.success('Image processing completed successfully!');
+          const transformationType = currentModel.categoryLabel === 'Video to Video' ? 'Video enhancement' : 'Image transformation';
+          onImagesGenerated([outputUrl], prompt || transformationType);
+          toast.success('Processing completed successfully!');
         }
       }
     } catch (error) {
@@ -199,17 +207,23 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
         return 'Describe the video motion you want to create...';
       case 'Text to Video':
         return 'Describe the video you want to create...';
+      case 'Video to Video':
+        return 'Describe the audio or enhancement you want to add...';
       default:
         return 'Enter your prompt...';
     }
   };
 
-  const requiresImageUpload = !batchMode && (currentModel.categoryLabel === 'Image to Image' || currentModel.categoryLabel === 'Image to Video');
+  const requiresImageUpload = !batchMode && (currentModel.categoryLabel === 'Image to Image' || 
+                                         currentModel.categoryLabel === 'Image to Video' ||
+                                         currentModel.categoryLabel === 'Video to Video');
   
   // Check if batch mode includes models that require image input
   const batchRequiresImage = batchMode && selectedModels.some(modelId => {
     const model = featuredModels.find(m => m.id === modelId);
-    return model?.categoryLabel === 'Image to Video' || model?.categoryLabel === 'Image to Image';
+    return model?.categoryLabel === 'Image to Video' || 
+           model?.categoryLabel === 'Image to Image' ||
+           model?.categoryLabel === 'Video to Video';
   });
   
   const canGenerate = batchMode 
@@ -359,12 +373,14 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
         {/* Image Upload for Batch Mode - Show if any selected model requires image input */}
         {batchMode && selectedModels.some(modelId => {
           const model = featuredModels.find(m => m.id === modelId);
-          return model?.categoryLabel === 'Image to Video' || model?.categoryLabel === 'Image to Image';
+          return model?.categoryLabel === 'Image to Video' || 
+                 model?.categoryLabel === 'Image to Image' ||
+                 model?.categoryLabel === 'Video to Video';
         }) && (
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-300 mb-3">
               Image Upload
-              <span className="text-purple-400 ml-1">(required for Image-to-Video and Image-to-Image models)</span>
+                              <span className="text-purple-400 ml-1">(required for Image-to-Video, Image-to-Image, and Video-to-Video models)</span>
             </label>
             <div className="flex gap-4">
               <label className={`flex items-center gap-3 px-6 py-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${

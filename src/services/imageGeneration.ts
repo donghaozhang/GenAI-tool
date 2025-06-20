@@ -75,6 +75,8 @@ export const generateImageWithModel = async (modelId: string, prompt?: string, c
         generationPrompt = 'A serene nature scene with mountains and water';
       } else if (modelId.includes('minimax/hailuo-02')) {
         generationPrompt = 'A person walking through a beautiful winter landscape with falling snow';
+      } else if (modelId.includes('mmaudio-v2')) {
+        generationPrompt = 'Cinematic background music with emotional depth and atmospheric ambiance';
       } else {
         generationPrompt = 'A creative digital artwork showcasing AI capabilities';
       }
@@ -148,9 +150,9 @@ export const generateImagesBatch = async (
     try {
       let imageUrls: string[];
       
-      // Check if this is an image-to-video or image-to-image model
-      if ((model.categoryLabel === 'Image to Video' || model.categoryLabel === 'Image to Image') && imageDataUrl) {
-        // Use pipeline processing for image-to-video/image-to-image models
+      // Check if this is an image-to-video, image-to-image, or video-to-video model
+      if ((model.categoryLabel === 'Image to Video' || model.categoryLabel === 'Image to Image' || model.categoryLabel === 'Video to Video') && imageDataUrl) {
+        // Use pipeline processing for models that require media input
         const { processImagePipeline } = await import('@/utils/pipelineProcessing');
         const outputUrl = await processImagePipeline(model.id, imageDataUrl, prompt);
         imageUrls = [outputUrl];

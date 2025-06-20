@@ -121,12 +121,16 @@ serve(async (req: Request) => {
       input.prompt = prompt;
     }
 
-    // Add image URL for image-to-image and image-to-video models
+    // Add image/video URL for different model types
     if (sourceImageUrl) {
-      // For FLUX Pro Kontext and similar models, the image field might be named differently
-      if (modelId.includes('flux-pro/kontext')) {
+      if (modelId.includes('mmaudio-v2')) {
+        // MMAudio V2 expects video_url parameter
+        input.video_url = sourceImageUrl;
+      } else if (modelId.includes('flux-pro/kontext')) {
+        // FLUX Pro Kontext uses image_url
         input.image_url = sourceImageUrl;
       } else {
+        // Default for most image-to-image and image-to-video models
         input.image_url = sourceImageUrl;
       }
     }
@@ -136,6 +140,14 @@ serve(async (req: Request) => {
       // MiniMax Hailuo 02 specific parameters
       input.duration = "6"; // Default to 6 seconds
       input.prompt_optimizer = true; // Enable prompt optimization by default
+    } else if (modelId.includes('mmaudio-v2')) {
+      // MMAudio V2 specific parameters
+      input.duration = 8; // Default duration in seconds
+      input.num_steps = 25; // Default number of steps
+      input.cfg_strength = 4.5; // Default CFG strength
+      if (!prompt) {
+        input.prompt = "Cinematic background music with emotional depth and atmospheric ambiance";
+      }
     }
 
     console.log(`Making request to FAL queue with model: ${modelId}`);

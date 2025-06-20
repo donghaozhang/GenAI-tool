@@ -8,7 +8,7 @@ export interface FeaturedModel {
   isNew: boolean;
   tags: string[];
   // Pipeline-specific properties (optional for backward compatibility)
-  type?: 'image-to-video' | 'image-to-image' | 'video-to-audio' | 'text-to-video' | 'image-to-3d' | 'text-to-3d' | 'text-to-image';
+  type?: 'image-to-video' | 'image-to-image' | 'video-to-audio' | 'text-to-video' | 'image-to-3d' | 'text-to-3d' | 'text-to-image' | 'video-to-video';
   typeLabel?: string; // User-friendly type display
   isPipelineModel?: boolean; // Flag to identify pipeline models
 }
@@ -233,6 +233,20 @@ export const featuredModels: FeaturedModel[] = [
     isPipelineModel: true,
   },
   
+  // Video to Video models
+  {
+    id: 'fal-ai/mmaudio-v2',
+    title: 'fal-ai/mmaudio-v2',
+    description: 'MMAudio V2 generates synchronized audio for videos based on text prompts. Combines seamlessly with video models to create videos with audio.',
+    category: 'video-to-video',
+    categoryLabel: 'Video to Video',
+    image: '',
+    isNew: true,
+    tags: ['mmaudio', 'audio-generation', 'video-enhancement', 'synchronized', 'audio-sync'],
+    type: 'video-to-video',
+    typeLabel: 'Video to Video',
+  },
+  
   // Image to 3D models
   {
     id: 'fal-ai/hunyuan3d-v21',
@@ -294,7 +308,7 @@ export const getCategoryCounts = () => {
 export interface PipelineModel {
   id: string;
   name: string;
-  type: 'image-to-video' | 'image-to-image' | 'video-to-audio' | 'text-to-video' | 'image-to-3d' | 'text-to-3d' | 'text-to-image';
+  type: 'image-to-video' | 'image-to-image' | 'video-to-audio' | 'text-to-video' | 'image-to-3d' | 'text-to-3d' | 'text-to-image' | 'video-to-video';
   typeLabel: string;
   description: string;
 }

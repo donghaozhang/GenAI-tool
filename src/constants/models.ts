@@ -83,6 +83,18 @@ export const featuredModels: FeaturedModel[] = [
   
   // Image to Video models
   {
+    id: 'fal-ai/minimax/hailuo-02/pro/image-to-video',
+    title: 'fal-ai/minimax/hailuo-02/pro/image-to-video',
+    description: 'MiniMax Hailuo-02 Image To Video API (Pro, 1080p): Advanced image-to-video generation model with 1080p resolution',
+    category: 'image-to-video',
+    categoryLabel: 'Image to Video',
+    image: '',
+    isNew: true,
+    tags: ['minimax', 'hailuo', 'image-to-video', '1080p', 'pro'],
+    type: 'image-to-video',
+    typeLabel: 'Image to Video',
+  },
+  {
     id: 'fal-ai/minimax/hailuo-02/standard/image-to-video',
     title: 'fal-ai/minimax/hailuo-02/standard/image-to-video',
     description: 'MiniMax Hailuo-02 Image To Video API (Standard, 768p): Advanced image-to-video generation model with 768p resolution',
@@ -234,7 +246,7 @@ export const getCategoryCounts = () => {
 export interface PipelineModel {
   id: string;
   name: string;
-  type: 'image-to-video' | 'image-to-image' | 'video-to-audio' | 'text-to-video' | 'image-to-3d' | 'text-to-3d';
+  type: 'image-to-video' | 'image-to-image' | 'video-to-audio' | 'text-to-video' | 'image-to-3d' | 'text-to-3d' | 'text-to-image';
   typeLabel: string;
   description: string;
 }

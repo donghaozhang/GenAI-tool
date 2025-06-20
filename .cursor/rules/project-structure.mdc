@@ -79,5 +79,7 @@ src/__tests__/
 - **Data URL support** for uploaded images (base64 format for API compatibility)
 - **Comprehensive test coverage** ensuring reliability and functionality
 - **Standardized model naming** with titles matching full model IDs for clarity and consistency
+- **Extensive Model Collection** including FLUX variants, Bytedance SeedDream, MiniMax Hailuo, and Luma Photon models
+- **Multi-Modal Support** covering Text-to-Image, Image-to-Image, Image-to-Video, and specialized reframing capabilities
 
 

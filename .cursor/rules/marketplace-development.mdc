@@ -95,6 +95,14 @@ The marketplace now uses a **Unified Generation Interface** that combines model 
 - **Migration**: Existing models are being updated to follow this standard
 - **Exception**: Only use human-readable titles when the model ID is not user-friendly
 
+## Recently Added Models (Following Standards)
+- **FLUX.1 [schnell]** (`fal-ai/flux-1/schnell`) - Fastest inference text-to-image model
+- **FLUX.1 [dev]** (`fal-ai/flux/dev`) - 12B parameter flow transformer for high-quality generation
+- **Bytedance SeedDream v3** (`fal-ai/bytedance/seedream/v3/text-to-image`) - Bilingual 2K resolution model
+- **MiniMax Hailuo 02 Pro** (`fal-ai/minimax/hailuo-02/pro/image-to-video`) - 1080p image-to-video generation
+- **MiniMax Hailuo 02 Standard** (`fal-ai/minimax/hailuo-02/standard/image-to-video`) - 768p image-to-video generation
+- **Luma Photon Reframe** (`fal-ai/luma-photon/reframe`) - Intelligent image extension and reframing
+
 ## API Integration
 - Image generation services in [imageGeneration.ts](mdc:src/services/imageGeneration.ts)
 - Pipeline processing utilities in [pipelineProcessing.ts](mdc:src/utils/pipelineProcessing.ts)

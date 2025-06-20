@@ -16,6 +16,18 @@ export interface FeaturedModel {
 export const featuredModels: FeaturedModel[] = [
   // Text to Image models first
   {
+    id: 'fal-ai/flux/dev',
+    title: 'fal-ai/flux/dev',
+    description: 'FLUX.1 [dev] is a 12 billion parameter flow transformer that generates high-quality images from text. Suitable for personal and commercial use.',
+    category: 'text-to-image',
+    categoryLabel: 'Text to Image',
+    image: '',
+    isNew: true,
+    tags: ['flux', 'dev', 'transformer', 'high-quality', 'commercial'],
+    type: 'text-to-image',
+    typeLabel: 'Text to Image',
+  },
+  {
     id: 'fal-ai/imagen4/preview',
     title: 'fal-ai/imagen4/preview',
     description: "Google's highest quality image generation model with exceptional detail, photorealism, and creative capabilities for professional-grade image creation.",

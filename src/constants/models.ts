@@ -28,6 +28,18 @@ export const featuredModels: FeaturedModel[] = [
     typeLabel: 'Text to Image',
   },
   {
+    id: 'fal-ai/bytedance/seedream/v3/text-to-image',
+    title: 'fal-ai/bytedance/seedream/v3/text-to-image',
+    description: 'Bytedance SeedDream 3.0 is a bilingual (Chinese and English) text-to-image model with native 2K resolution, exceptional text layout, and fast 3-second generation.',
+    category: 'text-to-image',
+    categoryLabel: 'Text to Image',
+    image: '',
+    isNew: true,
+    tags: ['bytedance', 'seedream', '2k-resolution', 'bilingual', 'fast-generation', 'text-layout'],
+    type: 'text-to-image',
+    typeLabel: 'Text to Image',
+  },
+  {
     id: 'fal-ai/imagen4/preview',
     title: 'fal-ai/imagen4/preview',
     description: "Google's highest quality image generation model with exceptional detail, photorealism, and creative capabilities for professional-grade image creation.",

@@ -67,6 +67,8 @@ export const generateImageWithModel = async (modelId: string, prompt?: string, c
         generationPrompt = 'A beautiful landscape with vibrant colors and stunning details';
       } else if (modelId.includes('imagen')) {
         generationPrompt = 'A modern abstract artwork with geometric patterns';
+      } else if (modelId.includes('bytedance/seedream')) {
+        generationPrompt = 'A photorealistic portrait of a person with cinematic lighting and exceptional detail';
       } else if (modelId.includes('kling')) {
         generationPrompt = 'A serene nature scene with mountains and water';
       } else if (modelId.includes('minimax/hailuo-02')) {

@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Switch } from '../ui/switch';
-import { Upload, Sparkles, Image, Video, Wand2, Layers } from 'lucide-react';
+import { Upload, Sparkles, Image, Video, Wand2, Layers, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateImageWithModel, generateImagesBatch, BatchGenerationResult } from '@/services/imageGeneration';
 import { processImagePipeline } from '@/utils/pipelineProcessing';
@@ -113,7 +113,15 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
       if (batchMode) {
         // Batch mode - generate with multiple models
         console.log(`Starting batch generation with ${selectedModels.length} models`);
-        const results = await generateImagesBatch(selectedModels, prompt, imageCount, uploadedImageDataUrl || undefined);
+        // Convert model IDs to model objects with categoryLabel
+        const modelObjects = selectedModels.map(modelId => {
+          const model = featuredModels.find(m => m.id === modelId);
+          return {
+            id: modelId,
+            categoryLabel: model?.categoryLabel || 'Text to Image'
+          };
+        });
+        const results = await generateImagesBatch(modelObjects, prompt, imageCount, uploadedImageDataUrl || undefined);
         setBatchResults(results);
         onBatchResults?.(results);
         
@@ -199,9 +207,10 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
   const requiresImageUpload = !batchMode && (currentModel.categoryLabel === 'Image to Image' || currentModel.categoryLabel === 'Image to Video');
   
   // Check if batch mode includes models that require image input
-  const batchRequiresImage = batchMode && selectedModels.some(model => 
-    model.categoryLabel === 'Image to Video' || model.categoryLabel === 'Image to Image'
-  );
+  const batchRequiresImage = batchMode && selectedModels.some(modelId => {
+    const model = featuredModels.find(m => m.id === modelId);
+    return model?.categoryLabel === 'Image to Video' || model?.categoryLabel === 'Image to Image';
+  });
   
   const canGenerate = batchMode 
     ? selectedModels.length > 0 && prompt.trim() && (!batchRequiresImage || uploadedFile !== null)
@@ -348,24 +357,53 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
       )}
 
         {/* Image Upload for Batch Mode - Show if any selected model requires image input */}
-        {batchMode && selectedModels.some(model => model.categoryLabel === 'Image to Video' || model.categoryLabel === 'Image to Image') && (
+        {batchMode && selectedModels.some(modelId => {
+          const model = featuredModels.find(m => m.id === modelId);
+          return model?.categoryLabel === 'Image to Video' || model?.categoryLabel === 'Image to Image';
+        }) && (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Image Upload (required for Image-to-Video and Image-to-Image models)
+            <label className="block text-sm font-medium text-gray-300 mb-3">
+              Image Upload
+              <span className="text-purple-400 ml-1">(required for Image-to-Video and Image-to-Image models)</span>
             </label>
-            <label className="flex items-center justify-center gap-2 px-4 py-8 rounded-lg border-2 border-dashed border-gray-600 cursor-pointer transition-colors hover:border-gray-500 hover:bg-gray-700/50">
-              <Upload className="w-6 h-6 text-gray-400" />
-              <span className="text-gray-300">
-                {uploadedFile ? `Uploaded: ${uploadedFile.name}` : 'Click to upload image'}
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-                data-testid="batch-file-input"
-              />
-            </label>
+            <div className="flex gap-4">
+              <label className={`flex items-center gap-3 px-6 py-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                uploadedFile 
+                  ? 'bg-green-600/20 border-green-500 text-green-400 hover:bg-green-600/30' 
+                  : 'bg-purple-600/10 border-purple-500/50 text-purple-300 hover:bg-purple-600/20 hover:border-purple-400'
+              }`}>
+                <Upload className="w-5 h-5" />
+                <div className="flex flex-col">
+                  <span className="font-medium">
+                    {uploadedFile ? 'Image Uploaded' : 'Upload Image'}
+                  </span>
+                  <span className="text-xs opacity-75">
+                    {uploadedFile ? uploadedFile.name : 'Click to select image file'}
+                  </span>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  data-testid="batch-file-input"
+                />
+              </label>
+              
+              {uploadedFile && (
+                <button
+                  onClick={() => {
+                    setUploadedFile(null);
+                    setUploadedImageDataUrl(null);
+                  }}
+                  className="flex items-center gap-2 px-4 py-3 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors"
+                  title="Remove uploaded image"
+                >
+                  <X className="w-4 h-4" />
+                  Remove
+                </button>
+              )}
+            </div>
           </div>
         )}
 

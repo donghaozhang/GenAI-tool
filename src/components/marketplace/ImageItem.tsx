@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Check } from 'lucide-react';
+import { Download, Check, Play } from 'lucide-react';
 
 interface ImageItemProps {
   imageUrl: string;
@@ -27,6 +27,12 @@ export const ImageItem: React.FC<ImageItemProps> = ({
     onDownload(imageUrl, index);
   };
 
+  // Check if the URL is a video file
+  const isVideo = imageUrl.toLowerCase().includes('.mp4') || 
+                  imageUrl.toLowerCase().includes('.mov') || 
+                  imageUrl.toLowerCase().includes('.webm') ||
+                  imageUrl.toLowerCase().includes('.avi');
+
   return (
     <div 
       className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
@@ -37,14 +43,36 @@ export const ImageItem: React.FC<ImageItemProps> = ({
       onClick={handleClick}
     >
       <div className="aspect-square bg-gray-700 relative">
-        <img
-          src={imageUrl}
-          alt={`Generated ${index + 1}`}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            console.error('Generated image failed to load:', imageUrl);
-          }}
-        />
+        {isVideo ? (
+          <video
+            src={imageUrl}
+            className="w-full h-full object-cover"
+            controls
+            muted
+            playsInline
+            onError={(e) => {
+              console.error('Generated video failed to load:', imageUrl);
+            }}
+          />
+        ) : (
+          <img
+            src={imageUrl}
+            alt={`Generated ${index + 1}`}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              console.error('Generated image failed to load:', imageUrl);
+            }}
+          />
+        )}
+        
+        {/* Video play indicator */}
+        {isVideo && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="bg-black/50 rounded-full p-3">
+              <Play className="w-6 h-6 text-white" />
+            </div>
+          </div>
+        )}
         
         {/* Selection indicator */}
         {isSelected && (
@@ -63,9 +91,9 @@ export const ImageItem: React.FC<ImageItemProps> = ({
           <Download className="w-3 h-3" />
         </Button>
         
-        {/* Image number */}
+        {/* Media type indicator */}
         <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
-          #{index + 1}
+          {isVideo ? '🎥' : '🖼️'} #{index + 1}
         </div>
       </div>
     </div>

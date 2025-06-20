@@ -37,8 +37,8 @@ describe('UnifiedGenerationInterface', () => {
     );
 
     expect(screen.getByText('AI Generation Studio')).toBeInTheDocument();
-    expect(screen.getByText('FLUX Schnell')).toBeInTheDocument();
-    expect(screen.getByText('Text to Image')).toBeInTheDocument();
+    expect(screen.getByText('fal-ai/imagen4/preview')).toBeInTheDocument();
+    expect(screen.getAllByText('Text to Image')).toHaveLength(2); // One in header, one in model card
   });
 
   it('should show correct model IDs including fixed FLUX Pro Kontext', () => {
@@ -55,7 +55,7 @@ describe('UnifiedGenerationInterface', () => {
     fireEvent.click(modelSelector);
 
     // Check that FLUX Pro Kontext is available (this verifies the model ID fix)
-    expect(screen.getByText('FLUX Pro Kontext')).toBeInTheDocument();
+    expect(screen.getByText('fal-ai/flux-pro/kontext')).toBeInTheDocument();
   });
 
   it('should switch input method when selecting image-to-image model', async () => {
@@ -71,12 +71,12 @@ describe('UnifiedGenerationInterface', () => {
     const modelSelector = modelSection?.querySelector('[role="combobox"]') as HTMLElement;
     fireEvent.click(modelSelector);
     
-    const fluxKontextOption = screen.getByText('FLUX Pro Kontext');
+    const fluxKontextOption = screen.getByText('fal-ai/flux-pro/kontext');
     fireEvent.click(fluxKontextOption);
 
     // Should switch to upload mode and show Image to Image type
     await waitFor(() => {
-      expect(screen.getByText('Image to Image')).toBeInTheDocument();
+      expect(screen.getAllByText('Image to Image')).toHaveLength(2); // One in header, one in model card
     });
   });
 
@@ -102,7 +102,7 @@ describe('UnifiedGenerationInterface', () => {
 
     await waitFor(() => {
       expect(mockGenerateImageWithModel).toHaveBeenCalledWith(
-        'fal-ai/flux/schnell',
+        'fal-ai/imagen4/preview',
         'A beautiful landscape',
         1
       );
@@ -130,11 +130,11 @@ describe('UnifiedGenerationInterface', () => {
     const modelSection = screen.getByText('AI Model').closest('div');
     const modelSelector = modelSection?.querySelector('[role="combobox"]') as HTMLElement;
     fireEvent.click(modelSelector);
-    const fluxKontextOption = screen.getByText('FLUX Pro Kontext');
+    const fluxKontextOption = screen.getByText('fal-ai/flux-pro/kontext');
     fireEvent.click(fluxKontextOption);
 
     // Mock file upload
-    const fileInput = screen.getByLabelText('Upload Image').querySelector('input') as HTMLInputElement;
+    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
     const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
     
     // Mock FileReader
@@ -218,11 +218,11 @@ describe('UnifiedGenerationInterface', () => {
     const modelSection = screen.getByText('AI Model').closest('div');
     const modelSelector = modelSection?.querySelector('[role="combobox"]') as HTMLElement;
     fireEvent.click(modelSelector);
-    const fluxKontextOption = screen.getByText('FLUX Pro Kontext');
+    const fluxKontextOption = screen.getByText('fal-ai/flux-pro/kontext');
     fireEvent.click(fluxKontextOption);
 
     // Mock file upload
-    const fileInput = screen.getByLabelText('Upload Image').querySelector('input') as HTMLInputElement;
+    const fileInput = screen.getByTestId('file-input') as HTMLInputElement;
     const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
     
     const mockFileReader = {
@@ -285,7 +285,7 @@ describe('UnifiedGenerationInterface', () => {
 
     await waitFor(() => {
       expect(mockGenerateImageWithModel).toHaveBeenCalledWith(
-        'fal-ai/flux/schnell',
+        'fal-ai/imagen4/preview',
         'Multiple landscapes',
         3
       );

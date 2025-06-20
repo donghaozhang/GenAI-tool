@@ -4,15 +4,13 @@ import userEvent from '@testing-library/user-event'
 import { UnifiedGenerationInterface } from '@/components/marketplace/UnifiedGenerationInterface'
 
 // Mock the pipeline processing
-const mockProcessImagePipeline = vi.fn()
 vi.mock('@/utils/pipelineProcessing', () => ({
-  processImagePipeline: mockProcessImagePipeline
+  processImagePipeline: vi.fn()
 }))
 
 // Mock image generation
-const mockGenerateImage = vi.fn()
 vi.mock('@/services/imageGeneration', () => ({
-  generateImage: mockGenerateImage
+  generateImageWithModel: vi.fn()
 }))
 
 // Mock file reading
@@ -30,8 +28,17 @@ describe('Clothes Changing Integration Tests', () => {
     onModelSelect: vi.fn()
   }
 
-  beforeEach(() => {
+  let mockProcessImagePipeline: any
+  let mockGenerateImageWithModel: any
+
+  beforeEach(async () => {
     vi.clearAllMocks()
+    
+    // Get the mocked functions
+    const { processImagePipeline } = await import('@/utils/pipelineProcessing')
+    const { generateImageWithModel } = await import('@/services/imageGeneration')
+    mockProcessImagePipeline = processImagePipeline as any
+    mockGenerateImageWithModel = generateImageWithModel as any
     
     // Mock FileReader
     global.FileReader = vi.fn(() => ({
@@ -58,10 +65,11 @@ describe('Clothes Changing Integration Tests', () => {
       render(<UnifiedGenerationInterface {...mockProps} />)
 
       // 1. Select the FLUX Pro Kontext model for clothes changing
-      const modelSelect = screen.getByRole('combobox', { name: /select ai model/i })
+      const modelSelects = screen.getAllByRole('combobox')
+      const modelSelect = modelSelects[0] // First combobox is the AI Model selector
       await user.click(modelSelect)
       
-      const fluxOption = screen.getByText(/flux pro kontext/i)
+      const fluxOption = screen.getByText(/fal-ai\/flux-pro\/kontext/i)
       await user.click(fluxOption)
 
       // 2. Upload an image
@@ -118,9 +126,10 @@ describe('Clothes Changing Integration Tests', () => {
       render(<UnifiedGenerationInterface {...mockProps} />)
 
       // Select model
-      const modelSelect = screen.getByRole('combobox', { name: /select ai model/i })
+      const modelSelects = screen.getAllByRole('combobox')
+      const modelSelect = modelSelects[0] // First combobox is the AI Model selector
       await user.click(modelSelect)
-      await user.click(screen.getByText(/flux pro kontext/i))
+      await user.click(screen.getByText(/fal-ai\/flux-pro\/kontext/i))
 
       // Upload image once
       const hiddenInput = screen.getByTestId('file-input')
@@ -169,9 +178,10 @@ describe('Clothes Changing Integration Tests', () => {
       render(<UnifiedGenerationInterface {...mockProps} />)
 
       // Setup and upload
-      const modelSelect = screen.getByRole('combobox', { name: /select ai model/i })
+      const modelSelects = screen.getAllByRole('combobox')
+      const modelSelect = modelSelects[0] // First combobox is the AI Model selector
       await user.click(modelSelect)
-      await user.click(screen.getByText(/flux pro kontext/i))
+      await user.click(screen.getByText(/fal-ai\/flux-pro\/kontext/i))
 
       const hiddenInput = screen.getByTestId('file-input')
       const mockFile = createMockFile('invalid.jpg', 'image/jpeg', 'invalid data')
@@ -200,9 +210,10 @@ describe('Clothes Changing Integration Tests', () => {
       render(<UnifiedGenerationInterface {...mockProps} />)
 
       // Select model
-      const modelSelect = screen.getByRole('combobox', { name: /select ai model/i })
+      const modelSelects = screen.getAllByRole('combobox')
+      const modelSelect = modelSelects[0] // First combobox is the AI Model selector
       await user.click(modelSelect)
-      await user.click(screen.getByText(/flux pro kontext/i))
+      await user.click(screen.getByText(/fal-ai\/flux-pro\/kontext/i))
 
       // Try to process without uploading image
       const promptInput = screen.getByPlaceholderText(/describe the image transformation/i)
@@ -222,9 +233,10 @@ describe('Clothes Changing Integration Tests', () => {
       render(<UnifiedGenerationInterface {...mockProps} />)
 
       // Select FLUX Pro Kontext (image-to-image)
-      const modelSelect = screen.getByRole('combobox', { name: /select ai model/i })
+      const modelSelects = screen.getAllByRole('combobox')
+      const modelSelect = modelSelects[0] // First combobox is the AI Model selector
       await user.click(modelSelect)
-      await user.click(screen.getByText(/flux pro kontext/i))
+      await user.click(screen.getByText(/fal-ai\/flux-pro\/kontext/i))
 
       // Should show image upload section
       expect(screen.getByText(/upload image/i)).toBeInTheDocument()
@@ -242,16 +254,17 @@ describe('Clothes Changing Integration Tests', () => {
       render(<UnifiedGenerationInterface {...mockProps} />)
 
       // Start with text-to-image model
-      const modelSelect = screen.getByRole('combobox', { name: /select ai model/i })
+      const modelSelects = screen.getAllByRole('combobox')
+      const modelSelect = modelSelects[0] // First combobox is the AI Model selector
       await user.click(modelSelect)
-      await user.click(screen.getByText(/imagen 4 preview/i))
+      await user.click(screen.getByText(/fal-ai\/imagen4\/preview/i))
 
       // Should show text prompt interface
       expect(screen.getByPlaceholderText(/describe the image you want to generate/i)).toBeInTheDocument()
 
       // Switch to image-to-image model
       await user.click(modelSelect)
-      await user.click(screen.getByText(/flux pro kontext/i))
+      await user.click(screen.getByText(/fal-ai\/flux-pro\/kontext/i))
 
       // Should show image upload interface
       expect(screen.getByText(/upload image/i)).toBeInTheDocument()
@@ -268,9 +281,10 @@ describe('Clothes Changing Integration Tests', () => {
       render(<UnifiedGenerationInterface {...mockProps} />)
 
       // Setup
-      const modelSelect = screen.getByRole('combobox', { name: /select ai model/i })
+      const modelSelects = screen.getAllByRole('combobox')
+      const modelSelect = modelSelects[0] // First combobox is the AI Model selector
       await user.click(modelSelect)
-      await user.click(screen.getByText(/flux pro kontext/i))
+      await user.click(screen.getByText(/fal-ai\/flux-pro\/kontext/i))
 
       // Upload portrait
       const hiddenInput = screen.getByTestId('file-input')
@@ -310,9 +324,10 @@ describe('Clothes Changing Integration Tests', () => {
       render(<UnifiedGenerationInterface {...mockProps} />)
 
       // Setup once
-      const modelSelect = screen.getByRole('combobox', { name: /select ai model/i })
+      const modelSelects = screen.getAllByRole('combobox')
+      const modelSelect = modelSelects[0] // First combobox is the AI Model selector
       await user.click(modelSelect)
-      await user.click(screen.getByText(/flux pro kontext/i))
+      await user.click(screen.getByText(/fal-ai\/flux-pro\/kontext/i))
 
       const hiddenInput = screen.getByTestId('file-input')
       const personFile = createMockFile('person.jpg', 'image/jpeg', 'person image')

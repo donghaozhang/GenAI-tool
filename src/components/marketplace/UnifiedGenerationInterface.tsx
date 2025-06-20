@@ -103,12 +103,17 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
       return;
     }
 
+    if (batchMode && batchRequiresImage && !uploadedFile) {
+      toast.error('Please upload an image - some selected models require image input');
+      return;
+    }
+
     setIsGenerating(true);
     try {
       if (batchMode) {
         // Batch mode - generate with multiple models
         console.log(`Starting batch generation with ${selectedModels.length} models`);
-        const results = await generateImagesBatch(selectedModels, prompt, imageCount);
+        const results = await generateImagesBatch(selectedModels, prompt, imageCount, uploadedImageDataUrl || undefined);
         setBatchResults(results);
         onBatchResults?.(results);
         
@@ -192,8 +197,14 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
   };
 
   const requiresImageUpload = !batchMode && (currentModel.categoryLabel === 'Image to Image' || currentModel.categoryLabel === 'Image to Video');
+  
+  // Check if batch mode includes models that require image input
+  const batchRequiresImage = batchMode && selectedModels.some(model => 
+    model.categoryLabel === 'Image to Video' || model.categoryLabel === 'Image to Image'
+  );
+  
   const canGenerate = batchMode 
-    ? selectedModels.length > 0 && prompt.trim()
+    ? selectedModels.length > 0 && prompt.trim() && (!batchRequiresImage || uploadedFile !== null)
     : inputMethod === 'text' ? prompt.trim() : uploadedFile !== null;
 
   return (
@@ -335,6 +346,28 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
           </div>
         </div>
       )}
+
+        {/* Image Upload for Batch Mode - Show if any selected model requires image input */}
+        {batchMode && selectedModels.some(model => model.categoryLabel === 'Image to Video' || model.categoryLabel === 'Image to Image') && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Image Upload (required for Image-to-Video and Image-to-Image models)
+            </label>
+            <label className="flex items-center justify-center gap-2 px-4 py-8 rounded-lg border-2 border-dashed border-gray-600 cursor-pointer transition-colors hover:border-gray-500 hover:bg-gray-700/50">
+              <Upload className="w-6 h-6 text-gray-400" />
+              <span className="text-gray-300">
+                {uploadedFile ? `Uploaded: ${uploadedFile.name}` : 'Click to upload image'}
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+                data-testid="batch-file-input"
+              />
+            </label>
+          </div>
+        )}
 
         {/* Text Input */}
         {(batchMode || inputMethod === 'text' || (requiresImageUpload && uploadedFile)) && (

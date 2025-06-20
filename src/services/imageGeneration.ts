@@ -135,22 +135,35 @@ export interface BatchGenerationResult {
 }
 
 export const generateImagesBatch = async (
-  modelIds: string[], 
+  models: { id: string; categoryLabel: string }[], 
   prompt: string, 
-  count: number = 1
+  count: number = 1,
+  imageDataUrl?: string
 ): Promise<BatchGenerationResult[]> => {
-  console.log(`Starting batch generation for ${modelIds.length} models...`);
+  console.log(`Starting batch generation for ${models.length} models...`);
   
   const startTime = Date.now();
-  const promises = modelIds.map(async (modelId): Promise<BatchGenerationResult> => {
+  const promises = models.map(async (model): Promise<BatchGenerationResult> => {
     const modelStartTime = Date.now();
     try {
-      const imageUrls = await generateImageWithModel(modelId, prompt, count);
+      let imageUrls: string[];
+      
+      // Check if this is an image-to-video or image-to-image model
+      if ((model.categoryLabel === 'Image to Video' || model.categoryLabel === 'Image to Image') && imageDataUrl) {
+        // Use pipeline processing for image-to-video/image-to-image models
+        const { processImagePipeline } = await import('@/utils/pipelineProcessing');
+        const outputUrl = await processImagePipeline(model.id, imageDataUrl, prompt);
+        imageUrls = [outputUrl];
+      } else {
+        // Use standard generation for text-to-image models
+        imageUrls = await generateImageWithModel(model.id, prompt, count);
+      }
+      
       const duration = Date.now() - modelStartTime;
       
       return {
-        modelId,
-        modelTitle: modelId, // Will be enhanced with actual model title
+        modelId: model.id,
+        modelTitle: model.id, // Will be enhanced with actual model title
         success: true,
         imageUrls,
         duration
@@ -160,8 +173,8 @@ export const generateImagesBatch = async (
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       
       return {
-        modelId,
-        modelTitle: modelId,
+        modelId: model.id,
+        modelTitle: model.id,
         success: false,
         error: errorMessage,
         duration
@@ -175,8 +188,8 @@ export const generateImagesBatch = async (
       return result.value;
     } else {
       return {
-        modelId: modelIds[index],
-        modelTitle: modelIds[index],
+        modelId: models[index].id,
+        modelTitle: models[index].id,
         success: false,
         error: result.reason?.message || 'Promise rejected',
         duration: 0
@@ -186,7 +199,7 @@ export const generateImagesBatch = async (
 
   const totalDuration = Date.now() - startTime;
   const successCount = batchResults.filter(r => r.success).length;
-  console.log(`Batch generation completed: ${successCount}/${modelIds.length} successful in ${totalDuration}ms`);
+  console.log(`Batch generation completed: ${successCount}/${models.length} successful in ${totalDuration}ms`);
   
   return batchResults;
 };

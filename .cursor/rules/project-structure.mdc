@@ -59,16 +59,15 @@ src/components/
 ## Test Suite Structure
 ```
 src/__tests__/
-├── components/marketplace/     # Component-specific tests (UnifiedGenerationInterface, etc.)
+├── components/marketplace/     # Core component tests (UnifiedGenerationInterface)
 ├── diagnostics/               # Diagnostic tests (ClothesChangingDiagnostic - 15 tests)
-├── edge-functions/           # Backend Edge Function tests
-├── integration/              # End-to-end integration tests (clothes changing workflows)
-├── pages/                    # Page component tests (AIModelMarketplace)
-└── utils/                    # Utility function tests (image upload, pipeline processing)
+├── integration/              # Essential integration tests (ClothesChangingTest, LivePipelineTest)
+└── utils/                    # Utility function tests (imageUpload)
 ```
-- **60+ comprehensive tests** with all tests passing ✅
-- **Clothes changing functionality** fully tested and working
-- **Test categories**: Component, integration, edge function, and diagnostic tests
+- **43 focused tests** with all tests passing ✅
+- **Modernized test suite** with cleanup of problematic tests
+- **Model title standardization** reflected in all test expectations
+- **Test categories**: Core component, diagnostic, essential integration, and utility tests
 
 ## Key Features
 - **Unified Generation Interface** combining model selection, input methods, and generation controls

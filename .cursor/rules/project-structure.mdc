@@ -26,8 +26,9 @@ src/components/
 ```
 
 ## Important Marketplace Components (Layout Order)
-- [UnifiedGenerationInterface.tsx](mdc:src/components/marketplace/UnifiedGenerationInterface.tsx) - Main interface combining model selection, input methods, and generation controls
-- [ModelSelector.tsx](mdc:src/components/marketplace/ModelSelector.tsx) - Enhanced model selection with color-coded type badges
+- [UnifiedGenerationInterface.tsx](mdc:src/components/marketplace/UnifiedGenerationInterface.tsx) - Main interface with single/batch mode toggle
+- [ModelSelector.tsx](mdc:src/components/marketplace/ModelSelector.tsx) - Single and multi-select model selection with type badges
+- [BatchResultsDisplay.tsx](mdc:src/components/marketplace/BatchResultsDisplay.tsx) - Dedicated batch generation results component
 - [ImageUploadSection.tsx](mdc:src/components/marketplace/ImageUploadSection.tsx) - File upload with data URL conversion for API compatibility
 - [MultiImageDisplay.tsx](mdc:src/components/marketplace/MultiImageDisplay.tsx) - Display generated/uploaded images
 - [ImagePipeline.tsx](mdc:src/components/marketplace/ImagePipeline.tsx) - Multi-step image processing pipeline with clothes changing support
@@ -43,7 +44,7 @@ src/components/
 - [client.ts](mdc:src/integrations/supabase/client.ts) - Supabase client setup
 
 ## Service Layer
-- [imageGeneration.ts](mdc:src/services/imageGeneration.ts) - AI image generation with full model ID support
+- [imageGeneration.ts](mdc:src/services/imageGeneration.ts) - AI image generation with single and batch processing support
 - [pipelineProcessing.ts](mdc:src/utils/pipelineProcessing.ts) - Multi-step image processing
 - [backgroundRemoval.ts](mdc:src/utils/backgroundRemoval.ts) - Background removal utilities
 
@@ -70,9 +71,10 @@ src/__tests__/
 - **Test categories**: Core component, diagnostic, essential integration, and utility tests
 
 ## Key Features
-- **Unified Generation Interface** combining model selection, input methods, and generation controls
+- **Unified Generation Interface** combining model selection, input methods, and generation controls with batch mode
+- **Batch Processing System** for multi-model comparison with parallel generation and error isolation
 - **Full fal-ai model ID format** throughout the application with consistent title formatting
-- **Enhanced model selector** with type indicators and color coding
+- **Enhanced model selector** with single/multi-select modes and type indicators
 - **Dynamic category filtering** with automatic count calculation and disabled states
 - **Comprehensive pipeline processing** with multiple AI model integrations
 - **Working clothes changing functionality** using FLUX Pro Kontext model (fal-ai/flux-pro/kontext)

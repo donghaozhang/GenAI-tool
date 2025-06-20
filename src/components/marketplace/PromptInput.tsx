@@ -18,7 +18,7 @@ export const PromptInput: React.FC<PromptInputProps> = ({ onImagesGenerated, sel
   const modelDisplayNames: { [key: string]: string } = {
     'fal-ai/flux/schnell': 'FLUX Schnell',
     'fal-ai/flux-pro': 'FLUX Pro',
-    'fal-ai/imagen-4-preview': 'Imagen 4',
+    'fal-ai/imagen4/preview': 'Imagen 4',
     'fal-ai/kling-video/v2.1/standard/image-to-video': 'Kling Video',
   };
 

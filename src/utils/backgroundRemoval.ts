@@ -1,83 +1,58 @@
 export const processBackgroundRemoval = async (imageUrl: string): Promise<string> => {
   try {
-    console.log('Starting background removal process...');
+    console.log('Starting background removal process with fal-ai/imageutils/rembg...');
     
-    // Import transformers dynamically
-    const { pipeline, env } = await import('@huggingface/transformers');
-    
-    // Configure transformers.js
-    env.allowLocalModels = false;
-    env.useBrowserCache = false;
-    
-    const segmenter = await pipeline('image-segmentation', 'Xenova/segformer-b0-finetuned-ade-512-512', {
-      device: 'webgpu',
+    // Get the FAL API key from environment
+    const FAL_API_KEY = import.meta.env.VITE_FAL_API_KEY;
+    if (!FAL_API_KEY) {
+      throw new Error('FAL_API_KEY not configured. Please set VITE_FAL_API_KEY in your environment.');
+    }
+
+    // Call the fal.ai background removal API directly
+    const response = await fetch('https://fal.run/fal-ai/imageutils/rembg', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Key ${FAL_API_KEY}`,
+      },
+      body: JSON.stringify({
+        image_url: imageUrl,
+        sync_mode: true, // Wait for the image to be generated and uploaded
+        crop_to_bbox: false // Keep full image dimensions
+      }),
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Background removal API error:', errorText);
+      throw new Error(`Background removal API request failed with status ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('Background removal API response:', result);
+
+    if (!result || !result.image || !result.image.url) {
+      throw new Error('Invalid response from background removal API - missing image URL');
+    }
+
+    console.log('Background removal completed successfully');
+    return result.image.url;
+  } catch (error) {
+    console.error('Error removing background:', error);
     
-    // Load image
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-      img.src = imageUrl;
-    });
-    
-    // Convert to canvas and resize if needed
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Could not get canvas context');
-    
-    const MAX_SIZE = 1024;
-    let { width, height } = img;
-    
-    if (width > MAX_SIZE || height > MAX_SIZE) {
-      if (width > height) {
-        height = Math.round((height * MAX_SIZE) / width);
-        width = MAX_SIZE;
-      } else {
-        width = Math.round((width * MAX_SIZE) / height);
-        height = MAX_SIZE;
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        throw new Error('API authentication failed. Please check your FAL_KEY configuration.');
+      } else if (error.message.includes('429')) {
+        throw new Error('API rate limit exceeded. Please try again later.');
+      } else if (error.message.includes('500')) {
+        throw new Error('Background removal service is temporarily unavailable. Please try again.');
+      } else if (error.message.includes('FAL_API_KEY not configured')) {
+        throw error; // Re-throw the configuration error as-is
       }
     }
     
-    canvas.width = width;
-    canvas.height = height;
-    ctx.drawImage(img, 0, 0, width, height);
-    
-    // Process with segmentation model
-    const imageData = canvas.toDataURL('image/jpeg', 0.8);
-    const result = await segmenter(imageData);
-    
-    if (!result || !Array.isArray(result) || result.length === 0 || !result[0].mask) {
-      throw new Error('Invalid segmentation result');
-    }
-    
-    // Create output canvas with transparent background
-    const outputCanvas = document.createElement('canvas');
-    outputCanvas.width = width;
-    outputCanvas.height = height;
-    const outputCtx = outputCanvas.getContext('2d');
-    if (!outputCtx) throw new Error('Could not get output canvas context');
-    
-    // Draw original image
-    outputCtx.drawImage(canvas, 0, 0);
-    
-    // Apply mask to alpha channel
-    const outputImageData = outputCtx.getImageData(0, 0, width, height);
-    const data = outputImageData.data;
-    
-    for (let i = 0; i < result[0].mask.data.length; i++) {
-      // Invert mask to keep subject, remove background
-      const alpha = Math.round((1 - result[0].mask.data[i]) * 255);
-      data[i * 4 + 3] = alpha;
-    }
-    
-    outputCtx.putImageData(outputImageData, 0, 0);
-    
-    // Convert to data URL
-    return outputCanvas.toDataURL('image/png', 1.0);
-  } catch (error) {
-    console.error('Error removing background:', error);
-    throw error;
+    throw new Error(`Background removal failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };

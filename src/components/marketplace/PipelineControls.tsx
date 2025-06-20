@@ -2,7 +2,8 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Play } from 'lucide-react';
-import { pipelineModels, PipelineModel } from '@/constants/pipelineModels';
+import { pipelineModels, PipelineModel } from '@/constants/models';
+import { Textarea } from '../ui/textarea';
 
 interface PipelineControlsProps {
   selectedPipelineModel: string;
@@ -99,9 +100,9 @@ export const PipelineControls: React.FC<PipelineControlsProps> = ({
               ✨ Advanced context-aware image modification and enhancement
             </p>
           )}
-          {selectedModel.id === 'background-removal' && (
+          {selectedModel.id === 'fal-ai/imageutils/rembg' && (
             <p className="text-xs text-blue-400 mt-1">
-              🎯 Automatically removes background using AI segmentation
+              🎯 Automatically removes background using advanced AI segmentation with rembg
             </p>
           )}
           {selectedModel.id === 'fal-ai/aura-sr' && (
@@ -127,7 +128,7 @@ export const PipelineControls: React.FC<PipelineControlsProps> = ({
         </div>
       )}
 
-      {selectedModel?.id !== 'background-removal' && selectedModel?.id !== 'fal-ai/aura-sr' && selectedModel?.id !== 'video-to-sound' && (
+      {selectedModel?.id !== 'fal-ai/imageutils/rembg' && selectedModel?.id !== 'fal-ai/aura-sr' && selectedModel?.id !== 'video-to-sound' && (
         <div>
           <label className="text-sm font-medium text-gray-300 mb-2 block">Pipeline Prompt</label>
           <input

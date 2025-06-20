@@ -1,8 +1,7 @@
-
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../ui/button';
 import { Loader2, Play, Download, Upload, RefreshCw, Volume2, Type, Box } from 'lucide-react';
-import { PipelineModel } from '@/constants/pipelineModels';
+import { PipelineModel } from '@/constants/models';
 import { ModelViewer3D } from './ModelViewer3D';
 
 interface ImageDisplayGridProps {

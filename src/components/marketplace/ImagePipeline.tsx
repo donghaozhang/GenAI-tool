@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowRight } from 'lucide-react';
 import { ImageUploadSection } from './ImageUploadSection';
 import { ImageDisplayGrid } from './ImageDisplayGrid';
 import { PipelineControls } from './PipelineControls';
-import { pipelineModels } from '@/constants/pipelineModels';
+import { pipelineModels } from '@/constants/models';
 import { processBackgroundRemoval } from '@/utils/backgroundRemoval';
 import { processImagePipeline } from '@/utils/pipelineProcessing';
 import { processVideoToSound } from '@/utils/elevenLabsProcessing';
@@ -53,7 +52,7 @@ export const ImagePipeline: React.FC<ImagePipelineProps> = ({ sourceImageUrl, so
       
       let result: string;
       
-      if (selectedPipelineModel === 'background-removal') {
+      if (selectedPipelineModel === 'fal-ai/imageutils/rembg') {
         result = await processBackgroundRemoval(currentSourceImage!);
       } else if (selectedPipelineModel === 'video-to-sound') {
         result = await processVideoToSound(currentSourceImage!);

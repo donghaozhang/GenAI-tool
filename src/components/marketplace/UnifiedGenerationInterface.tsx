@@ -32,7 +32,7 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
   onImagesGenerated, 
   onFileUploaded 
 }) => {
-  const [selectedModel, setSelectedModel] = useState('fal-ai/imagen-4-preview');
+  const [selectedModel, setSelectedModel] = useState('fal-ai/imagen4/preview');
   const [prompt, setPrompt] = useState('');
   const [inputMethod, setInputMethod] = useState<'text' | 'upload'>('text');
   const [isGenerating, setIsGenerating] = useState(false);

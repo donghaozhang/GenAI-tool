@@ -25,12 +25,14 @@ The marketplace now uses a **Unified Generation Interface** that combines model 
 
 ## Model ID Format Standards
 - **Always use full fal-ai format**: `"fal-ai/flux/schnell"` instead of short names like `"schnell"`
-- This applies to all model references in:
-  - `src/constants/models.ts` - Featured models array
+- **Model titles should match model IDs** for consistency and clarity (e.g., title: "fal-ai/flux-pro/kontext")
+- This standardization applies to all model references in:
+  - `src/constants/models.ts` - Featured models array (both `id` and `title` fields)
   - `src/constants/pipelineModels.ts` - Pipeline model configurations
   - `src/components/marketplace/ModelSelector.tsx` - Model options
   - `src/services/imageGeneration.ts` - API calls and model detection
   - Backend functions support both formats for backward compatibility
+- **Recent Update**: FLUX Pro Kontext model title updated to use full model ID format for consistency
 
 ## Pipeline Processing & Clothes Changing
 - **FLUX Pro Kontext Support** for advanced image-to-image transformations
@@ -79,11 +81,19 @@ The marketplace now uses a **Unified Generation Interface** that combines model 
 ## Adding New Models
 1. Add model data to `featuredModels` array in [models.ts](mdc:src/constants/models.ts)
 2. **Use full fal-ai format** for model ID (e.g., `"fal-ai/model-name"`)
-3. Include `type` field indicating model capability (Text to Image, Image to Video, etc.)
-4. Ensure `categoryLabel` matches one of the categories in `allCategories`
-5. Category counts will update automatically
-6. Model will appear in the grid and be filterable
-7. Categories will be enabled/disabled based on model availability
+3. **Set title to match the model ID** for consistency (e.g., title: `"fal-ai/model-name"`)
+4. Include `type` field indicating model capability (Text to Image, Image to Video, etc.)
+5. Ensure `categoryLabel` matches one of the categories in `allCategories`
+6. Category counts will update automatically
+7. Model will appear in the grid and be filterable
+8. Categories will be enabled/disabled based on model availability
+
+## Model Title Consistency Guidelines
+- **Standard Practice**: Model titles should match their full model IDs
+- **Example**: For model ID `"fal-ai/flux-pro/kontext"`, use title `"fal-ai/flux-pro/kontext"`
+- **Benefits**: Eliminates confusion, improves debugging, maintains consistency across UI
+- **Migration**: Existing models are being updated to follow this standard
+- **Exception**: Only use human-readable titles when the model ID is not user-friendly
 
 ## API Integration
 - Image generation services in [imageGeneration.ts](mdc:src/services/imageGeneration.ts)

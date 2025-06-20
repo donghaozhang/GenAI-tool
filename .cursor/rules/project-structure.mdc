@@ -72,12 +72,13 @@ src/__tests__/
 
 ## Key Features
 - **Unified Generation Interface** combining model selection, input methods, and generation controls
-- **Full fal-ai model ID format** throughout the application
+- **Full fal-ai model ID format** throughout the application with consistent title formatting
 - **Enhanced model selector** with type indicators and color coding
 - **Dynamic category filtering** with automatic count calculation and disabled states
 - **Comprehensive pipeline processing** with multiple AI model integrations
-- **Working clothes changing functionality** using FLUX Pro Kontext model
+- **Working clothes changing functionality** using FLUX Pro Kontext model (fal-ai/flux-pro/kontext)
 - **Data URL support** for uploaded images (base64 format for API compatibility)
 - **Comprehensive test coverage** ensuring reliability and functionality
+- **Standardized model naming** with titles matching full model IDs for clarity and consistency
 
 

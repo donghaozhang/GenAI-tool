@@ -31,7 +31,7 @@ export const featuredModels: FeaturedModel[] = [
   // Image to Image models
   {
     id: 'fal-ai/flux-pro/kontext',
-    title: 'FLUX Pro Kontext',
+    title: 'fal-ai/flux-pro/kontext',
     description: 'FLUX.1 Kontext [pro] handles both text and reference images as inputs, seamlessly enabling targeted, local editing and enhancement of specific image regions.',
     category: 'image-to-image',
     categoryLabel: 'Image to Image',
@@ -43,7 +43,7 @@ export const featuredModels: FeaturedModel[] = [
   },
   {
     id: 'fal-ai/flux-pro',
-    title: 'FLUX Pro Enhance',
+    title: 'fal-ai/flux-pro',
     description: 'Enhance image quality with FLUX Pro, delivering professional-grade image enhancement and refinement capabilities.',
     category: 'image-to-image',
     categoryLabel: 'Image to Image',
@@ -56,7 +56,7 @@ export const featuredModels: FeaturedModel[] = [
   },
   {
     id: 'fal-ai/aura-sr',
-    title: 'Aura SR',
+    title: 'fal-ai/aura-sr',
     description: 'Super-resolution image upscaling powered by advanced AI algorithms for exceptional detail enhancement and clarity.',
     category: 'image-to-image',
     categoryLabel: 'Image to Image',
@@ -69,7 +69,7 @@ export const featuredModels: FeaturedModel[] = [
   },
   {
     id: 'fal-ai/imageutils/rembg',
-    title: 'Background Removal',
+    title: 'fal-ai/imageutils/rembg',
     description: 'Remove the background from an image using advanced AI segmentation technology. Supports cropping to bounding box around the subject.',
     category: 'image-to-image',
     categoryLabel: 'Image to Image',
@@ -84,7 +84,7 @@ export const featuredModels: FeaturedModel[] = [
   // Image to Video models
   {
     id: 'fal-ai/kling-video/v2.1/master/image-to-video',
-    title: 'Kling Video 2.1 Master',
+    title: 'fal-ai/kling-video/v2.1/master/image-to-video',
     description: 'The premium endpoint for Kling 2.1, designed for top-tier image-to-video generation with exceptional quality and detail.',
     category: 'image-to-video',
     categoryLabel: 'Image to Video',
@@ -96,7 +96,7 @@ export const featuredModels: FeaturedModel[] = [
   },
   {
     id: 'fal-ai/kling-video/v2.1/standard/image-to-video',
-    title: 'Kling Video 2.1 Standard',
+    title: 'fal-ai/kling-video/v2.1/standard/image-to-video',
     description: 'Kling 2.1 Standard is a cost-efficient endpoint for the Kling 2.1 model, delivering high-quality image-to-video generation at an affordable price point.',
     category: 'image-to-video',
     categoryLabel: 'Image to Video',
@@ -108,7 +108,7 @@ export const featuredModels: FeaturedModel[] = [
   },
   {
     id: 'fal-ai/pixverse/v4.5',
-    title: 'PixVerse v4.5',
+    title: 'fal-ai/pixverse/v4.5',
     description: 'Generate high quality video clips from text and image prompts using PixVerse v4.5 with advanced motion control and stylistic transformations.',
     category: 'image-to-video',
     categoryLabel: 'Image to Video',
@@ -122,7 +122,7 @@ export const featuredModels: FeaturedModel[] = [
   // Text to Video models
   {
     id: 'fal-ai/veo-3',
-    title: 'Veo 3',
+    title: 'fal-ai/veo-3',
     description: 'Veo 3 by Google, the most advanced AI video generation model in the world. With sound too!',
     category: 'text-to-video',
     categoryLabel: 'Text to Video',
@@ -134,7 +134,7 @@ export const featuredModels: FeaturedModel[] = [
   },
   {
     id: 'fal-ai/bytedance/seedance/v1/lite/text-to-video',
-    title: 'SeeeDance Text to Video',
+    title: 'fal-ai/bytedance/seedance/v1/lite/text-to-video',
     description: 'Generate dynamic video content from text prompts using SeeeDance v1 Lite with efficient processing and creative motion synthesis.',
     category: 'text-to-video',
     categoryLabel: 'Text to Video',
@@ -149,7 +149,7 @@ export const featuredModels: FeaturedModel[] = [
   // Video to Audio models
   {
     id: 'video-to-sound',
-    title: 'ElevenLabs Video to Sound',
+    title: 'video-to-sound',
     description: 'Generate realistic sound effects and audio from video content using ElevenLabs advanced AI audio synthesis technology.',
     category: 'video-to-audio',
     categoryLabel: 'Video to Audio',
@@ -164,7 +164,7 @@ export const featuredModels: FeaturedModel[] = [
   // Image to 3D models
   {
     id: 'fal-ai/hunyuan3d-v21',
-    title: 'Hunyuan3D v2.1',
+    title: 'fal-ai/hunyuan3d-v21',
     description: 'Generate detailed 3D models from 2D images using Hunyuan3D v2.1 with advanced geometry reconstruction and texture mapping.',
     category: 'image-to-3d',
     categoryLabel: 'Image to 3D',

@@ -16,6 +16,18 @@ export interface FeaturedModel {
 export const featuredModels: FeaturedModel[] = [
   // Text to Image models first
   {
+    id: 'fal-ai/flux-1/schnell',
+    title: 'fal-ai/flux-1/schnell',
+    description: 'FLUX.1 [schnell] - Fastest inference in the world for the 12 billion parameter FLUX.1 text-to-image model. Turbo mode for next generation image generation.',
+    category: 'text-to-image',
+    categoryLabel: 'Text to Image',
+    image: '',
+    isNew: true,
+    tags: ['flux', 'schnell', 'fastest', 'turbo', 'commercial', '12b-params'],
+    type: 'text-to-image',
+    typeLabel: 'Text to Image',
+  },
+  {
     id: 'fal-ai/flux/dev',
     title: 'fal-ai/flux/dev',
     description: 'FLUX.1 [dev] is a 12 billion parameter flow transformer that generates high-quality images from text. Suitable for personal and commercial use.',

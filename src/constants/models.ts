@@ -66,6 +66,18 @@ export const featuredModels: FeaturedModel[] = [
   
   // Image to Image models
   {
+    id: 'fal-ai/luma-photon/reframe',
+    title: 'fal-ai/luma-photon/reframe',
+    description: 'Luma Photon Reframe extends and reframes images with intelligent content expansion. Seamlessly blends new content to enhance creativity and adaptability at a fraction of the cost.',
+    category: 'image-to-image',
+    categoryLabel: 'Image to Image',
+    image: '',
+    isNew: true,
+    tags: ['luma', 'photon', 'reframe', 'extend', 'aspect-ratio', 'creative'],
+    type: 'image-to-image',
+    typeLabel: 'Image to Image',
+  },
+  {
     id: 'fal-ai/flux-pro/kontext',
     title: 'fal-ai/flux-pro/kontext',
     description: 'FLUX.1 Kontext [pro] handles both text and reference images as inputs, seamlessly enabling targeted, local editing and enhancement of specific image regions.',

@@ -268,7 +268,7 @@ describe('UnifiedGenerationInterface', () => {
       />
     );
 
-    // Find the Number of Images section and its combobox
+    // Find the Number of Images/Videos section and its combobox
     const imageCountSection = screen.getByText('Number of Images').closest('div');
     const imageCountSelector = imageCountSection?.querySelector('[role="combobox"]') as HTMLElement;
     fireEvent.click(imageCountSelector);

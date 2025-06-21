@@ -482,7 +482,7 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
                     setUploadedImageDataUrl(null);
                   }}
                   className="flex items-center gap-2 px-4 py-3 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors"
-                  title="Remove uploaded image"
+                  title="Remove uploaded file"
                 >
                   <X className="w-4 h-4" />
                   Remove
@@ -519,7 +519,14 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              {batchMode ? 'Images per Model' : 'Number of Images'}
+              {batchMode 
+                ? 'Outputs per Model' 
+                : currentModel.categoryLabel === 'Video to Video' 
+                ? 'Number of Videos'
+                : currentModel.categoryLabel === 'Image to Video'
+                ? 'Number of Videos'
+                : 'Number of Images'
+              }
             </label>
             <Select value={imageCount.toString()} onValueChange={(value) => setImageCount(parseInt(value))}>
               <SelectTrigger className="w-full bg-gray-700 border-gray-600 text-white">
@@ -528,7 +535,15 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
               <SelectContent className="bg-gray-700 border-gray-600">
                 {[1, 2, 3, 4].map((num) => (
                   <SelectItem key={num} value={num.toString()} className="text-white hover:bg-gray-600">
-                    {num} image{num > 1 ? 's' : ''}{batchMode ? ' per model' : ''}
+                    {num} {
+                      batchMode 
+                        ? `output${num > 1 ? 's' : ''} per model`
+                        : currentModel.categoryLabel === 'Video to Video' 
+                        ? `video${num > 1 ? 's' : ''}`
+                        : currentModel.categoryLabel === 'Image to Video'
+                        ? `video${num > 1 ? 's' : ''}`
+                        : `image${num > 1 ? 's' : ''}`
+                    }
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -600,6 +615,8 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
                 ? 'Upload an image first, then describe the transformation'
                 : currentModel.categoryLabel === 'Image to Video'
                 ? 'Upload an image and describe the motion you want to create'
+                : currentModel.categoryLabel === 'Video to Video'
+                ? 'Upload a video and describe the audio or enhancement you want to add'
                 : currentModel.categoryLabel === 'Text to Video'
                 ? 'Describe the video scene and action you want to create'
                 : 'Follow the model-specific guidelines for best results'

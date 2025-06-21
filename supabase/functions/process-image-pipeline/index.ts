@@ -22,10 +22,10 @@ interface ResultFetchParams {
   responseUrl: string;
 }
 
-// Helper function to validate image URL
-const isValidImageUrl = (url: string): boolean => {
-  // Check for data URLs (base64 encoded images)
-  if (url.startsWith('data:image/')) {
+// Helper function to validate media URL (image or video)
+const isValidMediaUrl = (url: string): boolean => {
+  // Check for data URLs (base64 encoded images or videos)
+  if (url.startsWith('data:image/') || url.startsWith('data:video/')) {
     return true;
   }
   
@@ -104,9 +104,9 @@ serve(async (req: Request) => {
       );
     }
 
-    if (sourceImageUrl && !isValidImageUrl(sourceImageUrl)) {
+    if (sourceImageUrl && !isValidMediaUrl(sourceImageUrl)) {
       return new Response(
-        JSON.stringify({ error: 'Invalid image URL format' }),
+        JSON.stringify({ error: 'Invalid media URL format' }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
           status: 400 

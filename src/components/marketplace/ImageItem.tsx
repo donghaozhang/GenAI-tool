@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Check, Play } from 'lucide-react';
@@ -27,11 +26,21 @@ export const ImageItem: React.FC<ImageItemProps> = ({
     onDownload(imageUrl, index);
   };
 
-  // Check if the URL is a video file
-  const isVideo = imageUrl.toLowerCase().includes('.mp4') || 
-                  imageUrl.toLowerCase().includes('.mov') || 
-                  imageUrl.toLowerCase().includes('.webm') ||
-                  imageUrl.toLowerCase().includes('.avi');
+  // Check if the URL is a video file - improved detection
+  const isVideo = (() => {
+    const url = imageUrl.toLowerCase();
+    // Check for common video file extensions
+    const videoExtensions = ['.mp4', '.mov', '.webm', '.avi', '.mkv', '.m4v'];
+    const hasVideoExtension = videoExtensions.some(ext => url.includes(ext));
+    
+    // Also check for video MIME type hints in URL or query parameters
+    const hasVideoMimeHint = url.includes('video/') || url.includes('type=video');
+    
+    // Check if it's a blob URL that might contain video (common for generated content)
+    const isBlobVideo = url.startsWith('blob:') && (hasVideoExtension || hasVideoMimeHint);
+    
+    return hasVideoExtension || hasVideoMimeHint || isBlobVideo;
+  })();
 
   return (
     <div 

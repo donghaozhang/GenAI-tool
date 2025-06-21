@@ -190,8 +190,8 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
         setUploadedImageDataUrl(dataUrl);
-        // Also show the uploaded image in the display
-        onImagesGenerated([dataUrl], `Uploaded: ${file.name}`);
+        // Don't add uploaded files to the generated images display
+        // They will be shown in the upload confirmation area instead
       };
       reader.readAsDataURL(file);
     }
@@ -346,10 +346,10 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
                   : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'
               }`}>
                 <Upload className="w-4 h-4" />
-                Upload Image
+                {currentModel.categoryLabel === 'Video to Video' ? 'Upload Video' : 'Upload Image'}
                 <input
                   type="file"
-                  accept="image/*"
+                  accept={currentModel.categoryLabel === 'Video to Video' ? "video/*" : "image/*"}
                   onChange={handleFileUpload}
                   className="hidden"
                   data-testid="file-input"
@@ -365,12 +365,17 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
         <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
           <div className="flex items-center gap-2 text-green-400">
             <Upload className="w-4 h-4" />
-            <span className="text-sm">Uploaded: {uploadedFile.name}</span>
+            <span className="text-sm">
+              {batchMode 
+                ? `Uploaded: ${uploadedFile.name}`
+                : `${currentModel.categoryLabel === 'Video to Video' ? 'Video' : 'Image'} Uploaded: ${uploadedFile.name}`
+              }
+            </span>
           </div>
         </div>
       )}
 
-        {/* Image Upload for Batch Mode - Show if any selected model requires image input */}
+        {/* Media Upload for Batch Mode - Show if any selected model requires media input */}
         {batchMode && selectedModels.some(modelId => {
           const model = featuredModels.find(m => m.id === modelId);
           return model?.categoryLabel === 'Image to Video' || 
@@ -378,10 +383,25 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
                  model?.categoryLabel === 'Video to Video';
         }) && (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-3">
-              Image Upload
-                              <span className="text-purple-400 ml-1">(required for Image-to-Video, Image-to-Image, and Video-to-Video models)</span>
-            </label>
+            {(() => {
+              const hasVideoToVideo = selectedModels.some(modelId => {
+                const model = featuredModels.find(m => m.id === modelId);
+                return model?.categoryLabel === 'Video to Video';
+              });
+              const hasImageModels = selectedModels.some(modelId => {
+                const model = featuredModels.find(m => m.id === modelId);
+                return model?.categoryLabel === 'Image to Video' || model?.categoryLabel === 'Image to Image';
+              });
+              
+              return (
+                <label className="block text-sm font-medium text-gray-300 mb-3">
+                  {hasVideoToVideo && hasImageModels ? 'Media Upload' : hasVideoToVideo ? 'Video Upload' : 'Image Upload'}
+                  <span className="text-purple-400 ml-1">
+                    (required for {hasVideoToVideo && hasImageModels ? 'selected models' : hasVideoToVideo ? 'Video-to-Video models' : 'Image-to-Video and Image-to-Image models'})
+                  </span>
+                </label>
+              );
+            })()}
             <div className="flex gap-4">
               <label className={`flex items-center gap-3 px-6 py-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
                 uploadedFile 
@@ -390,16 +410,54 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
               }`}>
                 <Upload className="w-5 h-5" />
                 <div className="flex flex-col">
-                  <span className="font-medium">
-                    {uploadedFile ? 'Image Uploaded' : 'Upload Image'}
-                  </span>
-                  <span className="text-xs opacity-75">
-                    {uploadedFile ? uploadedFile.name : 'Click to select image file'}
-                  </span>
+                  {(() => {
+                    const hasVideoToVideo = selectedModels.some(modelId => {
+                      const model = featuredModels.find(m => m.id === modelId);
+                      return model?.categoryLabel === 'Video to Video';
+                    });
+                    const hasImageModels = selectedModels.some(modelId => {
+                      const model = featuredModels.find(m => m.id === modelId);
+                      return model?.categoryLabel === 'Image to Video' || model?.categoryLabel === 'Image to Image';
+                    });
+                    
+                    return (
+                      <>
+                        <span className="font-medium">
+                          {uploadedFile 
+                            ? hasVideoToVideo && hasImageModels ? 'Media Uploaded' : hasVideoToVideo ? 'Video Uploaded' : 'Image Uploaded'
+                            : hasVideoToVideo && hasImageModels ? 'Upload Media' : hasVideoToVideo ? 'Upload Video' : 'Upload Image'
+                          }
+                        </span>
+                        <span className="text-xs opacity-75">
+                          {uploadedFile 
+                            ? uploadedFile.name 
+                            : hasVideoToVideo && hasImageModels ? 'Click to select image or video file' : hasVideoToVideo ? 'Click to select video file' : 'Click to select image file'
+                          }
+                        </span>
+                      </>
+                    );
+                  })()}
                 </div>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept={(() => {
+                    const hasVideoToVideo = selectedModels.some(modelId => {
+                      const model = featuredModels.find(m => m.id === modelId);
+                      return model?.categoryLabel === 'Video to Video';
+                    });
+                    const hasImageModels = selectedModels.some(modelId => {
+                      const model = featuredModels.find(m => m.id === modelId);
+                      return model?.categoryLabel === 'Image to Video' || model?.categoryLabel === 'Image to Image';
+                    });
+                    
+                    if (hasVideoToVideo && hasImageModels) {
+                      return "image/*,video/*";
+                    } else if (hasVideoToVideo) {
+                      return "video/*";
+                    } else {
+                      return "image/*";
+                    }
+                  })()}
                   onChange={handleFileUpload}
                   className="hidden"
                   data-testid="batch-file-input"

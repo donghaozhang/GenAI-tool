@@ -54,19 +54,21 @@ Your app will be available at `http://localhost:5173`
    - Vercel will auto-detect it's a Vite project
 
 2. **Set Environment Variables in Vercel**
-   Go to Project Settings → Environment Variables and add:
+   Go to your Vercel project → Settings → Environment Variables and add these:
    
-   ```
-   VITE_SUPABASE_URL = https://wdprvtqbwnhwbpufcmgg.supabase.co
-   VITE_SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkcHJ2dHFid25od2JwdWZjbWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NDQyODksImV4cCI6MjA2NTUyMDI4OX0.6_f-ggUyf57kq1onDb_eXXPZSyctVpi7bglTxK_V0fE
-   VITE_SUPABASE_FUNCTIONS_URL = https://wdprvtqbwnhwbpufcmgg.supabase.co/functions/v1
-   VITE_FAL_API_KEY = your_fal_api_key_here
-   VITE_FAL_API_BASE_URL = https://fal.run
-   VITE_ELEVENLABS_API_BASE_URL = https://api.elevenlabs.io
-   VITE_OPENROUTER_API_BASE_URL = https://openrouter.ai
-   VITE_APP_NAME = AI Model Marketplace
-   VITE_APP_DOMAIN = your-project-name.vercel.app
-   ```
+   | Variable Name | Value | Environment |
+   |---------------|-------|-------------|
+   | `VITE_SUPABASE_URL` | `https://wdprvtqbwnhwbpufcmgg.supabase.co` | Production, Preview, Development |
+   | `VITE_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkcHJ2dHFid25od2JwdWZjbWdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5NDQyODksImV4cCI6MjA2NTUyMDI4OX0.6_f-ggUyf57kq1onDb_eXXPZSyctVpi7bglTxK_V0fE` | Production, Preview, Development |
+   | `VITE_SUPABASE_FUNCTIONS_URL` | `https://wdprvtqbwnhwbpufcmgg.supabase.co/functions/v1` | Production, Preview, Development |
+   | `VITE_FAL_API_KEY` | `your_actual_fal_api_key_here` | Production, Preview, Development |
+   | `VITE_FAL_API_BASE_URL` | `https://fal.run` | Production, Preview, Development |
+   | `VITE_ELEVENLABS_API_BASE_URL` | `https://api.elevenlabs.io` | Production, Preview, Development |
+   | `VITE_OPENROUTER_API_BASE_URL` | `https://openrouter.ai` | Production, Preview, Development |
+   | `VITE_APP_NAME` | `AI Model Marketplace` | Production, Preview, Development |
+   | `VITE_APP_DOMAIN` | `your-project-name.vercel.app` | Production, Preview, Development |
+   
+   **Important:** Make sure to select all three environments (Production, Preview, Development) for each variable.
 
 3. **Deploy**
    - Click "Deploy"

@@ -35,13 +35,13 @@ const AuthPage = () => {
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </CardTitle>
           <CardDescription className="text-gray-400">
-            {isLogin ? 'Sign in to play Space Invaders' : 'Join the Space Invaders community'}
+            {isLogin ? 'Sign in to access AI Marketplace' : 'Join the AI Marketplace community'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {isLogin ? <LoginForm /> : <SignUpForm />}
           
-          <div className="text-center">
+          <div className="text-center space-y-3">
             <Button
               variant="link"
               onClick={() => setIsLogin(!isLogin)}
@@ -49,6 +49,27 @@ const AuthPage = () => {
             >
               {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
             </Button>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-600" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-gray-900 px-2 text-gray-400">Or</span>
+              </div>
+            </div>
+            
+            <Button
+              variant="outline"
+              onClick={() => navigate('/marketplace')}
+              className="w-full border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+            >
+              Skip Auth - Try Marketplace
+            </Button>
+            
+            <p className="text-xs text-gray-500 mt-2">
+              You can explore AI models without an account. Sign up later to save your work.
+            </p>
           </div>
         </CardContent>
       </Card>

@@ -21,12 +21,11 @@ const Index = () => {
   }
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    } else if (!loading && user) {
+    if (!loading && user) {
       // Redirect authenticated users directly to the AI marketplace
       navigate('/marketplace');
     }
+    // Remove automatic redirect to auth - let users choose
   }, [user, loading, navigate]);
 
   if (loading) {

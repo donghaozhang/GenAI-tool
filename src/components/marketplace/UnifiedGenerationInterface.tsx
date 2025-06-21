@@ -110,7 +110,13 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
     }
 
     if (batchMode && batchRequiresImage && !uploadedFile) {
-      toast.error('Please upload an image - some selected models require image input');
+      // Check if MMAudio v2 is selected for more specific error message
+      const hasMMAudio = selectedModels.some(modelId => modelId.includes('mmaudio-v2'));
+      if (hasMMAudio) {
+        toast.error('MMAudio V2 requires a video file to generate synchronized audio - please upload a video');
+      } else {
+        toast.error('Please upload an image - some selected models require image input');
+      }
       return;
     }
 
@@ -159,7 +165,12 @@ export const UnifiedGenerationInterface: React.FC<UnifiedGenerationInterfaceProp
           // Use processImagePipeline for image-to-image, image-to-video, and video-to-video models
           if (!uploadedImageDataUrl) {
             const mediaType = currentModel.categoryLabel === 'Video to Video' ? 'video' : 'image';
-            toast.error(`Please upload a ${mediaType} first`);
+            // Provide specific error message for MMAudio v2
+            if (selectedModel.includes('mmaudio-v2')) {
+              toast.error('MMAudio V2 requires a video file to generate synchronized audio');
+            } else {
+              toast.error(`Please upload a ${mediaType} first`);
+            }
             return;
           }
           

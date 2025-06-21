@@ -141,13 +141,22 @@ serve(async (req: Request) => {
       input.duration = "6"; // Default to 6 seconds
       input.prompt_optimizer = true; // Enable prompt optimization by default
     } else if (modelId.includes('mmaudio-v2')) {
-      // MMAudio V2 specific parameters
-      input.duration = 8; // Default duration in seconds
-      input.num_steps = 25; // Default number of steps
-      input.cfg_strength = 4.5; // Default CFG strength
+      // MMAudio V2 specific parameters - requires both video_url and prompt
+      if (!sourceImageUrl) {
+        return new Response(
+          JSON.stringify({ error: 'MMAudio V2 requires a video URL' }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+            status: 400 
+          }
+        );
+      }
       if (!prompt) {
         input.prompt = "Cinematic background music with emotional depth and atmospheric ambiance";
       }
+      input.duration = 8; // Default duration in seconds
+      input.num_steps = 25; // Default number of steps
+      input.cfg_strength = 4.5; // Default CFG strength
     }
 
     console.log(`Making request to FAL queue with model: ${modelId}`);

@@ -45,5 +45,11 @@ export const validateConfig = () => {
   }
 };
 
-// Initialize validation
-validateConfig(); 
+// Initialize validation only in development
+if (import.meta.env.DEV) {
+  try {
+    validateConfig();
+  } catch (error) {
+    console.warn('Environment validation warning:', error);
+  }
+} 

@@ -5,8 +5,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
-  const { user, loading } = useAuth();
   const navigate = useNavigate();
+  
+  // Add error handling for auth context
+  let user, loading;
+  try {
+    const authContext = useAuth();
+    user = authContext.user;
+    loading = authContext.loading;
+  } catch (error) {
+    console.error('Auth context error:', error);
+    // Fallback values if auth context fails
+    user = null;
+    loading = false;
+  }
 
   useEffect(() => {
     if (!loading && !user) {

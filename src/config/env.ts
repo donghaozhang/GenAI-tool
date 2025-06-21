@@ -3,10 +3,13 @@ export const config = {
   supabase: {
     url: import.meta.env.VITE_SUPABASE_URL,
     anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+    functionsUrl: import.meta.env.VITE_SUPABASE_FUNCTIONS_URL || 
+                  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`,
   },
   api: {
     fal: {
       baseUrl: import.meta.env.VITE_FAL_API_BASE_URL || 'https://fal.run',
+      apiKey: import.meta.env.VITE_FAL_API_KEY,
     },
     elevenlabs: {
       baseUrl: import.meta.env.VITE_ELEVENLABS_API_BASE_URL || 'https://api.elevenlabs.io',
@@ -18,6 +21,9 @@ export const config = {
   app: {
     name: import.meta.env.VITE_APP_NAME || 'AI Model Marketplace',
     domain: import.meta.env.VITE_APP_DOMAIN || 'localhost:8080',
+    environment: import.meta.env.MODE || 'development',
+    isDevelopment: import.meta.env.MODE === 'development',
+    isProduction: import.meta.env.MODE === 'production',
   },
 } as const;
 

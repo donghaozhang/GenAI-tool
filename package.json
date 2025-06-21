@@ -12,7 +12,13 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "deploy": "node -e \"console.log('Use ./deploy.sh (Linux/Mac) or ./deploy.ps1 (Windows) to deploy')\"",
+    "deploy:vercel": "vercel",
+    "deploy:vercel:prod": "vercel --prod",
+    "deploy:functions": "supabase functions deploy process-image-pipeline",
+    "local:supabase": "supabase start",
+    "local:stop": "supabase stop"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

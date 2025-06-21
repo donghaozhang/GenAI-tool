@@ -91,10 +91,13 @@ serve(async (req: Request) => {
 
     console.log(`Processing pipeline for model: ${modelId}`);
     console.log(`Source image URL provided: ${!!sourceImageUrl}`);
-    console.log(`Prompt: ${prompt}`);
+    console.log(`Prompt: "${prompt}"`);
+    console.log(`Prompt length: ${prompt ? prompt.length : 0}`);
+    console.log(`Prompt type: ${typeof prompt}`);
 
     // Validate inputs
     if (!modelId) {
+      console.log('ERROR: Model ID is missing');
       return new Response(
         JSON.stringify({ error: 'Model ID is required' }),
         { 
@@ -104,14 +107,21 @@ serve(async (req: Request) => {
       );
     }
 
-    if (sourceImageUrl && !isValidMediaUrl(sourceImageUrl)) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid media URL format' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-          status: 400 
-        }
-      );
+    if (sourceImageUrl) {
+      console.log(`Source URL starts with: ${sourceImageUrl.substring(0, 50)}...`);
+      const isValid = isValidMediaUrl(sourceImageUrl);
+      console.log(`URL validation result: ${isValid}`);
+      
+      if (!isValid) {
+        console.log('ERROR: Invalid media URL format');
+        return new Response(
+          JSON.stringify({ error: 'Invalid media URL format' }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+            status: 400 
+          }
+        );
+      }
     }
 
     // Build the input for the FAL model
@@ -142,8 +152,10 @@ serve(async (req: Request) => {
       input.duration = "6"; // Default to 6 seconds
       input.prompt_optimizer = true; // Enable prompt optimization by default
     } else if (modelId.includes('mmaudio-v2')) {
+      console.log('Processing MMAudio v2 model');
       // MMAudio V2 specific parameters - requires both video_url and prompt
       if (!sourceImageUrl) {
+        console.log('ERROR: MMAudio V2 missing video URL');
         return new Response(
           JSON.stringify({ error: 'MMAudio V2 requires a video URL' }),
           { 
@@ -153,10 +165,16 @@ serve(async (req: Request) => {
         );
       }
       
+      console.log(`Current input.prompt: "${input.prompt}"`);
+      console.log(`input.prompt exists: ${!!input.prompt}`);
+      
       // Ensure MMAudio v2 always has a prompt (required by FAL API)
       if (!input.prompt) {
+        console.log('Setting default prompt for MMAudio v2');
         input.prompt = "Cinematic background music with emotional depth and atmospheric ambiance";
       }
+      
+      console.log(`Final input.prompt: "${input.prompt}"`);
       
       input.duration = 8; // Default duration in seconds
       input.num_steps = 25; // Default number of steps

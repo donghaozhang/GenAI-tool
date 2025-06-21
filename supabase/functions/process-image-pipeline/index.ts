@@ -117,7 +117,8 @@ serve(async (req: Request) => {
     // Build the input for the FAL model
     const input: any = {};
     
-    if (prompt) {
+    // Handle prompt - ensure we always have a prompt for models that require it
+    if (prompt && prompt.trim() !== '') {
       input.prompt = prompt;
     }
 
@@ -151,9 +152,12 @@ serve(async (req: Request) => {
           }
         );
       }
-      if (!prompt) {
+      
+      // Ensure MMAudio v2 always has a prompt (required by FAL API)
+      if (!input.prompt) {
         input.prompt = "Cinematic background music with emotional depth and atmospheric ambiance";
       }
+      
       input.duration = 8; // Default duration in seconds
       input.num_steps = 25; // Default number of steps
       input.cfg_strength = 4.5; // Default CFG strength

@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import AuthPage from "./components/auth/AuthPage";
 import AIModelMarketplace from "./pages/AIModelMarketplace";
+import TwitterTest from "./pages/TwitterTest";
 import NotFound from "./pages/NotFound";
 import "@/utils/env-check"; // Initialize environment variable check
 
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/marketplace" element={<AIModelMarketplace />} />
+            <Route path="/twitter-test" element={<TwitterTest />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

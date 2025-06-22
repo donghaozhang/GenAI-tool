@@ -4,7 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Github, Mail } from 'lucide-react';
+import { Github } from 'lucide-react';
+import { GoogleIcon } from '@/components/ui/google-icon';
 import { useToast } from '@/hooks/use-toast';
 
 export const LoginForm = () => {
@@ -104,7 +105,7 @@ export const LoginForm = () => {
           onClick={() => handleSocialLogin('google')}
           className="bg-gray-800 border-gray-600 hover:bg-gray-700"
         >
-          <Mail className="h-4 w-4" />
+          <GoogleIcon />
         </Button>
         
         <Button

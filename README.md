@@ -130,3 +130,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [FAL.ai](https://fal.ai) for AI model APIs
 - [ElevenLabs](https://elevenlabs.io) for audio generation
 - [shadcn/ui](https://ui.shadcn.com) for UI components
+
+<!-- Trigger redeployment after fixing Supabase access token -->

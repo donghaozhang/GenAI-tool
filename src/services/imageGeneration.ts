@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { consumeCredits } from './stripe';
 
 export interface GenerateImageParams {
   prompt: string;
@@ -30,6 +31,12 @@ export const generatePokemonImage = async (pokemonType: string, customPrompt?: s
   try {
     console.log(`Generating ${count} Pokemon images for ${pokemonType}...`);
     
+    // Check and consume credits before generation
+    const creditsConsumed = await consumeCredits(count);
+    if (!creditsConsumed) {
+      throw new Error('Insufficient credits. Please purchase more credits to continue generating images.');
+    }
+    
     const { data, error } = await supabase.functions.invoke('generate-pokemon-images', {
       body: { 
         pokemonType,
@@ -59,6 +66,12 @@ export const generatePokemonImage = async (pokemonType: string, customPrompt?: s
 export const generateImageWithModel = async (modelId: string, prompt?: string, count: number = 1): Promise<string[]> => {
   try {
     console.log(`Generating ${count} images with model ${modelId}...`);
+    
+    // Check and consume credits before generation
+    const creditsConsumed = await consumeCredits(count);
+    if (!creditsConsumed) {
+      throw new Error('Insufficient credits. Please purchase more credits to continue generating images.');
+    }
     
     // Create a prompt based on the model type if none provided
     let generationPrompt = prompt;
@@ -144,6 +157,13 @@ export const generateImagesBatch = async (
 ): Promise<BatchGenerationResult[]> => {
   console.log(`Starting batch generation for ${models.length} models...`);
   
+  // Check credits before starting batch generation
+  const totalCreditsNeeded = models.length * count;
+  const creditsConsumed = await consumeCredits(totalCreditsNeeded);
+  if (!creditsConsumed) {
+    throw new Error(`Insufficient credits. You need ${totalCreditsNeeded} credits for this batch generation. Please purchase more credits.`);
+  }
+  
   const startTime = Date.now();
   const promises = models.map(async (model): Promise<BatchGenerationResult> => {
     const modelStartTime = Date.now();
@@ -157,8 +177,26 @@ export const generateImagesBatch = async (
         const outputUrl = await processImagePipeline(model.id, imageDataUrl, prompt);
         imageUrls = [outputUrl];
       } else {
-        // Use standard generation for text-to-image models
-        imageUrls = await generateImageWithModel(model.id, prompt, count);
+        // For batch generation, we skip credit consumption here since we already consumed all credits upfront
+        // Call the function directly without credit check
+        const { data, error } = await supabase.functions.invoke('generate-pokemon-images', {
+          body: { 
+            pokemonType: 'custom',
+            customPrompt: prompt,
+            modelId: model.id,
+            count: count
+          }
+        });
+
+        if (error) {
+          throw new Error(`Failed to generate images: ${error.message}`);
+        }
+
+        if (!data?.imageUrls && !data?.imageUrl) {
+          throw new Error('No image URLs returned from the function');
+        }
+
+        imageUrls = data.imageUrls || [data.imageUrl];
       }
       
       const duration = Date.now() - modelStartTime;
@@ -200,8 +238,7 @@ export const generateImagesBatch = async (
   });
 
   const totalDuration = Date.now() - startTime;
-  const successCount = batchResults.filter(r => r.success).length;
-  console.log(`Batch generation completed: ${successCount}/${models.length} successful in ${totalDuration}ms`);
+  console.log(`Batch generation completed in ${totalDuration}ms`);
   
   return batchResults;
 };

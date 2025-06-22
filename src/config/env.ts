@@ -44,6 +44,10 @@ export const config = {
       baseUrl: import.meta.env.VITE_OPENROUTER_API_BASE_URL || 'https://openrouter.ai',
     },
   },
+  stripe: {
+    publishableKey: import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '',
+    secretKey: import.meta.env.VITE_STRIPE_SECRET_KEY || '', // Only used server-side
+  },
   app: {
     name: import.meta.env.VITE_APP_NAME || 'AI Model Marketplace',
     domain: import.meta.env.VITE_APP_DOMAIN || 'localhost:8080',
@@ -78,6 +82,7 @@ if (import.meta.env.DEV) {
     console.log(`🚀 Environment Mode: ${config.environment.mode.toUpperCase()}`);
     console.log(`📡 Supabase URL: ${config.supabase.url}`);
     console.log(`🔧 Functions URL: ${config.supabase.functionsUrl}`);
+    console.log(`💳 Stripe Available: ${config.stripe.publishableKey ? '✅' : '❌'}`);
   } catch (error) {
     console.warn('Environment validation warning:', error);
   }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { User, LogIn } from 'lucide-react';
+import { User, LogIn, Plus } from 'lucide-react';
 import { UserProfile } from '@/components/UserProfile';
 import { SearchBar } from '../components/marketplace/SearchBar';
 import { CategoryFilter } from '../components/marketplace/CategoryFilter';
@@ -10,8 +10,10 @@ import { ModelGrid } from '../components/marketplace/ModelGrid';
 import { TrendingSection } from '../components/marketplace/TrendingSection';
 import { MultiImageDisplay } from '../components/marketplace/MultiImageDisplay';
 import { UnifiedGenerationInterface } from '../components/marketplace/UnifiedGenerationInterface';
+import CreditsDisplay from '../components/marketplace/CreditsDisplay';
 import { BatchGenerationResult } from '../services/imageGeneration';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const AIModelMarketplace = () => {
   const navigate = useNavigate();
@@ -33,6 +35,37 @@ const AIModelMarketplace = () => {
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [generationPrompt, setGenerationPrompt] = useState('');
   const [batchResults, setBatchResults] = useState<BatchGenerationResult[]>([]);
+
+  // Debug function to add credits manually
+  const addTestCredits = async () => {
+    if (!user) {
+      toast.error('Please sign in first');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('user_credits')
+        .upsert({
+          user_id: user.id,
+          credits: 100
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) {
+        console.error('Error adding credits:', error);
+        toast.error('Failed to add credits');
+      } else {
+        toast.success('Added 100 test credits!');
+        // Refresh the page to update the credit display
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error adding credits:', error);
+      toast.error('Failed to add credits');
+    }
+  };
 
   const handleImagesGenerated = (imageUrls: string[], prompt: string) => {
     setGeneratedImages(prev => [...prev, ...imageUrls]);
@@ -66,7 +99,20 @@ const AIModelMarketplace = () => {
             {/* Auth Status */}
             <div className="flex items-center space-x-4">
               {user ? (
-                <UserProfile />
+                <>
+                  <CreditsDisplay />
+                  {/* Debug button - remove in production */}
+                  <Button
+                    onClick={addTestCredits}
+                    size="sm"
+                    variant="outline"
+                    className="border-yellow-500 text-yellow-400 hover:bg-yellow-500/10"
+                  >
+                    <Plus className="mr-1 h-3 w-3" />
+                    Add Test Credits
+                  </Button>
+                  <UserProfile />
+                </>
               ) : (
                 <Button
                   onClick={() => navigate('/auth')}

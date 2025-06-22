@@ -3,16 +3,46 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, Zap, Users } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { config } from '@/config/env';
 
 const Index = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      navigate('/ai-marketplace');
+    // Debug: Test Supabase connection
+    console.log('🔧 Debug: Supabase Config:', {
+      url: config.supabase.url,
+      anonKey: config.supabase.anonKey?.substring(0, 20) + '...',
+      mode: config.environment.mode
+    });
+
+    // Test basic Supabase connection
+    const testConnection = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        console.log('🔧 Debug: Auth session test:', { data, error });
+      } catch (err) {
+        console.error('🔧 Debug: Connection error:', err);
+      }
+    };
+
+    testConnection();
+
+    // Redirect to marketplace for all users (authenticated and unauthenticated)
+    if (!loading) {
+      navigate('/marketplace');
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">

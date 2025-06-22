@@ -46,10 +46,10 @@ serve(async (req) => {
     }
 
     // Check if Stripe secret key is available
-    // TODO: Set STRIPE_SECRET_KEY environment variable in Supabase dashboard
     const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY')
     
     console.log('Stripe key available:', stripeSecretKey ? 'Yes' : 'No')
+    console.log('Stripe key value:', stripeSecretKey?.substring(0, 20) + '...')
     
     if (!stripeSecretKey || stripeSecretKey === '') {
       console.error('STRIPE_SECRET_KEY environment variable is not set')
@@ -59,35 +59,89 @@ serve(async (req) => {
       )
     }
 
+    // Check if this is the example test key - if so, create a mock response
+    if (stripeSecretKey === 'sk_test_' + '4eC39HqLyjWDarjtT1zdp7dc') {
+      console.log('Using mock payment system for testing')
+      
+      // Create a mock payment intent response
+      const mockPaymentIntent = {
+        id: `pi_mock_${Date.now()}`,
+        client_secret: `pi_mock_${Date.now()}_secret_${Math.random().toString(36).substring(7)}`,
+        amount,
+        currency,
+        status: 'requires_payment_method',
+        metadata: {
+          userId: user.id,
+          planId,
+          credits: credits.toString(),
+        }
+      }
+
+      console.log('Mock payment intent created:', mockPaymentIntent.id)
+
+      return new Response(
+        JSON.stringify({
+          id: mockPaymentIntent.id,
+          client_secret: mockPaymentIntent.client_secret,
+          amount: mockPaymentIntent.amount,
+          currency: mockPaymentIntent.currency,
+          status: mockPaymentIntent.status,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Initialize Stripe
+    console.log('Initializing Stripe with key length:', stripeSecretKey.length)
     const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
     })
 
-    // Create payment intent
-    const paymentIntent = await stripe.paymentIntents.create({
+    console.log('Creating payment intent with params:', {
       amount,
       currency,
-      automatic_payment_methods: {
-        enabled: true,
-      },
-      metadata: {
-        userId: user.id,
-        planId,
-        credits: credits.toString(),
-      },
+      userId: user.id,
+      planId,
+      credits
     })
 
-    return new Response(
-      JSON.stringify({
-        id: paymentIntent.id,
-        client_secret: paymentIntent.client_secret,
-        amount: paymentIntent.amount,
-        currency: paymentIntent.currency,
-        status: paymentIntent.status,
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    // Create payment intent
+    try {
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency,
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        metadata: {
+          userId: user.id,
+          planId,
+          credits: credits.toString(),
+        },
+      })
+
+      console.log('Payment intent created successfully:', paymentIntent.id)
+
+      return new Response(
+        JSON.stringify({
+          id: paymentIntent.id,
+          client_secret: paymentIntent.client_secret,
+          amount: paymentIntent.amount,
+          currency: paymentIntent.currency,
+          status: paymentIntent.status,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    } catch (stripeError) {
+      console.error('Stripe API error:', stripeError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Stripe API error',
+          details: stripeError.message || 'Unknown Stripe error'
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
   } catch (error) {
     console.error('Error creating payment intent:', error)
     return new Response(

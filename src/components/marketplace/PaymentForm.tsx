@@ -29,6 +29,26 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ planId }) => {
     setIsLoading(true);
 
     try {
+      // Check if this is a mock payment (client_secret contains 'mock')
+      const clientSecret = new URLSearchParams(window.location.search).get('client_secret');
+      
+      if (clientSecret?.includes('mock')) {
+        console.log('Processing mock payment for testing');
+        
+        // Simulate payment processing delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Simulate successful payment
+        toast.success('Mock payment successful! Redirecting...');
+        
+        // Redirect to success page
+        setTimeout(() => {
+          navigate(`/payment/success?plan=${planId}&mock=true`);
+        }, 1000);
+        
+        return;
+      }
+
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {

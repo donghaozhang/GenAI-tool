@@ -132,3 +132,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [shadcn/ui](https://ui.shadcn.com) for UI components
 
 <!-- Trigger redeployment after fixing Supabase access token -->
+<!-- ✅ Vercel token updated - GitHub Actions should now deploy successfully -->

@@ -11,22 +11,57 @@ This document outlines the development workflow for the GenAI Tool project.
 1. Clone the repository
 2. Copy [.env.example](mdc:.env.example) to `.env` and fill in required values
 3. Run `npm install` to install dependencies
-4. Run `npm run dev` to start development server on `http://localhost:8080`
+4. **Environment Setup**:
+   - For local development: `npm run env:local` (uses local Supabase)
+   - For remote development: `npm run env:remote` (uses production Supabase)
+5. **Start Local Supabase** (if using local environment): `npm run local:supabase`
+6. Start development server: `npm run dev` or use environment-specific commands
+
+## Environment Configuration System
+
+### **Flexible Environment Switching**
+The project now supports seamless switching between local and remote environments:
+
+- **Local Mode**: Uses local Supabase instance for development and testing
+- **Remote Mode**: Uses production Supabase instance for production-like testing
+
+### **Environment Commands**
+- `npm run env:local` - Switch to local environment
+- `npm run env:remote` - Switch to remote environment  
+- `npm run dev:local` - Switch to local and start dev server
+- `npm run dev:remote` - Switch to remote and start dev server
+
+### **Local Supabase Commands**
+- `npm run local:supabase` - Start local Supabase instance
+- `npm run local:stop` - Stop local Supabase instance
+- `supabase functions deploy --no-verify-jwt` - Deploy Edge Functions locally
+
+### **Environment Configuration Files**
+- [.env](mdc:.env) - Main environment configuration with automatic switching
+- [src/config/env.ts](mdc:src/config/env.ts) - Dynamic environment configuration loader
+- [switch-env.js](mdc:switch-env.js) - Utility script for environment switching
 
 ## Available Scripts
 - `npm run dev` - Start development server (Vite)
+- `npm run dev:local` - Switch to local environment and start dev server
+- `npm run dev:remote` - Switch to remote environment and start dev server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
+- `npm run env:local` - Switch to local environment
+- `npm run env:remote` - Switch to remote environment
+- `npm run local:supabase` - Start local Supabase
+- `npm run local:stop` - Stop local Supabase
 
 ## Technology Stack
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS + shadcn/ui components
-- **Backend**: Supabase (authentication, database)
+- **Backend**: Supabase (authentication, database, Edge Functions)
 - **State Management**: React Context (AuthContext)
 - **Routing**: React Router
 - **UI Components**: shadcn/ui in [components/ui/](mdc:src/components/ui)
+- **Environment Management**: Dynamic local/remote configuration
 
 ## File Organization Principles
 - Components are organized by feature (auth, marketplace, ui)
@@ -42,6 +77,9 @@ This document outlines the development workflow for the GenAI Tool project.
 
 ## Key Configuration Files
 - [package.json](mdc:package.json) - Dependencies and scripts
+- [.env](mdc:.env) - Environment configuration with local/remote switching
+- [src/config/env.ts](mdc:src/config/env.ts) - Dynamic environment configuration
+- [switch-env.js](mdc:switch-env.js) - Environment switching utility
 - [vite.config.ts](mdc:vite.config.ts) - Vite configuration
 - [tailwind.config.ts](mdc:tailwind.config.ts) - Tailwind CSS configuration
 - [tsconfig.json](mdc:tsconfig.json) - TypeScript configuration
@@ -52,9 +90,42 @@ This document outlines the development workflow for the GenAI Tool project.
 3. AI Marketplace ([AIModelMarketplace.tsx](mdc:src/pages/AIModelMarketplace.tsx))
 4. Model interaction and image generation
 
+## Development Environment Setup
+
+### **Local Development (Recommended)**
+1. Run `npm run env:local` to switch to local environment
+2. Start local Supabase: `npm run local:supabase`
+3. Deploy Edge Functions: `supabase functions deploy --no-verify-jwt`
+4. Start development server: `npm run dev`
+5. Access at `http://localhost:8080` (or `8081` if port is busy)
+
+### **Remote Development**
+1. Run `npm run env:remote` to switch to remote environment
+2. Ensure FAL API key is set in `.env` file
+3. Start development server: `npm run dev`
+
+### **Quick Start Commands**
+- **Full Local Setup**: `npm run local:supabase && npm run dev:local`
+- **Remote Setup**: `npm run dev:remote`
+
 ## Development Notes
 - The application focuses on AI marketplace functionality
 - Space Invaders game component exists but is not part of main user flow
 - Authentication is handled through Supabase
-- Environment variables are required for full functionality
+- **Environment Switching**: Use `VITE_ENV_MODE` to control local/remote configuration
+- **Edge Functions**: Pipeline processing requires either local Supabase or remote deployment
+- **Console Logging**: Environment configuration is logged in development mode
+- **Automatic Configuration**: Environment settings are automatically applied based on mode
+
+## Troubleshooting
+
+### **Connection Refused Errors**
+- Ensure local Supabase is running: `npm run local:supabase`
+- Check environment mode: Look for console logs showing active configuration
+- Verify Edge Functions are deployed locally
+
+### **Environment Issues**
+- Use `node switch-env.js local` or `node switch-env.js remote` to manually switch
+- Check `.env` file for correct `VITE_ENV_MODE` value
+- Restart development server after environment changes
 

@@ -1,0 +1,247 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Environment Management Guide
+
+This document details the flexible environment configuration system for local and remote development.
+
+## Overview
+
+The project supports seamless switching between **local** and **remote** environments, allowing developers to work with either:
+- **Local Supabase** instance for development/testing
+- **Remote Supabase** instance for production-like testing
+
+## Environment Configuration
+
+### **Environment Variables**
+```bash
+# Primary environment mode controller
+VITE_ENV_MODE=local  # or 'remote'
+
+# Local Supabase Configuration
+VITE_SUPABASE_LOCAL_URL=http://127.0.0.1:54321
+VITE_SUPABASE_LOCAL_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# Remote Supabase Configuration  
+VITE_SUPABASE_REMOTE_URL=https://wdprvtqbwnhwbpufcmgg.supabase.co
+VITE_SUPABASE_REMOTE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+# Active Configuration (automatically set)
+VITE_SUPABASE_URL=http://127.0.0.1:54321
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+### **Dynamic Configuration Loading**
+The [src/config/env.ts](mdc:src/config/env.ts) file automatically selects the appropriate configuration based on `VITE_ENV_MODE`:
+
+```typescript
+// Environment mode detection
+const envMode = import.meta.env.VITE_ENV_MODE || 'local';
+const isLocal = envMode === 'local';
+
+// Auto-select Supabase configuration
+const getSupabaseConfig = () => {
+  if (isLocal) {
+    return {
+      url: import.meta.env.VITE_SUPABASE_LOCAL_URL || 'http://127.0.0.1:54321',
+      anonKey: import.meta.env.VITE_SUPABASE_LOCAL_ANON_KEY,
+    };
+  } else {
+    return {
+      url: import.meta.env.VITE_SUPABASE_REMOTE_URL,
+      anonKey: import.meta.env.VITE_SUPABASE_REMOTE_ANON_KEY,
+    };
+  }
+};
+```
+
+## Environment Switching Commands
+
+### **NPM Scripts**
+```bash
+# Environment switching
+npm run env:local     # Switch to local environment
+npm run env:remote    # Switch to remote environment
+
+# Development with environment switching
+npm run dev:local     # Switch to local and start dev server
+npm run dev:remote    # Switch to remote and start dev server
+
+# Local Supabase management
+npm run local:supabase  # Start local Supabase instance
+npm run local:stop      # Stop local Supabase instance
+```
+
+### **Manual Environment Switching**
+```bash
+# Using the utility script directly
+node switch-env.js local   # Switch to local environment
+node switch-env.js remote  # Switch to remote environment
+```
+
+## Environment Setup Workflows
+
+### **Local Development Setup**
+1. **Switch to Local Environment**:
+   ```bash
+   npm run env:local
+   ```
+
+2. **Start Local Supabase**:
+   ```bash
+   npm run local:supabase
+   ```
+
+3. **Deploy Edge Functions** (if needed):
+   ```bash
+   supabase functions deploy --no-verify-jwt
+   ```
+
+4. **Start Development Server**:
+   ```bash
+   npm run dev
+   ```
+
+### **Remote Development Setup**
+1. **Switch to Remote Environment**:
+   ```bash
+   npm run env:remote
+   ```
+
+2. **Ensure API Keys are Set** (in `.env` file):
+   ```bash
+   VITE_FAL_API_KEY=your_fal_api_key_here
+   ```
+
+3. **Start Development Server**:
+   ```bash
+   npm run dev
+   ```
+
+### **Quick Start Commands**
+```bash
+# Full local setup in one command
+npm run local:supabase && npm run dev:local
+
+# Remote setup in one command
+npm run dev:remote
+```
+
+## Environment Indicators
+
+### **Console Output**
+In development mode, the active environment is logged:
+```
+🚀 Environment Mode: LOCAL
+📡 Supabase URL: http://127.0.0.1:54321
+🔧 Functions URL: http://127.0.0.1:54321/functions/v1
+```
+
+### **Configuration Access**
+```typescript
+import { config } from '@/config/env';
+
+// Check current environment
+console.log(config.environment.mode);        // 'local' or 'remote'
+console.log(config.environment.isLocal);     // true/false
+console.log(config.environment.isRemote);    // true/false
+
+// Access configuration
+console.log(config.supabase.url);           // Active Supabase URL
+console.log(config.supabase.functionsUrl);  // Active Functions URL
+```
+
+## Switch Environment Utility
+
+### **Script Features**
+The [switch-env.js](mdc:switch-env.js) utility provides:
+- **Automatic Configuration Update**: Updates `.env` file with correct values
+- **Validation**: Ensures environment mode is valid (`local` or `remote`)
+- **User Feedback**: Clear success/error messages
+- **Instructions**: Helpful tips for each environment mode
+
+### **Usage Examples**
+```bash
+# Switch to local development
+node switch-env.js local
+# Output: ✅ Successfully switched to LOCAL environment
+#         🏠 Using local Supabase instance (http://127.0.0.1:54321)
+#         💡 Make sure to run "supabase start" first
+
+# Switch to remote development  
+node switch-env.js remote
+# Output: ✅ Successfully switched to REMOTE environment
+#         🌐 Using remote Supabase instance
+#         💡 Make sure your FAL API key is set for pipeline processing
+```
+
+## Troubleshooting
+
+### **Connection Refused Errors**
+**Problem**: `net::ERR_CONNECTION_REFUSED` on port 54321
+
+**Solutions**:
+1. Ensure local Supabase is running:
+   ```bash
+   npm run local:supabase
+   ```
+
+2. Check environment mode in console logs
+
+3. Verify Edge Functions are deployed:
+   ```bash
+   supabase functions deploy --no-verify-jwt
+   ```
+
+### **Environment Not Switching**
+**Problem**: Changes not taking effect
+
+**Solutions**:
+1. Check `.env` file for correct `VITE_ENV_MODE` value
+2. Restart development server after environment changes
+3. Clear browser cache if needed
+
+### **Edge Function Errors**
+**Problem**: Pipeline processing fails
+
+**Local Environment**:
+- Ensure local Supabase is running
+- Deploy functions locally: `supabase functions deploy --no-verify-jwt`
+
+**Remote Environment**:
+- Ensure FAL API key is set in environment variables
+- Check remote function deployment status
+
+## Best Practices
+
+### **Development Workflow**
+1. **Start with Local**: Use local environment for development and testing
+2. **Switch for Testing**: Use remote environment to test with production data
+3. **Commit Environment Mode**: Keep `VITE_ENV_MODE` in version control for team consistency
+4. **Document Changes**: Update environment-related documentation when making changes
+
+### **Environment Consistency**
+- **Use Standard Commands**: Prefer npm scripts over manual environment switching
+- **Validate Configuration**: Check console logs to verify active environment
+- **Test Both Modes**: Ensure features work in both local and remote environments
+- **Keep Keys Secure**: Never commit API keys or sensitive configuration
+
+## Configuration Reference
+
+### **Local Environment**
+- **Supabase URL**: `http://127.0.0.1:54321`
+- **Database**: Local PostgreSQL instance
+- **Edge Functions**: Deployed locally
+- **Storage**: Local S3-compatible storage
+- **Auth**: Local authentication service
+
+### **Remote Environment**  
+- **Supabase URL**: `https://wdprvtqbwnhwbpufcmgg.supabase.co`
+- **Database**: Production PostgreSQL instance
+- **Edge Functions**: Deployed to Supabase cloud
+- **Storage**: Production Supabase storage
+- **Auth**: Production authentication service
+
+This system provides maximum flexibility for development while maintaining consistency and ease of use.

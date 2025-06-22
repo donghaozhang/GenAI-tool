@@ -40,8 +40,15 @@ src/components/
 ## Data & Configuration
 - [models.ts](mdc:src/constants/models.ts) - Centralized model data with full fal-ai format IDs
 - [pipelineModels.ts](mdc:src/constants/pipelineModels.ts) - Pipeline-specific model configurations
-- [env.ts](mdc:src/config/env.ts) - Centralized environment configuration
+- [env.ts](mdc:src/config/env.ts) - **Dynamic environment configuration** with local/remote switching
 - [client.ts](mdc:src/integrations/supabase/client.ts) - Supabase client setup
+
+## Environment Management
+- [.env](mdc:.env) - **Flexible environment configuration** with local/remote Supabase settings
+- [switch-env.js](mdc:switch-env.js) - **Environment switching utility** for seamless local/remote transitions
+- **Environment Scripts**: `npm run env:local`, `npm run env:remote`, `npm run dev:local`, `npm run dev:remote`
+- **Local Supabase Support**: Automatic configuration for `http://127.0.0.1:54321`
+- **Remote Supabase Support**: Production environment configuration
 
 ## Service Layer
 - [imageGeneration.ts](mdc:src/services/imageGeneration.ts) - AI image generation with single and batch processing support
@@ -83,5 +90,9 @@ src/__tests__/
 - **Standardized model naming** with titles matching full model IDs for clarity and consistency
 - **Extensive Model Collection** including FLUX variants, Bytedance SeedDream, MiniMax Hailuo, Luma Photon, and MMAudio V2 models
 - **Multi-Modal Support** covering Text-to-Image, Image-to-Image, Image-to-Video, Video-to-Video, and specialized reframing capabilities
+- **Flexible Environment Management** with seamless local/remote Supabase switching
+- **Automatic Environment Detection** with console logging and configuration validation
+- **Local Development Support** with Edge Functions and database running locally
+- **Production-like Testing** with remote environment mode for comprehensive validation
 
 

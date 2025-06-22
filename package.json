@@ -18,7 +18,11 @@
     "deploy:vercel:prod": "vercel --prod",
     "deploy:functions": "supabase functions deploy process-image-pipeline",
     "local:supabase": "supabase start",
-    "local:stop": "supabase stop"
+    "local:stop": "supabase stop",
+    "env:local": "node switch-env.js local",
+    "env:remote": "node switch-env.js remote",
+    "dev:local": "node switch-env.js local && vite",
+    "dev:remote": "node switch-env.js remote && vite"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

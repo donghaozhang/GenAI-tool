@@ -1,10 +1,36 @@
+// Environment mode detection
+const envMode = import.meta.env.VITE_ENV_MODE || 'local';
+const isLocal = envMode === 'local';
+
+// Auto-select Supabase configuration based on environment mode
+const getSupabaseConfig = () => {
+  if (isLocal) {
+    return {
+      url: import.meta.env.VITE_SUPABASE_LOCAL_URL || 'http://127.0.0.1:54321',
+      anonKey: import.meta.env.VITE_SUPABASE_LOCAL_ANON_KEY,
+    };
+  } else {
+    return {
+      url: import.meta.env.VITE_SUPABASE_REMOTE_URL || import.meta.env.VITE_SUPABASE_URL,
+      anonKey: import.meta.env.VITE_SUPABASE_REMOTE_ANON_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY,
+    };
+  }
+};
+
+const supabaseConfig = getSupabaseConfig();
+
 // Centralized environment configuration
 export const config = {
+  environment: {
+    mode: envMode,
+    isLocal,
+    isRemote: !isLocal,
+  },
   supabase: {
-    url: import.meta.env.VITE_SUPABASE_URL,
-    anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+    url: supabaseConfig.url,
+    anonKey: supabaseConfig.anonKey,
     functionsUrl: import.meta.env.VITE_SUPABASE_FUNCTIONS_URL || 
-                  `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`,
+                  `${supabaseConfig.url}/functions/v1`,
   },
   api: {
     fal: {
@@ -45,10 +71,13 @@ export const validateConfig = () => {
   }
 };
 
-// Initialize validation only in development
+// Initialize validation and log current configuration
 if (import.meta.env.DEV) {
   try {
     validateConfig();
+    console.log(`🚀 Environment Mode: ${config.environment.mode.toUpperCase()}`);
+    console.log(`📡 Supabase URL: ${config.supabase.url}`);
+    console.log(`🔧 Functions URL: ${config.supabase.functionsUrl}`);
   } catch (error) {
     console.warn('Environment validation warning:', error);
   }

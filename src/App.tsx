@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +8,9 @@ import Index from "./pages/Index";
 import AuthPage from "./components/auth/AuthPage";
 import AIModelMarketplace from "./pages/AIModelMarketplace";
 import TwitterTest from "./pages/TwitterTest";
+import GoogleOAuthTest from "./pages/GoogleOAuthTest";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import "@/utils/env-check"; // Initialize environment variable check
 
@@ -25,7 +27,11 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/marketplace" element={<AIModelMarketplace />} />
+            <Route path="/ai-marketplace" element={<AIModelMarketplace />} />
             <Route path="/twitter-test" element={<TwitterTest />} />
+            <Route path="/google-test" element={<GoogleOAuthTest />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

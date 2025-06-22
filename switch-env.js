@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const envPath = path.join(__dirname, '.env');
 
@@ -52,9 +56,11 @@ try {
   if (targetMode === 'local') {
     console.log('🏠 Using local Supabase instance (http://127.0.0.1:54321)');
     console.log('💡 Make sure to run "supabase start" first');
+    console.log('⚠️  Note: OAuth providers need manual configuration for local development');
   } else {
     console.log('🌐 Using remote Supabase instance');
     console.log('💡 Make sure your FAL API key is set for pipeline processing');
+    console.log('✅ OAuth authentication (Google) will work automatically');
   }
   
   console.log('🔄 Restart your development server to apply changes');

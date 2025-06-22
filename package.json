@@ -23,7 +23,7 @@
     "env:remote": "node switch-env.js remote",
     "dev:local": "node switch-env.js local && vite",
     "dev:remote": "node switch-env.js remote && vite",
-    "test:twitter": "node test-twitter-oauth.js"
+    "test:twitter": "node scripts/test-twitter-oauth.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

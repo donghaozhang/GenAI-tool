@@ -26,19 +26,12 @@ export const UserProfile = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      toast({
-        title: 'Signed out successfully',
-        description: 'You have been logged out. Redirecting to authentication page...',
-      });
+      toast.success('Signed out successfully! Redirecting to authentication page...');
       // Navigate to auth page after successful logout
-      navigate('/auth');
+      setTimeout(() => navigate('/auth'), 1000);
     } catch (error) {
       console.error('Logout error:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to sign out. Please try again.',
-        variant: 'destructive',
-      });
+      toast.error('Failed to sign out. Please try again.');
     }
   };
 

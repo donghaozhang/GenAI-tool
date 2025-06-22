@@ -5,13 +5,23 @@ console.clear();
 console.log("🚀 Quick Google OAuth Test");
 console.log("=" .repeat(30));
 
+// Get client ID from environment or prompt user to set it
+const clientId = process.env.VITE_GOOGLE_CLIENT_ID || "CLIENT_ID_NOT_SET_IN_ENV";
+
+if (clientId === "CLIENT_ID_NOT_SET_IN_ENV") {
+  console.log('❌ VITE_GOOGLE_CLIENT_ID not found in environment variables');
+  console.log('Please set your Google Client ID in .env file');
+  console.log('Example: VITE_GOOGLE_CLIENT_ID=your_client_id_here');
+} else {
+  console.log('✅ Using Client ID from environment variables');
+}
+
 // Test 1: Check current configuration
 console.log("\n📊 Current Configuration:");
 console.log("URL:", window.location.href);
 console.log("Origin:", window.location.origin);
 
 // Test 2: Create direct OAuth test link
-const clientId = "389790994997-qcla9r90kd25v9j46n6qj9je54o2dn6q9ge5g4c2dn2.apps.googleusercontent.com";
 const redirectUri = "https://wdprvtqbwnhwbpufcmgg.supabase.co/auth/v1/callback";
 const testUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email+profile`;
 

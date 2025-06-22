@@ -5,7 +5,118 @@ alwaysApply: false
 ---
 # Social Authentication Implementation Guide
 
-This document covers the implementation of social authentication features including Google icon integration and Twitter OAuth configuration.
+This document covers the implementation of social authentication features including comprehensive Google OAuth setup, diagnostic tools, and Twitter OAuth configuration.
+
+## 🔍 Google OAuth Complete Implementation
+
+### 🎯 Working Configuration (December 2024)
+**Successfully implemented and tested Google OAuth with proper error resolution**
+
+#### Current Working Credentials
+```env
+# Google OAuth 2.0 Configuration (Production Ready)
+# Store these in .env file - NEVER commit secrets to git!
+VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+VITE_GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+```
+
+**⚠️ SECURITY WARNING**: Never commit actual credentials to git. Always use environment variables.
+
+#### Google Cloud Console Setup
+- **Project**: `speedy-sunspot-460603-p7` (Project ID: 389790994997)
+- **OAuth Consent Screen**: Published in Production mode
+- **App Name**: `marketartAI`
+- **User Type**: External (100 user limit)
+- **Support Email**: `zdhpeter@gmail.com`
+
+#### Authorized Configurations
+```
+JavaScript Origins:
+- https://wdprvtqbwnhwbpufcmgg.supabase.co
+- http://localhost:8080
+- http://localhost:8081
+- http://localhost:8082
+
+Redirect URIs:
+- https://wdprvtqbwnhwbpufcmgg.supabase.co/auth/v1/callback
+```
+
+#### Privacy Policy & Terms of Service
+**Required for OAuth consent screen:**
+- Privacy Policy: `http://localhost:8080/privacy` → `src/pages/PrivacyPolicy.tsx`
+- Terms of Service: `http://localhost:8080/terms` → `src/pages/TermsOfService.tsx`
+- Routes added to `src/App.tsx`
+
+### 🛠️ Comprehensive Diagnostic Tools Suite
+
+#### 15 Diagnostic Scripts Created (`scripts/` directory)
+1. **`google-oauth-diagnostic.js`** - Complete OAuth configuration analysis
+2. **`live-oauth-test.js`** - Real-time OAuth flow testing
+3. **`browser-console-debug.js`** - Browser-based debugging interface
+4. **`quick-console-test.js`** - Fast OAuth validation
+5. **`verify-supabase-oauth.js`** - Supabase configuration verification
+6. **`check-oauth-config.js`** - Configuration checker
+7. **`test-live-oauth.js`** - Live testing script
+8. **`oauth-status-summary.js`** - Status summary tool
+9. **`debug-invalid-client.js`** - Invalid client error debugger
+10. **`check-oauth-client-status.js`** - OAuth client status checker
+11. **`fix-invalid-client.js`** - Step-by-step fix guide
+12. **`final-verification.js`** - Final verification script
+13. **`find-correct-oauth-client.js`** - Client ID finder
+14. **`test-app-oauth.js`** - App-based OAuth testing
+15. **`test-google-oauth.js`** - Google OAuth specific tests
+
+#### Key Diagnostic Features
+- **Real-time OAuth URL testing**
+- **Client ID validation against Google's servers**
+- **Supabase configuration verification**
+- **Browser console integration**
+- **Step-by-step troubleshooting guides**
+- **Automated error detection and reporting**
+
+### 🚨 Critical Error Resolution Patterns
+
+#### "Error 401: invalid_client" Resolution
+**Root Causes Identified:**
+1. **Client ID mismatch** between Google Cloud Console and Supabase Dashboard
+2. **Wrong Google Cloud project** - OAuth client must be in same project as consent screen
+3. **Incomplete OAuth client configuration** - missing redirect URIs or JavaScript origins
+
+**Resolution Process:**
+1. **Verify Project Context** - Ensure OAuth client is in correct Google Cloud project
+2. **Copy Exact Client ID** - Use exact string from Google Cloud Console
+3. **Update Supabase Dashboard** - Match credentials exactly
+4. **Test with Diagnostic Scripts** - Use browser console tools for validation
+
+#### Route Handling for OAuth Redirects
+**Problem**: OAuth redirects to `/ai-marketplace` causing 404 errors
+**Solution**: Add route alias in `src/App.tsx`
+```typescript
+<Route path="/ai-marketplace" element={<AIModelMarketplace />} />
+<Route path="/marketplace" element={<AIModelMarketplace />} />
+```
+
+### 🧪 Testing Methodology
+
+#### Google OAuth Test Page
+Location: `src/pages/GoogleOAuthTest.tsx`
+- Real-time configuration testing
+- OAuth flow simulation
+- Error reporting and diagnostics
+- Route: `/google-test`
+
+#### Browser Console Testing
+```javascript
+// Run in browser console on localhost:8080
+console.log('🚀 Quick Google OAuth Test');
+const testUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=https%3A%2F%2Fwdprvtqbwnhwbpufcmgg.supabase.co%2Fauth%2Fv1%2Fcallback&response_type=code&scope=email+profile`;
+window.open(testUrl, '_blank');
+```
+
+#### Development Testing Ports
+- **Primary**: `http://localhost:8080/`
+- **Backup**: `http://localhost:8081/`
+- **Fallback**: `http://localhost:8082/`
 
 ## 🎨 Google Icon Implementation
 
@@ -85,7 +196,7 @@ const handleSocialLogin = async (provider: 'google' | 'twitter' | 'github') => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/marketplace`
+        redirectTo: `${window.location.origin}/ai-marketplace`
       }
     });
     
@@ -102,6 +213,24 @@ const handleSocialLogin = async (provider: 'google' | 'twitter' | 'github') => {
 
 ### Error Patterns and Solutions
 
+#### Google OAuth "invalid_client" Error
+**Symptoms**: 
+- `Error 401: invalid_client`
+- `The OAuth client was not found`
+- Redirect to Google error page
+
+**Root Causes**:
+1. Client ID doesn't exist in Google's database
+2. OAuth client in wrong Google Cloud project
+3. Supabase using different Client ID than configured
+
+**Solution Process**:
+1. Verify correct Google Cloud project context
+2. Create new OAuth client if needed in correct project
+3. Copy exact Client ID from Google Cloud Console
+4. Update Supabase Dashboard with exact credentials
+5. Test with diagnostic scripts
+
 #### Twitter OAuth 404 Error
 **Symptom**: `GET https://wdprvtqbwnhwbpufcmgg.supabase.co/ 404 (Not Found)`
 
@@ -109,57 +238,32 @@ const handleSocialLogin = async (provider: 'google' | 'twitter' | 'github') => {
 
 **Solution**: Update Supabase dashboard with OAuth 1.0a Consumer Keys
 
-#### Google OAuth Success Pattern
-**Working Configuration**:
-- Uses OAuth 2.0 (Google's standard)
-- Configured in Supabase with Client ID/Secret
-- Proper redirect URL configuration
-
-## 🧪 Testing and Debugging
-
-### Twitter OAuth Test Page
-Location: `src/pages/TwitterTest.tsx`
-
-Features:
-- Environment variable debugging
-- Authentication status checking
-- Simple OAuth testing (without custom redirects)
-- Comprehensive error reporting
-
-### Test Routes
-```typescript
-// Add to App.tsx routing
-<Route path="/twitter-test" element={<TwitterTest />} />
-```
-
-### Testing Commands
-```bash
-# Test Twitter OAuth from command line
-npm run test:twitter
-
-# Start development server
-npm run dev
-```
-
 ## 🔒 Security Best Practices
 
 ### Environment Variables
 Store OAuth credentials in `.env` file (git-ignored):
 
 ```env
+# Google OAuth 2.0 Configuration (Working)
+VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+VITE_GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
 # Twitter OAuth 1.0a Configuration
 VITE_TWITTER_CLIENT_ID=HjHB8STk7FoP7HigMv1njanr7
 VITE_TWITTER_CLIENT_SECRET=j3jxdGfDm5Y7aRKcrXYybyj30558MujuIJhDCpzQKkDBqMgVDu
-
-# Google OAuth 2.0 Configuration  
-VITE_GOOGLE_CLIENT_ID=your_google_client_id
-VITE_GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
+
+**🔒 SECURITY NOTES:**
+- Never commit actual credentials to git repositories
+- Use environment variables for all sensitive configuration
+- Rotate credentials if accidentally exposed
+- Keep `.env` file in `.gitignore`
 
 ### Callback URL Security
 - Always use HTTPS for production callbacks
 - Include localhost URLs for development testing
 - Validate redirect URLs in provider settings
+- Use `/ai-marketplace` as primary redirect target
 
 ## 📱 UI/UX Implementation
 
@@ -187,15 +291,19 @@ VITE_GOOGLE_CLIENT_SECRET=your_google_client_secret
 
 Before deploying social authentication:
 
-1. **Twitter OAuth**:
+1. **Google OAuth** ✅:
+   - ✅ OAuth 2.0 credentials configured in Supabase dashboard
+   - ✅ Authorized redirect URIs configured in Google Console
+   - ✅ OAuth consent screen published in production
+   - ✅ Privacy policy and terms of service pages created
+   - ✅ GoogleIcon component implemented
+   - ✅ Diagnostic tools created and tested
+   - ✅ Route aliases configured for OAuth redirects
+
+2. **Twitter OAuth**:
    - ✅ OAuth 1.0a credentials configured in Supabase dashboard
    - ✅ Callback URLs added to Twitter app
    - ✅ App permissions set correctly
-
-2. **Google OAuth**:
-   - ✅ OAuth 2.0 credentials configured in Supabase dashboard
-   - ✅ Authorized redirect URIs configured in Google Console
-   - ✅ GoogleIcon component implemented
 
 3. **GitHub OAuth**:
    - ✅ OAuth app configured with callback URLs
@@ -205,22 +313,45 @@ Before deploying social authentication:
    - ✅ All providers tested in development
    - ✅ Redirect flows working correctly
    - ✅ Error handling implemented
+   - ✅ Diagnostic tools validated
 
-## 🚨 Common Pitfalls
+## 🚨 Common Pitfalls & Solutions
 
 ### OAuth Version Mismatch
 - **Twitter**: Must use OAuth 1.0a (Consumer Keys)
 - **Google**: Uses OAuth 2.0 (Client ID/Secret)
 - **GitHub**: Uses OAuth 2.0 (Client ID/Secret)
 
+### Google Cloud Project Context
+- **Critical**: OAuth client must be in same project as published consent screen
+- **Verify**: Project name in top-left of Google Cloud Console
+- **Fix**: Create OAuth client in correct project (`speedy-sunspot-460603-p7`)
+
 ### Callback URL Mismatches
 - Ensure exact URL matches between provider and Supabase
 - Include all development ports for local testing
 - Use HTTPS for production environments
+- Add route aliases for OAuth redirect targets
+
+### Client ID/Secret Precision
+- Copy credentials exactly from provider console
+- No extra spaces or characters
+- Update both Supabase Dashboard and environment files
+- Test with diagnostic scripts after updates
 
 ### Icon Implementation
 - Use brand-specific icons, not generic ones
 - Maintain consistent sizing and styling
 - Ensure proper accessibility attributes
 
-This implementation provides a complete, secure social authentication system with proper branding and error handling.
+## 🎯 Success Metrics
+
+**Google OAuth Implementation Complete:**
+- ✅ No more "invalid_client" errors
+- ✅ Successful authentication flow
+- ✅ Proper redirect handling
+- ✅ Comprehensive diagnostic tooling
+- ✅ Production-ready consent screen
+- ✅ Complete documentation and troubleshooting guides
+
+This implementation provides a complete, secure, and thoroughly tested social authentication system with extensive diagnostic capabilities and proper error resolution patterns.

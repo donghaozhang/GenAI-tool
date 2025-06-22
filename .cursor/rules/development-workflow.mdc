@@ -53,6 +53,44 @@ The project now supports seamless switching between local and remote environment
 - `npm run local:supabase` - Start local Supabase
 - `npm run local:stop` - Stop local Supabase
 
+## OAuth Diagnostic Tools & Testing
+
+### **Comprehensive Diagnostic Scripts Suite**
+Location: `scripts/` directory (15 diagnostic tools)
+
+#### **Key Diagnostic Scripts**:
+- **`google-oauth-diagnostic.js`** - Complete OAuth configuration analysis
+- **`live-oauth-test.js`** - Real-time OAuth flow testing  
+- **`browser-console-debug.js`** - Browser-based debugging interface
+- **`quick-console-test.js`** - Fast OAuth validation
+- **`verify-supabase-oauth.js`** - Supabase configuration verification
+
+#### **OAuth Testing Workflow**:
+1. **Start Development Server**: `npm run dev` (usually runs on `http://localhost:8080`)
+2. **Navigate to Auth Page**: `http://localhost:8080/auth`
+3. **Run Diagnostic Script**: Copy and paste any diagnostic script into browser console
+4. **Test OAuth Flow**: Use built-in test buttons or manual OAuth testing
+5. **Debug Issues**: Use diagnostic output to identify and resolve problems
+
+#### **Browser Console Testing**:
+```javascript
+// Quick Google OAuth Test (run in browser console)
+console.log('🚀 Quick Google OAuth Test');
+const testUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=https%3A%2F%2Fwdprvtqbwnhwbpufcmgg.supabase.co%2Fauth%2Fv1%2Fcallback&response_type=code&scope=email+profile`;
+window.open(testUrl, '_blank');
+```
+
+#### **OAuth Test Pages**:
+- **Google OAuth Test**: `/google-test` → `src/pages/GoogleOAuthTest.tsx`
+- **Twitter OAuth Test**: `/twitter-test` → `src/pages/TwitterTest.tsx`
+- **Privacy Policy**: `/privacy` → `src/pages/PrivacyPolicy.tsx`
+- **Terms of Service**: `/terms` → `src/pages/TermsOfService.tsx`
+
+### **Development Testing Ports**
+- **Primary**: `http://localhost:8080/` (default)
+- **Backup**: `http://localhost:8081/` (if 8080 is busy)
+- **Fallback**: `http://localhost:8082/` (if both above are busy)
+
 ## Technology Stack
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
@@ -128,4 +166,81 @@ The project now supports seamless switching between local and remote environment
 - Use `node switch-env.js local` or `node switch-env.js remote` to manually switch
 - Check `.env` file for correct `VITE_ENV_MODE` value
 - Restart development server after environment changes
+
+### **OAuth Authentication Issues**
+
+#### **Google OAuth "Error 401: invalid_client"**
+**Symptoms**: 
+- `Error 401: invalid_client`
+- `The OAuth client was not found`
+- Redirect to Google error page
+
+**Diagnosis**:
+1. Run diagnostic script in browser console: `scripts/google-oauth-diagnostic.js`
+2. Check Google Cloud Console project context (must be `speedy-sunspot-460603-p7`)
+3. Verify Client ID matches exactly between Google Cloud Console and Supabase Dashboard
+
+**Solutions**:
+1. **Verify Correct Project**: Ensure OAuth client exists in `speedy-sunspot-460603-p7` project
+2. **Copy Exact Credentials**: Use exact Client ID from Google Cloud Console
+3. **Update Supabase Dashboard**: Match credentials exactly in Auth → Providers → Google
+4. **Test with Diagnostics**: Use `scripts/quick-console-test.js` for validation
+
+#### **OAuth Redirect 404 Errors**
+**Symptoms**: 
+- OAuth completes successfully but shows 404 page
+- URL shows `/ai-marketplace` but page not found
+
+**Solution**: 
+- Ensure route aliases exist in `src/App.tsx`:
+```typescript
+<Route path="/ai-marketplace" element={<AIModelMarketplace />} />
+<Route path="/marketplace" element={<AIModelMarketplace />} />
+```
+
+#### **Twitter OAuth 404 Errors**
+**Symptoms**: `GET https://wdprvtqbwnhwbpufcmgg.supabase.co/ 404 (Not Found)`
+
+**Root Cause**: Using OAuth 2.0 credentials instead of OAuth 1.0a
+
+**Solution**: Update Supabase dashboard with OAuth 1.0a Consumer Keys (not Client ID/Secret)
+
+### **Development Server Issues**
+
+#### **Port Conflicts**
+- **Default Port**: `8080` (preferred)
+- **Backup Ports**: `8081`, `8082` (automatically tried if 8080 busy)
+- **Solution**: Update OAuth redirect URIs to include all ports in use
+
+#### **Hot Module Replacement (HMR) Issues**
+- **Symptom**: Excessive HMR updates (x10+ updates for single change)
+- **Cause**: Often related to CSS/styling changes
+- **Solution**: Restart development server if HMR becomes unstable
+
+### **Diagnostic Tools Usage**
+
+#### **Quick OAuth Testing**:
+1. Open browser console on `http://localhost:8080/auth`
+2. Paste and run any diagnostic script from `scripts/` directory
+3. Follow diagnostic output instructions
+4. Use built-in test buttons or manual testing
+
+#### **Common Diagnostic Scripts**:
+- **Quick Test**: `scripts/quick-console-test.js`
+- **Full Diagnosis**: `scripts/google-oauth-diagnostic.js`
+- **Live Testing**: `scripts/live-oauth-test.js`
+- **Configuration Check**: `scripts/verify-supabase-oauth.js`
+
+### **Environment Variable Issues**
+- **Check Current Config**: Look for console logs showing active environment
+- **Manual Switch**: Use `node switch-env.js local` or `node switch-env.js remote`
+- **Validation**: Ensure `.env` file contains correct `VITE_ENV_MODE` value
+- **OAuth Credentials**: Verify Google OAuth credentials match working configuration:
+  ```env
+  # Example format - replace with your actual credentials
+  VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+  VITE_GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+  ```
+
+**🔒 SECURITY WARNING**: Never commit actual OAuth credentials to git repositories. Always use environment variables and keep `.env` in `.gitignore`.
 

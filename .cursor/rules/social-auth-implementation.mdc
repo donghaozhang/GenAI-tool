@@ -1,0 +1,226 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Social Authentication Implementation Guide
+
+This document covers the implementation of social authentication features including Google icon integration and Twitter OAuth configuration.
+
+## 🎨 Google Icon Implementation
+
+### GoogleIcon Component
+Location: `src/components/ui/google-icon.tsx`
+
+```typescript
+export const GoogleIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg
+    aria-hidden
+    viewBox="0 0 488 512"
+    className="h-4 w-4"
+    fill="currentColor"
+    {...props}
+  >
+    {/* Official Google "G" logo SVG paths */}
+  </svg>
+);
+```
+
+### Integration Pattern
+Replace generic Mail icons with branded Google icon:
+
+```typescript
+// ✅ CORRECT: Use branded Google icon
+import { GoogleIcon } from '@/components/ui/google-icon';
+
+<Button onClick={() => handleSocialLogin('google')}>
+  <GoogleIcon />
+</Button>
+
+// ❌ WRONG: Generic mail icon for Google
+import { Mail } from 'lucide-react';
+<Button><Mail className="h-4 w-4" /></Button>
+```
+
+## 🐦 Twitter OAuth Configuration
+
+### Critical OAuth Version Requirements
+**Supabase Auth uses OAuth 1.0a for Twitter, NOT OAuth 2.0**
+
+### Twitter Developer Portal Setup
+1. **App Configuration**:
+   - App Type: "Web App, Automated App or Bot"
+   - Client Type: "Confidential client"
+   - Permissions: "Read and write and Direct message"
+
+2. **Callback URLs** (required):
+   ```
+   https://wdprvtqbwnhwbpufcmgg.supabase.co/auth/v1/callback
+   http://localhost:8080/
+   http://localhost:8081/
+   http://localhost:8082/
+   ```
+
+3. **Credentials to Use**:
+   - **Use**: OAuth 1.0a Consumer Keys
+     - API Key (Consumer Key): `HjHB8STk7FoP7HigMv1njanr7`
+     - API Secret Key (Consumer Secret): `j3jxdGfDm5Y7aRKcrXYybyj30558MujuIJhDCpzQKkDBqMgVDu`
+   - **Don't Use**: OAuth 2.0 Client ID/Secret
+
+### Supabase Dashboard Configuration
+Navigate to: Authentication → Providers → Twitter
+
+```
+API Key: HjHB8STk7FoP7HigMv1njanr7
+API Secret Key: j3jxdGfDm5Y7aRKcrXYybyj30558MujuIJhDCpzQKkDBqMgVDu
+Callback URL: https://wdprvtqbwnhwbpufcmgg.supabase.co/auth/v1/callback
+```
+
+## 🔧 OAuth Implementation Patterns
+
+### Social Login Handler
+```typescript
+const handleSocialLogin = async (provider: 'google' | 'twitter' | 'github') => {
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/marketplace`
+      }
+    });
+    
+    if (error) {
+      console.error(`${provider} OAuth failed:`, error);
+      toast.error(`Failed to sign in with ${provider}`);
+    }
+  } catch (error: any) {
+    console.error(`${provider} OAuth exception:`, error);
+    toast.error(`Authentication error: ${error.message}`);
+  }
+};
+```
+
+### Error Patterns and Solutions
+
+#### Twitter OAuth 404 Error
+**Symptom**: `GET https://wdprvtqbwnhwbpufcmgg.supabase.co/ 404 (Not Found)`
+
+**Root Cause**: Using OAuth 2.0 credentials instead of OAuth 1.0a
+
+**Solution**: Update Supabase dashboard with OAuth 1.0a Consumer Keys
+
+#### Google OAuth Success Pattern
+**Working Configuration**:
+- Uses OAuth 2.0 (Google's standard)
+- Configured in Supabase with Client ID/Secret
+- Proper redirect URL configuration
+
+## 🧪 Testing and Debugging
+
+### Twitter OAuth Test Page
+Location: `src/pages/TwitterTest.tsx`
+
+Features:
+- Environment variable debugging
+- Authentication status checking
+- Simple OAuth testing (without custom redirects)
+- Comprehensive error reporting
+
+### Test Routes
+```typescript
+// Add to App.tsx routing
+<Route path="/twitter-test" element={<TwitterTest />} />
+```
+
+### Testing Commands
+```bash
+# Test Twitter OAuth from command line
+npm run test:twitter
+
+# Start development server
+npm run dev
+```
+
+## 🔒 Security Best Practices
+
+### Environment Variables
+Store OAuth credentials in `.env` file (git-ignored):
+
+```env
+# Twitter OAuth 1.0a Configuration
+VITE_TWITTER_CLIENT_ID=HjHB8STk7FoP7HigMv1njanr7
+VITE_TWITTER_CLIENT_SECRET=j3jxdGfDm5Y7aRKcrXYybyj30558MujuIJhDCpzQKkDBqMgVDu
+
+# Google OAuth 2.0 Configuration  
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+VITE_GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
+
+### Callback URL Security
+- Always use HTTPS for production callbacks
+- Include localhost URLs for development testing
+- Validate redirect URLs in provider settings
+
+## 📱 UI/UX Implementation
+
+### Social Login Button Layout
+```typescript
+<div className="grid grid-cols-3 gap-3">
+  <Button variant="outline" onClick={() => handleSocialLogin('google')}>
+    <GoogleIcon />
+  </Button>
+  <Button variant="outline" onClick={() => handleSocialLogin('twitter')}>
+    <Twitter className="h-4 w-4" />
+  </Button>
+  <Button variant="outline" onClick={() => handleSocialLogin('github')}>
+    <Github className="h-4 w-4" />
+  </Button>
+</div>
+```
+
+### Visual Consistency
+- Use brand-specific icons for each provider
+- Maintain consistent button sizing (`h-4 w-4`)
+- Apply consistent styling (`bg-gray-800 border-gray-600 hover:bg-gray-700`)
+
+## ✅ Deployment Checklist
+
+Before deploying social authentication:
+
+1. **Twitter OAuth**:
+   - ✅ OAuth 1.0a credentials configured in Supabase dashboard
+   - ✅ Callback URLs added to Twitter app
+   - ✅ App permissions set correctly
+
+2. **Google OAuth**:
+   - ✅ OAuth 2.0 credentials configured in Supabase dashboard
+   - ✅ Authorized redirect URIs configured in Google Console
+   - ✅ GoogleIcon component implemented
+
+3. **GitHub OAuth**:
+   - ✅ OAuth app configured with callback URLs
+   - ✅ Credentials added to Supabase dashboard
+
+4. **Testing**:
+   - ✅ All providers tested in development
+   - ✅ Redirect flows working correctly
+   - ✅ Error handling implemented
+
+## 🚨 Common Pitfalls
+
+### OAuth Version Mismatch
+- **Twitter**: Must use OAuth 1.0a (Consumer Keys)
+- **Google**: Uses OAuth 2.0 (Client ID/Secret)
+- **GitHub**: Uses OAuth 2.0 (Client ID/Secret)
+
+### Callback URL Mismatches
+- Ensure exact URL matches between provider and Supabase
+- Include all development ports for local testing
+- Use HTTPS for production environments
+
+### Icon Implementation
+- Use brand-specific icons, not generic ones
+- Maintain consistent sizing and styling
+- Ensure proper accessibility attributes
+
+This implementation provides a complete, secure social authentication system with proper branding and error handling.

@@ -1,12 +1,14 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, User } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const UserProfile = () => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   if (!user) return null;
 
@@ -20,6 +22,25 @@ export const UserProfile = () => {
   };
 
   const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: 'Signed out successfully',
+        description: 'You have been logged out. Redirecting to authentication page...',
+      });
+      // Navigate to auth page after successful logout
+      navigate('/auth');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to sign out. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <div className="flex items-center gap-3 bg-gray-800 rounded-lg p-3">
@@ -42,8 +63,9 @@ export const UserProfile = () => {
       <Button
         variant="ghost"
         size="sm"
-        onClick={signOut}
+        onClick={handleSignOut}
         className="text-gray-400 hover:text-white hover:bg-gray-700"
+        title="Sign out"
       >
         <LogOut className="h-4 w-4" />
       </Button>

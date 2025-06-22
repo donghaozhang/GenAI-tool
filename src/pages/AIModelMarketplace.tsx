@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { User, LogIn } from 'lucide-react';
+import { UserProfile } from '@/components/UserProfile';
 import { SearchBar } from '../components/marketplace/SearchBar';
 import { CategoryFilter } from '../components/marketplace/CategoryFilter';
 import { ModelGrid } from '../components/marketplace/ModelGrid';
@@ -65,10 +66,7 @@ const AIModelMarketplace = () => {
             {/* Auth Status */}
             <div className="flex items-center space-x-4">
               {user ? (
-                <div className="flex items-center space-x-2 text-green-400">
-                  <User size={20} />
-                  <span className="text-sm">Signed in</span>
-                </div>
+                <UserProfile />
               ) : (
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center space-x-2 text-gray-400">

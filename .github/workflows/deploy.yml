@@ -22,9 +22,10 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Install Supabase CLI
-        run: |
-          npm install -g supabase@latest
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
       - name: Link Supabase project
         run: |
@@ -35,12 +36,16 @@ jobs:
       - name: Deploy Edge Functions
         run: |
           supabase functions deploy process-image-pipeline
+          supabase functions deploy create-payment-intent
+          supabase functions deploy process-payment-success
+          supabase functions deploy consume-credits
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Set Edge Function secrets
         run: |
           supabase secrets set FAL_API_KEY="${{ secrets.FAL_API_KEY }}"
+          supabase secrets set STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 

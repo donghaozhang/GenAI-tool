@@ -59,7 +59,7 @@ const AIModelMarketplace = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white">AI Model Marketplace</h1>
+              <h1 className="text-3xl font-bold text-white">marketartAI</h1>
               <p className="text-gray-400 mt-1">Discover and use cutting-edge AI models with pipeline capabilities</p>
             </div>
             
@@ -68,20 +68,13 @@ const AIModelMarketplace = () => {
               {user ? (
                 <UserProfile />
               ) : (
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-2 text-gray-400">
-                    <span className="text-sm">Guest mode</span>
-                  </div>
-                  <Button
-                    onClick={() => navigate('/auth')}
-                    variant="outline"
-                    size="sm"
-                    className="border-blue-500 text-blue-400 hover:bg-blue-500 hover:text-white"
-                  >
-                    <LogIn size={16} className="mr-2" />
-                    Sign In
-                  </Button>
-                </div>
+                <Button
+                  onClick={() => navigate('/auth')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </Button>
               )}
             </div>
           </div>

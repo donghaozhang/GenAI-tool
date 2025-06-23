@@ -48,14 +48,16 @@ const getModelParameters = (modelId: string, prompt: string, seed: number) => {
     };
   }
   
-  // FLUX models (default) - using FLUX-specific parameters
+  // FLUX models - using exact parameters from FAL.ai FLUX Schnell documentation
+  // Reference: https://fal.ai/models/fal-ai/flux/schnell/api
   return {
     prompt: prompt,
     image_size: 'square_hd',
     num_inference_steps: 4,
-    guidance_scale: 3.5,
-    enable_safety_checker: true,
-    seed: seed
+    seed: seed,
+    sync_mode: false,
+    num_images: 1,
+    enable_safety_checker: true
   };
 };
 

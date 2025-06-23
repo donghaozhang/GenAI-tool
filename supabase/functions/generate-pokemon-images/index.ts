@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -42,12 +41,16 @@ serve(async (req) => {
     console.log(`Generating ${count} images for ${pokemonType} with prompt: ${prompt}`);
     console.log(`Model ID: ${modelId || 'default'}`);
 
+    // Use the provided modelId or default to flux/schnell
+    const actualModelId = modelId || 'fal-ai/flux/schnell';
+    console.log(`Using model: ${actualModelId}`);
+
     // Generate multiple images with different seeds
     const imagePromises = [];
     for (let i = 0; i < count; i++) {
       const seed = Math.floor(Math.random() * 1000000);
       imagePromises.push(
-        fetch('https://fal.run/fal-ai/flux/schnell', {
+        fetch(`https://fal.run/${actualModelId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

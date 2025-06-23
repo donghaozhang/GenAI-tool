@@ -86,7 +86,7 @@ serve(async (req) => {
             'Content-Type': 'application/json',
             'Authorization': `Key ${FAL_API_KEY}`,
           },
-          body: JSON.stringify(modelParams),
+          body: JSON.stringify({ input: modelParams }),
         })
       );
     }

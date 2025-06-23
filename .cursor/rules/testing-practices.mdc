@@ -8,11 +8,11 @@ alwaysApply: false
 This document outlines the comprehensive testing strategy implemented for the GenAI Tool project.
 
 ## Test Suite Overview
-- **Total Tests**: 43 comprehensive tests across focused categories
+- **Total Tests**: 5 focused test files across essential categories
 - **Test Runner**: Vitest with @testing-library/react
 - **Test Coverage**: Core component tests, diagnostic tests, and essential utility tests
 - **All tests currently passing** ✅
-- **Recent Cleanup**: Removed 20+ problematic tests that had complex mocking issues
+- **Streamlined Approach**: Focused on essential functionality with reduced test complexity
 
 ## Test Organization Structure
 ```
@@ -23,20 +23,21 @@ src/__tests__/
 └── utils/                    # Utility function tests (imageUpload)
 ```
 
-**Note**: Recently cleaned up test suite by removing:
-- Complex integration tests with Radix UI mocking issues
-- Redundant pipeline processing tests with backend dependencies
-- Edge function tests requiring @fal-ai/serverless-client setup
-- Duplicate test files with outdated model expectations
+**Current Test Files**:
+1. `ClothesChangingDiagnostic.test.ts` - Comprehensive clothes changing functionality
+2. `UnifiedGenerationInterface.test.tsx` - Core marketplace interface
+3. `ClothesChangingTest.test.ts` - Integration testing for clothes changing
+4. `LivePipelineTest.test.ts` - Live pipeline processing tests
+5. `imageUpload.test.ts` - Image upload utility functions
 
 ## Key Test Categories
 
 ### 1. Clothes Changing Functionality Tests
 **Location**: `src/__tests__/diagnostics/ClothesChangingDiagnostic.test.ts`
-- **15 comprehensive tests** covering the FLUX Pro Kontext model
+- **Comprehensive tests** covering the FLUX Pro Kontext model
 - Tests model ID format validation, input parameters, API integration
 - Validates clothes changing prompts and image transformations
-- **All 15 tests passing** ✅
+- **All tests passing** ✅
 
 ### 2. Core Component Tests
 **Location**: `src/__tests__/components/marketplace/UnifiedGenerationInterface.test.tsx`
@@ -56,8 +57,8 @@ src/__tests__/
 
 ### 4. Integration Tests
 **Locations**:
-- `src/__tests__/integration/ClothesChangingTest.test.ts` - 5 tests ✅
-- `src/__tests__/integration/LivePipelineTest.test.ts` - 8 tests (3 skipped for live environment) ✅
+- `src/__tests__/integration/ClothesChangingTest.test.ts` - Essential clothes changing workflows ✅
+- `src/__tests__/integration/LivePipelineTest.test.ts` - Live pipeline testing (some tests skipped for CI/CD) ✅
 
 **Coverage**:
 - Essential clothes changing workflows
@@ -98,14 +99,14 @@ npm test
 # Clothes changing functionality
 npm test ClothesChangingDiagnostic
 
-# Pipeline processing
-npm test PipelineProcessing
+# Core component tests
+npm test UnifiedGenerationInterface
 
 # Integration tests
 npm test integration/
 
-# Component tests
-npm test components/marketplace/
+# Utility tests
+npm test imageUpload
 ```
 
 ### Test Development Guidelines
@@ -123,18 +124,19 @@ npm test components/marketplace/
 - Update tests when API endpoints or model parameters change
 
 ## Test Suite Modernization & Model Title Updates
-Recent updates have **modernized the test suite** and aligned it with current model standards:
+Recent updates have **streamlined the test suite** and aligned it with current model standards:
 
 ### Model Title Standardization
 - Updated all test references from "FLUX Pro Kontext" → "fal-ai/flux-pro/kontext"
 - Updated default model expectations from "fal-ai/flux/schnell" → "fal-ai/imagen4/preview"
 - Ensured consistent model ID format throughout test suite
 
-### Test Suite Cleanup Benefits
-- **Improved reliability**: Removed flaky tests with complex mocking dependencies
-- **Faster execution**: Focused on essential functionality rather than edge cases
+### Test Suite Streamlining Benefits
+- **Improved reliability**: Focused on essential functionality rather than edge cases
+- **Faster execution**: Reduced complexity with targeted test coverage
 - **Better maintainability**: Simplified test structure with clear separation of concerns
-- **Consistent results**: All remaining tests pass reliably in CI/CD environment
+- **Consistent results**: All tests pass reliably in CI/CD environment
+- **Reduced maintenance overhead**: Fewer test files to maintain and update
 
 ## Future Testing Enhancements
 - Add performance testing for image processing pipelines

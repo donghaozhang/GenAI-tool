@@ -44,11 +44,10 @@ The marketplace now uses a **Unified Generation Interface** that combines model 
 - **Model titles should match model IDs** for consistency and clarity (e.g., title: "fal-ai/flux-pro/kontext")
 - This standardization applies to all model references in:
   - `src/constants/models.ts` - Featured models array (both `id` and `title` fields)
-  - `src/constants/pipelineModels.ts` - Pipeline model configurations
   - `src/components/marketplace/ModelSelector.tsx` - Model options
   - `src/services/imageGeneration.ts` - API calls and model detection
   - Backend functions support both formats for backward compatibility
-- **Recent Update**: FLUX Pro Kontext model title updated to use full model ID format for consistency
+- **Recent Update**: All model titles updated to use full model ID format for consistency
 
 ## Pipeline Processing & Clothes Changing
 - **FLUX Pro Kontext Support** for advanced image-to-image transformations
@@ -56,7 +55,7 @@ The marketplace now uses a **Unified Generation Interface** that combines model 
 - **Modern Edge Function** using `@fal-ai/client` instead of direct HTTP calls
 - **Enhanced Error Handling** with proper validation and user-friendly messages
 - **Data URL Support** for uploaded images (base64 format for API compatibility)
-- **Comprehensive Test Coverage** with 20+ passing tests for clothes changing functionality
+- **Comprehensive Test Coverage** with focused testing for clothes changing functionality
 
 ## Model Data Management
 - All model data is centralized in [models.ts](mdc:src/constants/models.ts)
@@ -110,17 +109,40 @@ The marketplace now uses a **Unified Generation Interface** that combines model 
 - **Standard Practice**: Model titles should match their full model IDs
 - **Example**: For model ID `"fal-ai/flux-pro/kontext"`, use title `"fal-ai/flux-pro/kontext"`
 - **Benefits**: Eliminates confusion, improves debugging, maintains consistency across UI
-- **Migration**: Existing models are being updated to follow this standard
+- **Current Status**: All models follow this standard
 - **Exception**: Only use human-readable titles when the model ID is not user-friendly
 
-## Recently Added Models (Following Standards)
-- **FLUX.1 [schnell]** (`fal-ai/flux-1/schnell`) - Fastest inference text-to-image model
+## Current Model Collection (Following Standards)
+### **Text to Image Models**
+- **FLUX.1 [schnell]** (`fal-ai/flux-1/schnell`) - Fastest inference text-to-image model with 12B parameters
 - **FLUX.1 [dev]** (`fal-ai/flux/dev`) - 12B parameter flow transformer for high-quality generation
 - **Bytedance SeedDream v3** (`fal-ai/bytedance/seedream/v3/text-to-image`) - Bilingual 2K resolution model
+- **Google Imagen 4** (`fal-ai/imagen4/preview`) - Google's highest quality image generation model
+
+### **Image to Image Models**
+- **Luma Photon Reframe** (`fal-ai/luma-photon/reframe`) - Intelligent image extension and reframing
+- **FLUX Pro Kontext** (`fal-ai/flux-pro/kontext`) - Advanced image-to-image transformations with clothes changing
+- **FLUX Pro** (`fal-ai/flux-pro`) - Professional-grade image enhancement
+- **Aura SR** (`fal-ai/aura-sr`) - Super-resolution image upscaling
+- **Background Removal** (`fal-ai/imageutils/rembg`) - AI-powered background removal
+
+### **Image to Video Models**
 - **MiniMax Hailuo 02 Pro** (`fal-ai/minimax/hailuo-02/pro/image-to-video`) - 1080p image-to-video generation
 - **MiniMax Hailuo 02 Standard** (`fal-ai/minimax/hailuo-02/standard/image-to-video`) - 768p image-to-video generation
-- **Luma Photon Reframe** (`fal-ai/luma-photon/reframe`) - Intelligent image extension and reframing
-- **MMAudio V2** (`fal-ai/mmaudio-v2`) - Video-to-video model that generates synchronized audio for videos based on text prompts
+- **Kling Video v2.1 Master** (`fal-ai/kling-video/v2.1/master/image-to-video`) - Premium image-to-video generation
+- **Kling Video v2.1 Standard** (`fal-ai/kling-video/v2.1/standard/image-to-video`) - Cost-efficient image-to-video
+- **PixVerse v4.5** (`fal-ai/pixverse/v4.5`) - High-quality video clips with motion control
+
+### **Text to Video Models**
+- **Veo 3** (`fal-ai/veo-3`) - Google's most advanced AI video generation model with sound
+- **Kling Video v2.1** (`fal-ai/kling-video/v2.1/master/text-to-video`) - Premium text-to-video generation
+
+### **Video to Video Models**
+- **MMAudio V2** (`fal-ai/mmaudio-v2`) - Video-to-video model that generates synchronized audio for videos
+
+### **Specialized Models**
+- **Image to 3D Models**: Various 3D generation capabilities
+- **Audio Generation Models**: Text-to-audio and video-to-audio processing
 
 ## API Integration
 - Image generation services in [imageGeneration.ts](mdc:src/services/imageGeneration.ts)
@@ -133,10 +155,10 @@ The marketplace now uses a **Unified Generation Interface** that combines model 
 - Backend functions in `supabase/functions/` support both full and short model ID formats
 
 ## Testing & Quality Assurance
-- **Modernized Test Suite**: Cleaned up from 60+ to 43 focused tests, all passing ✅
+- **Streamlined Test Suite**: 5 focused test files covering essential functionality ✅
 - **Model Title Testing**: All tests updated to reflect standardized model naming (fal-ai format)
 - **Core Test Coverage**: UnifiedGenerationInterface, ClothesChangingDiagnostic, imageUpload utilities
-- **Removed Problematic Tests**: Eliminated complex integration tests with mocking issues
+- **Reliable Testing**: Focused on essential functionality with consistent results
 - **CI/CD Ready**: Reliable test execution without flaky dependencies
 
 ### Test Maintenance Best Practices

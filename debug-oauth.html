@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Debug Test</title>
+</head>
+<body>
+    <h1>OAuth Debug Test</h1>
+    <button onclick="testOAuth()">Test Google OAuth</button>
+    <div id="result"></div>
+
+    <script>
+        function testOAuth() {
+            // Test what domain is being used
+            const currentOrigin = window.location.origin;
+            const configDomain = 'gen-tool-qurosity-x.vercel.app';
+            
+            console.log('Current Origin:', currentOrigin);
+            console.log('Expected Domain:', configDomain);
+            
+            // Test the OAuth URL that would be generated
+            const redirectTo = `https://${configDomain}/marketplace`;
+            const oauthUrl = `https://wdprvtqbwnhwbpufcmgg.supabase.co/auth/v1/authorize?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`;
+            
+            document.getElementById('result').innerHTML = `
+                <h3>Debug Info:</h3>
+                <p><strong>Current Origin:</strong> ${currentOrigin}</p>
+                <p><strong>Expected Domain:</strong> ${configDomain}</p>
+                <p><strong>Redirect URL:</strong> ${redirectTo}</p>
+                <p><strong>OAuth URL:</strong> <a href="${oauthUrl}" target="_blank">${oauthUrl}</a></p>
+                <br>
+                <button onclick="window.open('${oauthUrl}', '_blank')">Test OAuth Flow</button>
+            `;
+        }
+    </script>
+</body>
+</html> 

@@ -12,6 +12,29 @@ interface GenerateImageParams {
   count?: number;
 }
 
+// Model-specific parameter configurations
+const getModelParameters = (modelId: string, prompt: string, seed: number) => {
+  // Google Imagen 4 models
+  if (modelId.includes('imagen4')) {
+    return {
+      prompt: prompt,
+      aspect_ratio: '1:1',
+      num_images: 1,
+      seed: seed
+    };
+  }
+  
+  // FLUX models (default)
+  return {
+    prompt: prompt,
+    image_size: 'square_hd',
+    num_inference_steps: 4,
+    guidance_scale: 3.5,
+    enable_safety_checker: true,
+    seed: seed
+  };
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -49,6 +72,10 @@ serve(async (req) => {
     const imagePromises = [];
     for (let i = 0; i < count; i++) {
       const seed = Math.floor(Math.random() * 1000000);
+      const modelParams = getModelParameters(actualModelId, prompt, seed);
+      
+      console.log(`API parameters for ${actualModelId}:`, JSON.stringify(modelParams, null, 2));
+      
       imagePromises.push(
         fetch(`https://fal.run/${actualModelId}`, {
           method: 'POST',
@@ -56,14 +83,7 @@ serve(async (req) => {
             'Content-Type': 'application/json',
             'Authorization': `Key ${FAL_API_KEY}`,
           },
-          body: JSON.stringify({
-            prompt: prompt,
-            image_size: 'square_hd',
-            num_inference_steps: 4,
-            guidance_scale: 3.5,
-            enable_safety_checker: true,
-            seed: seed
-          }),
+          body: JSON.stringify(modelParams),
         })
       );
     }
@@ -75,11 +95,21 @@ serve(async (req) => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Fal API error:', errorText);
-        throw new Error(`Failed to generate image: ${response.statusText}`);
+        throw new Error(`Failed to generate image: ${response.statusText} - ${errorText}`);
       }
 
       const data = await response.json();
-      imageUrls.push(data.images[0].url);
+      console.log('API response:', JSON.stringify(data, null, 2));
+      
+      // Handle different response formats
+      if (data.images && data.images.length > 0) {
+        imageUrls.push(data.images[0].url);
+      } else if (data.image) {
+        imageUrls.push(data.image.url);
+      } else {
+        console.error('Unexpected API response format:', data);
+        throw new Error('Unexpected API response format');
+      }
     }
 
     console.log(`${imageUrls.length} images generated successfully:`, imageUrls);

@@ -12,30 +12,6 @@ interface GenerateImageParams {
   count?: number;
 }
 
-// Modern FAL.ai client setup
-const createFalClient = (apiKey: string) => {
-  return {
-    subscribe: async (modelId: string, options: any) => {
-      const response = await fetch(`https://fal.run/${modelId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Key ${apiKey}`,
-        },
-        body: JSON.stringify(options.input),
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`FAL API error: ${response.status} - ${errorText}`);
-      }
-      
-      const data = await response.json();
-      return { data };
-    }
-  };
-};
-
 // Model-specific parameter configurations based on FAL.ai documentation
 const getModelParameters = (modelId: string, prompt: string, seed: number) => {
   // Google Imagen 4 models - using exact parameters from FAL.ai docs
@@ -94,9 +70,6 @@ serve(async (req) => {
     const actualModelId = modelId || 'fal-ai/flux/schnell';
     console.log(`Using model: ${actualModelId}`);
 
-    // Create FAL client
-    const fal = createFalClient(FAL_API_KEY);
-
     // Generate multiple images with different seeds
     const imagePromises = [];
     for (let i = 0; i < count; i++) {
@@ -105,19 +78,30 @@ serve(async (req) => {
       
       console.log(`API parameters for ${actualModelId}:`, JSON.stringify(modelParams, null, 2));
       
-      // Use modern FAL.ai client approach
+      // Use direct HTTP fetch with correct parameters
       imagePromises.push(
-        fal.subscribe(actualModelId, {
-          input: modelParams
+        fetch(`https://fal.run/${actualModelId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Key ${FAL_API_KEY}`,
+          },
+          body: JSON.stringify(modelParams),
         })
       );
     }
 
-    const results = await Promise.all(imagePromises);
+    const responses = await Promise.all(imagePromises);
     const imageUrls = [];
 
-    for (const result of results) {
-      const data = result.data;
+    for (const response of responses) {
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('FAL API error:', errorText);
+        throw new Error(`FAL API error: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
       console.log('API response:', JSON.stringify(data, null, 2));
       
       // Handle different response formats based on FAL.ai documentation

@@ -1,0 +1,285 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Stripe Payment Integration Rules
+
+This rule set defines the mandatory requirements and procedures for implementing Stripe payments in the AI marketplace application.
+
+## Payment Integration Setup Rules
+
+### **Rule 1: Stripe Account Configuration**
+**Account Requirements:**
+1. Create verified Stripe account at [Stripe Dashboard](https://dashboard.stripe.com/)
+2. Complete account verification process
+3. Obtain API keys from **Developers** → **API keys**
+   - Publishable key (starts with `pk_test_` for testing)
+   - Secret key (starts with `sk_test_` for testing)
+
+**Environment Configuration:**
+```env
+# Required Stripe Environment Variables
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_actual_publishable_key_here
+VITE_STRIPE_SECRET_KEY=sk_test_your_actual_secret_key_here
+```
+
+**Supabase Environment Variables:**
+- `STRIPE_SECRET_KEY` - Your Stripe secret key
+- `SUPABASE_SERVICE_ROLE_KEY` - Your Supabase service role key
+
+### **Rule 2: Edge Function Deployment Requirements**
+**Mandatory Edge Functions:**
+```bash
+# Deploy all payment-related Edge Functions
+supabase functions deploy create-payment-intent --no-verify-jwt
+supabase functions deploy process-payment-success --no-verify-jwt
+supabase functions deploy consume-credits --no-verify-jwt
+```
+
+**Database Migration:**
+```bash
+# Apply credits system migration
+supabase db push
+```
+
+## Payment System Architecture Rules
+
+### **Rule 3: Credit System Implementation**
+**Credit Management Requirements:**
+- **User Credits:** Track AI generation credits per user
+- **Automatic Consumption:** Credits MUST be consumed on each AI generation
+- **Batch Processing:** Credit validation for multi-model generations
+- **Free Credits:** New users MUST receive 10 free credits
+
+**Pricing Structure (Required):**
+- **Starter Pack:** 100 credits for $9.99
+- **Professional:** 500 credits for $39.99
+- **Enterprise:** 2000 credits for $149.99
+
+### **Rule 4: Component Architecture Requirements**
+**Frontend Components (Mandatory Structure):**
+```
+src/
+├── services/stripe.ts              # Stripe service layer
+├── components/marketplace/
+│   ├── PricingPlans.tsx           # Credit packages display
+│   ├── PaymentForm.tsx            # Stripe Elements form
+│   └── CreditsDisplay.tsx         # User credit balance
+└── pages/
+    ├── Payment.tsx                # Payment checkout page
+    └── PaymentSuccess.tsx         # Success confirmation
+```
+
+**Backend Functions (Required):**
+```
+supabase/functions/
+├── create-payment-intent/         # Create Stripe payment intent
+├── process-payment-success/       # Verify payment & add credits
+└── consume-credits/               # Consume credits for AI generation
+```
+
+## Database Schema Rules
+
+### **Rule 5: Database Structure Requirements**
+**Required Tables:**
+```sql
+-- User credits table (MANDATORY)
+user_credits (
+  id, user_id, credits, created_at, updated_at
+)
+
+-- Transaction history (MANDATORY)
+transactions (
+  id, user_id, payment_intent_id, amount, currency, 
+  credits_purchased, status, created_at, updated_at
+)
+```
+
+**Data Access Rules:**
+- All credit operations MUST use proper authentication
+- Credit consumption MUST be atomic transactions
+- Payment verification MUST be server-side only
+
+## Payment Processing Rules
+
+### **Rule 6: Payment Security Requirements**
+**Security Implementation:**
+- ✅ Stripe Elements MUST handle all credit card processing (PCI compliance)
+- ✅ Payment Intents MUST be used for one-time payments
+- ✅ Real-time payment validation MUST be implemented
+- ✅ Comprehensive error handling MUST be present
+
+**Authentication Rules:**
+- User authentication REQUIRED for all payment operations
+- Server-side payment processing MANDATORY
+- Client-side payment data MUST be minimal
+
+### **Rule 7: User Experience Requirements**
+**Mandatory UX Features:**
+- ✅ Real-time credit balance display in marketplace
+- ✅ Seamless checkout experience with Stripe Elements
+- ✅ Payment success confirmation with credit addition
+- ✅ Clear messaging when credits are insufficient
+- ✅ Transparent pricing display
+
+**Error Handling:**
+- Payment failures MUST show user-friendly messages
+- Credit validation errors MUST be clearly communicated
+- Network errors MUST have retry mechanisms
+
+## Testing and Validation Rules
+
+### **Rule 8: Testing Requirements**
+**Test Cards (Development Only):**
+- **Success:** `4242 4242 4242 4242`
+- **Decline:** `4000 0000 0000 0002`
+- **Insufficient Funds:** `4000 0000 0000 9995`
+
+**Test Flow Validation:**
+1. Visit `/pricing` to verify credit packages display
+2. Click "Purchase" on any plan
+3. Complete payment form with test card
+4. Verify credits are added to user account
+5. Test AI generation with credit consumption
+
+**Mandatory Testing Checklist:**
+- [ ] Payment form loads correctly
+- [ ] Test cards process successfully
+- [ ] Credits are added after successful payment
+- [ ] Credit consumption works during AI generation
+- [ ] Error states display properly
+- [ ] Payment success page functions correctly
+
+## Production Deployment Rules
+
+### **Rule 9: Production Configuration Requirements**
+**Live Environment Setup:**
+- Production Stripe keys MUST replace test keys
+- Webhook endpoints MUST be configured for production
+- Price IDs MUST be updated with actual Stripe Price IDs
+- SSL certificates MUST be valid for payment processing
+
+**Production Checklist:**
+- [ ] `VITE_STRIPE_PUBLISHABLE_KEY` set to live key (starts with `pk_live_`)
+- [ ] `STRIPE_SECRET_KEY` in Supabase set to live key (starts with `sk_live_`)
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` configured in Supabase
+- [ ] Database migration applied to production
+- [ ] Edge Functions deployed to production
+- [ ] Webhook endpoints configured (if using)
+
+### **Rule 10: Webhook Configuration (Optional)**
+**Production Webhook Setup:**
+1. Stripe Dashboard → **Developers** → **Webhooks**
+2. Add endpoint: `https://your-domain.com/api/webhooks/stripe`
+3. Select events: `payment_intent.succeeded`, `payment_intent.payment_failed`
+
+**Price ID Updates:**
+```typescript
+// Update PRICING_PLANS in src/services/stripe.ts
+export const PRICING_PLANS = {
+  starter: {
+    // ... other fields
+    priceId: 'price_1234567890abcdef', // Replace with actual Price ID
+  },
+  // ... other plans
+};
+```
+
+## Security Compliance Rules
+
+### **Rule 11: Payment Security Standards**
+**Environment Security:**
+- ✅ NEVER commit `.env` file to git
+- ✅ Use different keys for test/production environments
+- ✅ Rotate keys immediately if accidentally exposed
+- ✅ Use Supabase environment variables for Edge Functions
+
+**Payment Processing Security:**
+- ✅ Stripe Elements handles PCI compliance automatically
+- ✅ Payment processing MUST happen server-side only
+- ✅ Webhook verification REQUIRED for production
+- ✅ User authentication REQUIRED for all purchases
+
+## Troubleshooting Rules
+
+### **Rule 12: Common Issue Resolution**
+**Issue Resolution Procedures:**
+
+1. **"Stripe not initialized" Error:**
+   - Verify `VITE_STRIPE_PUBLISHABLE_KEY` is set correctly
+   - Ensure key starts with `pk_test_` or `pk_live_`
+   - Restart development server after environment changes
+
+2. **"Payment intent creation failed" Error:**
+   - Check `STRIPE_SECRET_KEY` in Supabase environment variables
+   - Verify Edge Function deployment status
+   - Review Edge Function logs for detailed errors
+
+3. **"Insufficient credits" Error:**
+   - Verify user has credits in `user_credits` table
+   - Check credit consumption logic in `consume-credits` function
+   - Ensure proper user authentication
+
+4. **Database Connection Errors:**
+   - Confirm migration applied: `supabase db push`
+   - Verify Row Level Security policies are correct
+   - Check Supabase connection status
+
+**Debug Commands:**
+```bash
+# Check Supabase status
+supabase status
+
+# View Edge Function logs
+supabase functions logs create-payment-intent
+
+# Test database connection
+supabase db ping
+```
+
+## Monitoring and Analytics Rules
+
+### **Rule 13: Payment Monitoring Requirements**
+**Stripe Dashboard Monitoring:**
+- Track successful/failed transactions in **Payments** section
+- Monitor customer payment history in **Customers** section
+- Analyze revenue trends in **Revenue** section
+
+**Supabase Metrics Tracking:**
+- Monitor credit consumption patterns in **Database** metrics
+- Track payment processing performance in **Edge Functions** metrics
+- Monitor user registration and retention in **Auth** metrics
+
+**Alert Configuration:**
+- Set up alerts for failed payment processing
+- Monitor unusual credit consumption patterns
+- Track API usage and rate limiting
+
+## Enhancement and Extension Rules
+
+### **Rule 14: Future Development Guidelines**
+**Planned Enhancements:**
+- **Subscription Plans:** Implement recurring monthly payments
+- **Usage Analytics:** Track and analyze credit consumption patterns
+- **Referral System:** Credit rewards for user referrals
+- **Bulk Discounts:** Volume pricing for enterprise users
+- **Payment Methods:** Add PayPal, Apple Pay, Google Pay integration
+
+**Integration Opportunities:**
+- **Email Notifications:** Payment confirmations via email service
+- **Discord Bot:** Credit balance notifications
+- **Mobile App:** React Native payment integration
+- **Admin Dashboard:** Payment management interface
+
+**Development Standards:**
+- All new payment features MUST follow established security rules
+- New payment methods MUST integrate with existing credit system
+- All payment-related code MUST include comprehensive error handling
+- Payment features MUST be thoroughly tested before deployment
+
+---
+
+**Payment Integration Compliance:** All payment development MUST follow these rules
+**Last Updated:** January 2025
+**Rule Version:** 1.0.0

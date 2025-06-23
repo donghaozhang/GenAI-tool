@@ -1,0 +1,147 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Security Development Rules
+
+This rule set defines mandatory security practices for the AI Model Marketplace application.
+
+## Environment Variable Management Rules
+
+### **Rule 1: Mandatory Environment Variables**
+All sensitive configuration MUST use environment variables:
+
+**Required Variables:**
+- `VITE_SUPABASE_URL` - Supabase project URL (✅ Required)
+- `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key (✅ Required)
+- `VITE_FAL_API_BASE_URL` - FAL.ai API base URL (❌ Optional, has default)
+- `VITE_ELEVENLABS_API_BASE_URL` - ElevenLabs API base URL (❌ Optional, has default)
+- `VITE_OPENROUTER_API_BASE_URL` - OpenRouter API base URL (❌ Optional, has default)
+- `VITE_APP_NAME` - Application name (❌ Optional, has default)
+- `VITE_APP_DOMAIN` - Application domain (❌ Optional, has default)
+
+**Setup Process:**
+1. Always copy `.env.example` to `.env` for new environments
+2. Replace ALL placeholder values with actual credentials
+3. Verify setup using automatic validation on app startup
+
+### **Rule 2: Environment Variable Security**
+**NEVER commit sensitive data:**
+- `.env` files MUST be in `.gitignore`
+- Use `.env.example` as template (safe to commit)
+- API keys MUST be truncated in debug logs
+- Different keys MUST be used for dev/staging/production
+
+**Validation Requirements:**
+- Automatic validation on app startup (implemented in `src/config/env.ts`)
+- Type safety through TypeScript interfaces (defined in `src/types/env.ts`)
+- Development debugging utility (available in `src/utils/env-check.ts`)
+
+## Code Security Rules
+
+### **Rule 3: API Key Protection**
+**Implementation Requirements:**
+- All API integrations MUST use environment variables
+- Keys MUST start with `VITE_` for client-side access
+- Server-side keys MUST be stored in Supabase environment variables
+- API keys MUST be rotated regularly in production
+
+**Monitoring:**
+- Set up API usage monitoring to detect unauthorized access
+- Implement rate limiting for API endpoints
+- Enable alerts for unusual usage patterns
+
+### **Rule 4: Development Security Practices**
+**During Development:**
+- Console logging of environment status is allowed in development mode
+- Security-sensitive information MUST be censored in logs
+- Never use production keys in development environment
+- Restart development server after environment variable changes
+
+**Code Review Requirements:**
+- No hardcoded credentials in source code
+- Environment variable validation must be present
+- Proper error handling for missing configuration
+
+## File Organization Security Rules
+
+### **Rule 5: Secure File Structure**
+**Configuration Files:**
+- `src/config/env.ts` - Centralized configuration (✅ Implemented)
+- `src/types/env.ts` - TypeScript environment types (✅ Implemented)
+- `src/utils/env-check.ts` - Development debugging (✅ Implemented)
+- `.env.example` - Template file (✅ Safe to commit)
+- `.env` - Local configuration (🔒 NEVER commit)
+
+**Modified Security Files:**
+- `.gitignore` - Environment exclusions added
+- `src/vite-env.d.ts` - Environment variable types
+- `src/integrations/supabase/client.ts` - Uses environment variables
+- `src/App.tsx` - Environment validation integrated
+
+## Production Deployment Rules
+
+### **Rule 6: Production Security Requirements**
+**Before Production Deployment:**
+1. Set environment variables in hosting platform (not in code)
+2. NEVER use development keys in production
+3. Enable CORS, rate limiting, and other security measures
+4. Set up monitoring and usage alerts
+5. Implement regular API key rotation schedule
+
+**Production Checklist:**
+- [ ] All environment variables configured in hosting platform
+- [ ] Development keys replaced with production keys
+- [ ] Security measures enabled (CORS, rate limiting)
+- [ ] Monitoring and alerts configured
+- [ ] API key rotation schedule established
+
+## Troubleshooting Security Rules
+
+### **Rule 7: Security Issue Resolution**
+**Common Security Issues:**
+1. **Missing Environment Variables Error:**
+   - Verify `.env` file exists in project root
+   - Check all required variables are set with correct names
+   - Look for typos in variable names (case-sensitive)
+
+2. **Supabase Connection Errors:**
+   - Validate `VITE_SUPABASE_URL` format and accessibility
+   - Ensure `VITE_SUPABASE_ANON_KEY` is current and valid
+   - Check Supabase project status and availability
+
+3. **Environment Loading Issues:**
+   - Restart development server after changes
+   - Ensure all client variables start with `VITE_`
+   - Check `.env` file syntax (no quotes around values unless needed)
+
+**Debug Process:**
+1. Check browser console for "🔍 Environment Variables Check" output
+2. Verify environment variable loading in development
+3. Test with `npm run dev` restart
+4. Use development debugging utilities for diagnosis
+
+## Security Compliance Rules
+
+### **Rule 8: Security Standards Compliance**
+**Implemented Security Features:**
+- ✅ Environment variable validation with automatic startup checks
+- ✅ TypeScript type safety for all configuration
+- ✅ Git security with proper `.gitignore` exclusions
+- ✅ Centralized configuration management
+- ✅ Development debugging with secure information display
+- ✅ API key truncation in logs for security
+
+**Ongoing Security Practices:**
+- Regular security audits of environment configuration
+- API key rotation following security best practices
+- Monitor for accidental credential exposure in commits
+- Maintain separation between development and production environments
+- Document and track all security-related configuration changes
+
+---
+
+**Security Rule Compliance:** All development work MUST follow these security rules
+**Last Updated:** January 2025
+**Rule Version:** 1.0.0

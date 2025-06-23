@@ -1,0 +1,267 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Edge Function Troubleshooting & Fixes
+
+This document provides comprehensive guidance for troubleshooting and fixing Edge Function issues, particularly focusing on the recent resolution of 500 errors in the image generation system.
+
+## Recent Critical Fix: Edge Function 500 Errors ✅
+
+### Problem Summary
+- **Issue**: Edge Function returning 500 Internal Server Error
+- **Symptoms**: `FunctionsHttpError: Edge Function returned a non-2xx status code`
+- **Affected Feature**: AI image generation with FAL.ai models
+- **Root Cause**: Environment variable quoting issue with FAL API key
+
+### Root Cause Analysis
+
+The issue was traced through multiple layers:
+
+1. **Initial Suspicion**: API parameter format mismatch
+2. **Authentication Issues**: 401 errors from FAL API
+3. **Environment Variables**: FAL_API_KEY configuration problems
+4. **Final Discovery**: Colon (`:`) character in API key being escaped incorrectly when set with quotes
+
+### The Solution 🎯
+
+**Problem**: FAL API key contains colon character that was being escaped incorrectly
+```bash
+# WRONG - Causes authentication failures
+supabase secrets set FAL_API_KEY="ce1a4a62-4ceb-4faa-989f-2ed52adb7f7d:6b16e77cf71a9c9ed70149237587f95e"
+
+# CORRECT - Works perfectly
+supabase secrets set FAL_API_KEY=ce1a4a62-4ceb-4faa-989f-2ed52adb7f7d:6b16e77cf71a9c9ed70149237587f95e
+```
+
+### Debugging Process & Tools
+
+#### 1. Supabase MCP Tools
+```bash
+# Check Edge Function logs
+mcp_supabase_get_logs(project_id, service="edge-function")
+
+# List Edge Functions and versions
+mcp_supabase_list_edge_functions(project_id)
+```
+
+#### 2. Direct API Testing
+Created test scripts to isolate the issue:
+```javascript
+// Test FAL API directly
+const response = await fetch('https://fal.run/fal-ai/flux/schnell', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Key ${apiKey}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(params)
+});
+```
+
+#### 3. Environment Variable Validation
+```bash
+# Check current secrets
+supabase secrets list
+
+# Verify digest changes after updates
+# Different digest = successfully updated
+```
+
+### Edge Function Implementation Best Practices
+
+#### 1. Simplified Error Handling
+```typescript
+// Version 3.0 - Simplified and Reliable Implementation
+serve(async (req) => {
+  try {
+    // Check API key first
+    const FAL_API_KEY = Deno.env.get('FAL_API_KEY');
+    if (!FAL_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: 'FAL_API_KEY not configured' }),
+        { status: 500, headers: corsHeaders }
+      );
+    }
+
+    // Single API call instead of complex Promise.all
+    const response = await fetch(`https://fal.run/${modelId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Key ${FAL_API_KEY}`,
+      },
+      body: JSON.stringify(modelParams),
+    });
+
+    // Clear error handling
+    if (!response.ok) {
+      const errorText = await response.text();
+      return new Response(
+        JSON.stringify({ error: `FAL API error: ${response.status}`, details: errorText }),
+        { status: 500, headers: corsHeaders }
+      );
+    }
+
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: corsHeaders }
+    );
+  }
+});
+```
+
+#### 2. Model Parameter Configuration
+```typescript
+const getModelParameters = (modelId: string, prompt: string, seed: number) => {
+  // Google Imagen 4 models
+  if (modelId.includes('imagen4')) {
+    return {
+      prompt: prompt,
+      aspect_ratio: '1:1',
+      num_images: 1,
+      seed: seed
+    };
+  }
+  
+  // FLUX models - default
+  return {
+    prompt: prompt,
+    image_size: 'square_hd',
+    num_inference_steps: 4,
+    seed: seed,
+    sync_mode: false,
+    num_images: 1,
+    enable_safety_checker: true
+  };
+};
+```
+
+## Troubleshooting Checklist
+
+### Environment Variables
+- [ ] Check if FAL_API_KEY is set: `supabase secrets list`
+- [ ] Verify API key format (no quotes for keys with special characters)
+- [ ] Test API key directly with FAL API
+- [ ] Redeploy after environment variable changes
+
+### Edge Function Deployment
+- [ ] Deploy after any code changes: `supabase functions deploy <function-name> --no-verify-jwt`
+- [ ] Check deployment logs for errors
+- [ ] Verify function version in Supabase dashboard
+
+### API Integration
+- [ ] Verify model ID format (use full fal-ai format)
+- [ ] Check parameter structure for different models
+- [ ] Test with minimal request first
+- [ ] Validate response format handling
+
+### Common Error Patterns
+
+#### 401 Authentication Errors
+```json
+{
+  "detail": "Cannot access application 'fal-ai/flux'. Authentication is required to access this application."
+}
+```
+**Solution**: Check FAL API key configuration and format
+
+#### 422 Validation Errors
+```json
+{
+  "detail": [{"loc": ["body", "prompt"], "msg": "Field required"}]
+}
+```
+**Solution**: Verify parameter structure (remove `input` wrapper if present)
+
+#### 500 Internal Server Errors
+- Check Edge Function logs
+- Verify environment variables
+- Test API key directly
+- Simplify function logic for debugging
+
+## Testing & Validation
+
+### 1. Direct Edge Function Testing
+```bash
+curl -X POST "https://PROJECT_ID.supabase.co/functions/v1/generate-pokemon-images" \
+  -H "Authorization: Bearer ANON_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"pokemonType":"custom","customPrompt":"test","modelId":"fal-ai/flux/schnell","count":1}'
+```
+
+### 2. Web Application Testing
+- Clear browser cache
+- Use incognito mode for fresh session
+- Check browser console for detailed errors
+- Monitor network requests
+
+### 3. Deployment Verification
+```bash
+# Check function status
+supabase functions list
+
+# View recent logs
+supabase functions logs <function-name>
+```
+
+## Environment Variable Best Practices
+
+### Special Characters in API Keys
+- **Avoid quotes** for keys containing `:`, `=`, or other special characters
+- **Test directly** before setting in production
+- **Use digest comparison** to verify updates
+
+### Secure Management
+```bash
+# Set without quotes for special characters
+supabase secrets set API_KEY=value:with:colons
+
+# Set with quotes for simple values
+supabase secrets set SIMPLE_KEY="simple_value"
+
+# Always verify after setting
+supabase secrets list
+```
+
+## Recovery Procedures
+
+### If Edge Functions Stop Working
+1. **Check recent deployments** - roll back if needed
+2. **Verify environment variables** - compare digests
+3. **Test API keys directly** - validate external dependencies
+4. **Simplify function logic** - remove complex features temporarily
+5. **Deploy incrementally** - add features back one by one
+
+### Emergency Rollback
+```bash
+# Redeploy previous working version
+git checkout <previous-commit>
+supabase functions deploy <function-name> --no-verify-jwt
+```
+
+## Success Metrics
+
+### Working Edge Function Indicators
+- ✅ 200 OK response status
+- ✅ Valid image URLs in response
+- ✅ Proper JSON response format
+- ✅ No authentication errors in logs
+- ✅ Consistent performance across models
+
+### Example Successful Response
+```json
+{
+  "imageUrls": ["https://v3.fal.media/files/penguin/fjkUQZ2RAqW9FUH7lLgm2.png"],
+  "imageUrl": "https://v3.fal.media/files/penguin/fjkUQZ2RAqW9FUH7lLgm2.png",
+  "debug": {
+    "modelUsed": "fal-ai/flux/schnell",
+    "promptUsed": "A simple test image",
+    "timestamp": "2025-06-23T03:44:19.467Z"
+  }
+}
+```
+
+This documentation should be referenced whenever Edge Function issues arise, providing a systematic approach to diagnosis and resolution.

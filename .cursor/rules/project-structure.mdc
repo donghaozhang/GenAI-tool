@@ -61,7 +61,7 @@ src/components/
 
 ## Backend Functions
 - `supabase/functions/process-image-pipeline/` - **Updated Edge Function** using modern @fal-ai/client for clothes changing support
-- `supabase/functions/generate-pokemon-images/` - Specialized image generation
+- `supabase/functions/generate-pokemon-images/` - **Fixed Edge Function** with proper FAL API integration and environment variable handling
 - `supabase/functions/process-elevenlabs-video/` - Video processing integration
 
 ## Test Suite Structure

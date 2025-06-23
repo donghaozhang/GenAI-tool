@@ -244,3 +244,80 @@ window.open(testUrl, '_blank');
 
 **🔒 SECURITY WARNING**: Never commit actual OAuth credentials to git repositories. Always use environment variables and keep `.env` in `.gitignore`.
 
+### **Edge Function Issues** ⚠️ **CRITICAL**
+
+#### **500 Internal Server Errors**
+**Symptoms**: 
+- `FunctionsHttpError: Edge Function returned a non-2xx status code`
+- Image generation fails with server errors
+- FAL API authentication issues
+
+**Root Cause Analysis**:
+1. **Environment Variable Issues**: API keys with special characters (`:`, `=`) being escaped incorrectly
+2. **Model Parameter Mismatch**: Different AI models require different parameter structures
+3. **Authentication Failures**: FAL API key format or configuration problems
+
+**Solutions**:
+1. **Environment Variable Format**: 
+   ```bash
+   # WRONG - Causes authentication failures with special characters
+   supabase secrets set FAL_API_KEY="key:with:colons"
+   
+   # CORRECT - Works perfectly
+   supabase secrets set FAL_API_KEY=key:with:colons
+   ```
+
+2. **Verify Environment Variables**:
+   ```bash
+   # Check current secrets
+   supabase secrets list
+   
+   # Look for digest changes after updates
+   # Different digest = successfully updated
+   ```
+
+3. **Test Edge Functions**:
+   ```bash
+   # Deploy after changes
+   supabase functions deploy generate-pokemon-images --no-verify-jwt
+   
+   # Check logs for errors
+   supabase functions logs generate-pokemon-images
+   ```
+
+4. **Model Parameter Structure**:
+   - **Google Imagen 4**: `{prompt, aspect_ratio, num_images, seed}`
+   - **FLUX models**: `{prompt, image_size, num_inference_steps, seed, sync_mode, num_images, enable_safety_checker}`
+   - **Remove unsupported parameters** like `guidance_scale` for FLUX models
+
+#### **Debugging Edge Functions**
+1. **Use Supabase MCP Tools** for comprehensive diagnostics:
+   - Check logs: `mcp_supabase_get_logs(project_id, service="edge-function")`
+   - List functions: `mcp_supabase_list_edge_functions(project_id)`
+
+2. **Direct API Testing**:
+   ```javascript
+   // Test FAL API directly
+   const response = await fetch('https://fal.run/fal-ai/flux/schnell', {
+     method: 'POST',
+     headers: {
+       'Authorization': `Key ${apiKey}`,
+       'Content-Type': 'application/json'
+     },
+     body: JSON.stringify(params)
+   });
+   ```
+
+3. **Environment Variable Validation**:
+   - Check if variables are set correctly
+   - Verify special characters aren't being escaped
+   - Test API keys directly before using in Edge Functions
+
+#### **Success Indicators**
+- ✅ 200 OK response status from Edge Functions
+- ✅ Valid image URLs in response
+- ✅ No authentication errors in logs
+- ✅ Consistent performance across different AI models
+
+**📖 See Also**: [Edge Function Troubleshooting Guide](mdc:.cursor/rules/edge-function-troubleshooting.mdc) for comprehensive debugging procedures.
+

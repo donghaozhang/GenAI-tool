@@ -1,6 +1,6 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
 # Edge Function Troubleshooting & Fixes
@@ -29,10 +29,10 @@ The issue was traced through multiple layers:
 **Problem**: FAL API key contains colon character that was being escaped incorrectly
 ```bash
 # WRONG - Causes authentication failures
-supabase secrets set FAL_API_KEY="ce1a4a62-4ceb-4faa-989f-2ed52adb7f7d:6b16e77cf71a9c9ed70149237587f95e"
+supabase secrets set FAL_API_KEY="your-api-key:with-colon-here"
 
 # CORRECT - Works perfectly
-supabase secrets set FAL_API_KEY=ce1a4a62-4ceb-4faa-989f-2ed52adb7f7d:6b16e77cf71a9c9ed70149237587f95e
+supabase secrets set FAL_API_KEY=your-api-key:with-colon-here
 ```
 
 ### Debugging Process & Tools
@@ -265,3 +265,5 @@ supabase functions deploy <function-name> --no-verify-jwt
 ```
 
 This documentation should be referenced whenever Edge Function issues arise, providing a systematic approach to diagnosis and resolution.
+
+

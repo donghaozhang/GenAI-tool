@@ -261,10 +261,10 @@ window.open(testUrl, '_blank');
 1. **Environment Variable Format**: 
    ```bash
    # WRONG - Causes authentication failures with special characters
-   supabase secrets set FAL_API_KEY="key:with:colons"
+   supabase secrets set FAL_API_KEY="your-api-key:with-colon"
    
    # CORRECT - Works perfectly
-   supabase secrets set FAL_API_KEY=key:with:colons
+   supabase secrets set FAL_API_KEY=your-api-key:with-colon
    ```
 
 2. **Verify Environment Variables**:

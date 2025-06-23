@@ -12,9 +12,33 @@ interface GenerateImageParams {
   count?: number;
 }
 
-// Model-specific parameter configurations
+// Modern FAL.ai client setup
+const createFalClient = (apiKey: string) => {
+  return {
+    subscribe: async (modelId: string, options: any) => {
+      const response = await fetch(`https://fal.run/${modelId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Key ${apiKey}`,
+        },
+        body: JSON.stringify(options.input),
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`FAL API error: ${response.status} - ${errorText}`);
+      }
+      
+      const data = await response.json();
+      return { data };
+    }
+  };
+};
+
+// Model-specific parameter configurations based on FAL.ai documentation
 const getModelParameters = (modelId: string, prompt: string, seed: number) => {
-  // Google Imagen 4 models
+  // Google Imagen 4 models - using exact parameters from FAL.ai docs
   if (modelId.includes('imagen4')) {
     return {
       prompt: prompt,
@@ -24,7 +48,7 @@ const getModelParameters = (modelId: string, prompt: string, seed: number) => {
     };
   }
   
-  // FLUX models (default)
+  // FLUX models (default) - using FLUX-specific parameters
   return {
     prompt: prompt,
     image_size: 'square_hd',
@@ -68,6 +92,9 @@ serve(async (req) => {
     const actualModelId = modelId || 'fal-ai/flux/schnell';
     console.log(`Using model: ${actualModelId}`);
 
+    // Create FAL client
+    const fal = createFalClient(FAL_API_KEY);
+
     // Generate multiple images with different seeds
     const imagePromises = [];
     for (let i = 0; i < count; i++) {
@@ -76,35 +103,27 @@ serve(async (req) => {
       
       console.log(`API parameters for ${actualModelId}:`, JSON.stringify(modelParams, null, 2));
       
+      // Use modern FAL.ai client approach
       imagePromises.push(
-        fetch(`https://fal.run/${actualModelId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Key ${FAL_API_KEY}`,
-          },
-          body: JSON.stringify(modelParams),
+        fal.subscribe(actualModelId, {
+          input: modelParams
         })
       );
     }
 
-    const responses = await Promise.all(imagePromises);
+    const results = await Promise.all(imagePromises);
     const imageUrls = [];
 
-    for (const response of responses) {
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Fal API error:', errorText);
-        throw new Error(`Failed to generate image: ${response.statusText} - ${errorText}`);
-      }
-
-      const data = await response.json();
+    for (const result of results) {
+      const data = result.data;
       console.log('API response:', JSON.stringify(data, null, 2));
       
-      // Handle different response formats
+      // Handle different response formats based on FAL.ai documentation
       if (data.images && data.images.length > 0) {
+        // Imagen 4 format: { images: [{ url: "..." }], seed: 42 }
         imageUrls.push(data.images[0].url);
       } else if (data.image) {
+        // Alternative format: { image: { url: "..." } }
         imageUrls.push(data.image.url);
       } else {
         console.error('Unexpected API response format:', data);

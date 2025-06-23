@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -48,8 +47,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
+  // Determine the canonical origin for OAuth redirects
+  const getRedirectOrigin = () => {
+    // Prefer configured app domain to avoid preview / stale domains
+    try {
+      // Lazy import to avoid circular deps with contexts in SSR
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { config } = require('@/config/env');
+      if (config?.app?.domain) {
+        const domain = config.app.domain.startsWith('http')
+          ? config.app.domain
+          : `https://${config.app.domain}`;
+        return domain;
+      }
+    } catch (err) {
+      // ignore – fall back to window.location
+    }
+    return window.location.origin;
+  };
+
+  const redirectOrigin = getRedirectOrigin();
+
   const signUp = async (email: string, password: string, fullName?: string) => {
-    const redirectUrl = `${window.location.origin}/marketplace`;
+    const redirectUrl = `${redirectOrigin}/marketplace`;
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -76,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/marketplace`,
+        redirectTo: `${redirectOrigin}/marketplace`,
       }
     });
     return { error };

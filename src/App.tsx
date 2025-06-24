@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import PricingPlans from "./components/marketplace/PricingPlans";
 import Payment from "./pages/Payment";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import { AIDesigner } from "./pages/designer/AIDesigner";
 import "@/utils/env-check"; // Initialize environment variable check
 
 const queryClient = new QueryClient();
@@ -31,6 +32,8 @@ const App = () => (
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/marketplace" element={<AIModelMarketplace />} />
             <Route path="/ai-marketplace" element={<AIModelMarketplace />} />
+            <Route path="/designer" element={<AIDesigner />} />
+            <Route path="/ai-designer" element={<AIDesigner />} />
             <Route path="/pricing" element={<PricingPlans />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/payment/success" element={<PaymentSuccess />} />

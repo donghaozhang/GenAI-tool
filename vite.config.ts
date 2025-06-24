@@ -17,6 +17,17 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Ensure single instances of important libs to avoid duplicate React and Three warnings
+      react: path.resolve(__dirname, "./node_modules/react"),
+      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
+      "react/jsx-runtime": path.resolve(__dirname, "./node_modules/react/jsx-runtime"),
+      "react/jsx-dev-runtime": path.resolve(__dirname, "./node_modules/react/jsx-dev-runtime"),
+      three: path.resolve(__dirname, "./node_modules/three"),
     },
+    dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "three", "zustand"],
+  },
+  optimizeDeps: {
+    include: ["react", "react-dom", "zustand"],
+    force: true,
   },
 }));

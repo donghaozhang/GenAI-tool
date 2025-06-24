@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { User, LogIn, Plus } from 'lucide-react';
+import { User, LogIn, Plus, Palette } from 'lucide-react';
 import { UserProfile } from '@/components/UserProfile';
 import { SearchBar } from '../components/marketplace/SearchBar';
 import { CategoryFilter } from '../components/marketplace/CategoryFilter';
@@ -98,6 +98,16 @@ const AIModelMarketplace = () => {
             
             {/* Auth Status */}
             <div className="flex items-center space-x-4">
+              <Button
+                onClick={() => navigate('/designer')}
+                size="sm"
+                variant="outline"
+                className="border-purple-500 text-purple-400 hover:bg-purple-500/10"
+              >
+                <Palette className="mr-2 h-4 w-4" />
+                AI Designer
+              </Button>
+              
               {user ? (
                 <>
                   <CreditsDisplay />

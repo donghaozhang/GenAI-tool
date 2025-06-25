@@ -188,34 +188,34 @@ export const useChatStore = create<ChatStore>()(
     
     generateResponse: async (userMessage: string) => {
       const { addMessage, setLoading, setTyping, setError, selectedModel } = get();
-      
+
+      // Immediately add the user message
+      addMessage({ role: 'user', content: userMessage });
+
+      setLoading(true);
+      setTyping(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        setError(null);
-        
-        // Add user message
-        addMessage({
-          role: 'user',
-          content: userMessage,
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userMessage, model: selectedModel }),
         });
-        
-        setTyping(true);
-        
-        // Simulate AI response (replace with actual API call)
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Add AI response
+
+        if (!res.ok) throw new Error(`API error ${res.status}`);
+
+        const data = await res.json();
+        const aiContent = data.content || data.answer || 'Sorry, no response';
+
         addMessage({
           role: 'assistant',
-          content: `I understand you want to work on: "${userMessage}". Let me help you create some amazing designs!`,
-          metadata: {
-            model: selectedModel,
-            tokens: 150,
-          },
+          content: aiContent,
+          metadata: { model: selectedModel },
         });
-        
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'An error occurred');
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message ?? 'Failed to get AI response');
       } finally {
         setLoading(false);
         setTyping(false);

@@ -8,6 +8,17 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      // Forward API and websocket traffic to Jaaz Python backend (FastAPI)
+      "/socket.io": {
+        target: "http://127.0.0.1:57988",
+        ws: true,
+      },
+      "/api": {
+        target: "http://127.0.0.1:57988",
+        changeOrigin: true,
+      },
+    },
   },
   plugins: [
     react(),
@@ -23,6 +34,7 @@ export default defineConfig(({ mode }) => ({
       "react/jsx-runtime": path.resolve(__dirname, "./node_modules/react/jsx-runtime"),
       "react/jsx-dev-runtime": path.resolve(__dirname, "./node_modules/react/jsx-dev-runtime"),
       three: path.resolve(__dirname, "./node_modules/three"),
+      zustand: path.resolve(__dirname, "./node_modules/zustand"),
     },
     dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "three", "zustand"],
   },

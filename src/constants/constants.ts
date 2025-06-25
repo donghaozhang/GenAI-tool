@@ -4,10 +4,8 @@ import { config } from '@/config/env'
 // Logo Configuration  
 export const LOGO_URL = 'https://raw.githubusercontent.com/11cafe/jaaz/refs/heads/main/assets/icons/jaaz.png'
 
-// API Configuration
-export const BASE_API_URL = import.meta.env.DEV
-  ? `http://localhost:${import.meta.env.VITE_BACKEND_PORT || 57988}`
-  : 'https://jaaz.app'
+// API Configuration - Use Supabase Edge Functions instead of local backend
+export const BASE_API_URL = config.supabase.functionsUrl
 
 export const PROVIDER_NAME_MAPPING: {
   [key: string]: { name: string; icon: string }
@@ -93,7 +91,7 @@ export const DEFAULT_PROVIDERS_CONFIG: { [key: string]: LLMConfig } = {
       // 'ideogram-ai/ideogram-v3-balanced': { type: 'image' },
       'openai/gpt-image-1': { type: 'image' },
     },
-    url: `${BASE_API_URL}/api/v1/`,
+    url: `${BASE_API_URL}/jaaz-chat/api/`,
     api_key: '',
     max_tokens: 8192,
   },

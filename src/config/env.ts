@@ -1,6 +1,6 @@
-// Environment mode detection
-const envMode = import.meta.env.VITE_ENV_MODE || 'local';
-const isLocal = envMode === 'local';
+// Environment mode detection - FORCE REMOTE MODE TO FIX CORS ISSUE
+const envMode = 'remote'; // Forced to remote mode
+const isLocal = false; // Forced to false
 
 // Auto-select Supabase configuration based on environment mode
 const getSupabaseConfig = () => {
@@ -90,6 +90,9 @@ if (import.meta.env.DEV) {
     console.log(`🚀 Environment Mode: ${config.environment.mode.toUpperCase()}`);
     console.log(`📡 Supabase URL: ${config.supabase.url}`);
     console.log(`🔧 Functions URL: ${config.supabase.functionsUrl}`);
+    console.log(`🌍 Raw VITE_ENV_MODE: ${import.meta.env.VITE_ENV_MODE}`);
+    console.log(`🌍 Raw VITE_SUPABASE_REMOTE_URL: ${import.meta.env.VITE_SUPABASE_REMOTE_URL}`);
+    console.log(`🌍 Raw VITE_SUPABASE_LOCAL_URL: ${import.meta.env.VITE_SUPABASE_LOCAL_URL}`);
     console.log(`💳 Stripe Available: ${config.stripe.publishableKey ? '✅' : '❌'}`);
     console.log(`🎯 FAL API Available: ${config.api.fal.apiKey ? '✅' : '❌'}`);
     console.log(`🔄 Replicate API Available: ${config.api.replicate.apiKey ? '✅' : '❌'}`);

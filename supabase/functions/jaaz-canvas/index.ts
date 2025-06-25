@@ -156,10 +156,16 @@ serve(async (req) => {
 
   try {
     const { pathname } = new URL(req.url)
+    console.log('📍 Incoming canvas request path:', pathname, 'Method:', req.method)
+    
+    // Remove function name prefix from pathname for routing
+    const routePath = pathname.replace('/jaaz-canvas', '') || '/'
+    console.log('🛤️ Canvas route path:', routePath)
+    
     const canvasService = new CanvasService()
 
     // Create canvas
-    if (pathname === '/api/canvas' && req.method === 'POST') {
+    if (routePath === '/api/canvas' && req.method === 'POST') {
       const data: CanvasRequest = await req.json()
       const canvas = await canvasService.createCanvas(data)
       
@@ -172,8 +178,8 @@ serve(async (req) => {
     }
 
     // Get canvas by ID
-    if (pathname.startsWith('/api/canvas/') && req.method === 'GET') {
-      const canvasId = pathname.split('/').pop()
+    if (routePath.startsWith('/api/canvas/') && req.method === 'GET') {
+      const canvasId = routePath.split('/').pop()
       if (!canvasId) {
         return new Response(JSON.stringify({ error: 'Canvas ID required' }), {
           status: 400,
@@ -204,8 +210,8 @@ serve(async (req) => {
     }
 
     // Update canvas
-    if (pathname.startsWith('/api/canvas/') && req.method === 'PUT') {
-      const canvasId = pathname.split('/').pop()
+    if (routePath.startsWith('/api/canvas/') && req.method === 'PUT') {
+      const canvasId = routePath.split('/').pop()
       if (!canvasId) {
         return new Response(JSON.stringify({ error: 'Canvas ID required' }), {
           status: 400,
@@ -228,8 +234,8 @@ serve(async (req) => {
     }
 
     // Delete canvas
-    if (pathname.startsWith('/api/canvas/') && req.method === 'DELETE') {
-      const canvasId = pathname.split('/').pop()
+    if (routePath.startsWith('/api/canvas/') && req.method === 'DELETE') {
+      const canvasId = routePath.split('/').pop()
       if (!canvasId) {
         return new Response(JSON.stringify({ error: 'Canvas ID required' }), {
           status: 400,
@@ -251,7 +257,7 @@ serve(async (req) => {
     }
 
     // List canvases
-    if (pathname === '/api/canvases' && req.method === 'GET') {
+    if (routePath === '/api/canvases' && req.method === 'GET') {
       const url = new URL(req.url)
       const userId = url.searchParams.get('user_id')
       const canvases = await canvasService.listCanvases(userId || undefined)
@@ -265,8 +271,8 @@ serve(async (req) => {
     }
 
     // Export canvas
-    if (pathname.startsWith('/api/canvas/') && pathname.includes('/export') && req.method === 'GET') {
-      const parts = pathname.split('/')
+    if (routePath.startsWith('/api/canvas/') && routePath.includes('/export') && req.method === 'GET') {
+      const parts = routePath.split('/')
       const canvasId = parts[3]
       const format = parts[5] as 'png' | 'svg' | 'json' || 'png'
       

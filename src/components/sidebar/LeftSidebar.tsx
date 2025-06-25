@@ -25,6 +25,7 @@ export default function LeftSidebar({
       const sessions = await fetch(`${config.supabase.functionsUrl}/jaaz-chat/api/chat_sessions`, {
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.supabase.anonKey}`,
         },
       })
       const data = await sessions.json()

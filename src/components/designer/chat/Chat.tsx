@@ -315,12 +315,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     sessionIdRef.current = sessionId
 
-    const resp = await fetch((import.meta.env.VITE_JAAZ_BACKEND_URL || 'http://localhost:8000') + '/api/chat_session/' + sessionId)
-    const data = await resp.json()
-    const msgs = data?.length ? data : []
-    setMessages(msgs)
-    if (msgs.length > 0) {
-      setInitCanvas(false)
+    try {
+      // Use our getChatSession API function instead of direct fetch
+      const { getChatSession } = await import('@/api/chat')
+      const msgs = await getChatSession(sessionId)
+      setMessages(msgs || [])
+      if (msgs && msgs.length > 0) {
+        setInitCanvas(false)
+      }
+    } catch (error) {
+      console.error('Failed to load chat session:', error)
+      setMessages([])
     }
 
     scrollToBottom()

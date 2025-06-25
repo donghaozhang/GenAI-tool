@@ -43,7 +43,8 @@ export const PROVIDER_NAME_MAPPING: {
 export const DEFAULT_PROVIDERS_CONFIG: { [key: string]: LLMConfig } = {
   anthropic: {
     models: {
-      'claude-3-7-sonnet-latest': { type: 'text' },
+      'anthropic/claude-3.5-sonnet': { type: 'text' },
+      'anthropic/claude-3-haiku': { type: 'text' },
     },
     url: config.api.anthropic.baseUrl,
     api_key: config.api.anthropic.apiKey || '',
@@ -51,9 +52,8 @@ export const DEFAULT_PROVIDERS_CONFIG: { [key: string]: LLMConfig } = {
   },
   openai: {
     models: {
-      'gpt-4o': { type: 'text' },
-      'gpt-4o-mini': { type: 'text' },
-      'gpt-image-1': { type: 'image' },
+      'openai/gpt-4o': { type: 'text' },
+      'openai/gpt-4o-mini': { type: 'text' },
     },
     url: 'https://api.openai.com/v1/',
     api_key: '',
@@ -75,12 +75,11 @@ export const DEFAULT_PROVIDERS_CONFIG: { [key: string]: LLMConfig } = {
   jaaz: {
     models: {
       // text models
-      'gpt-4o': { type: 'text' },
-      'gpt-4o-mini': { type: 'text' },
-      'deepseek/deepseek-chat-v3-0324:free': { type: 'text' },
-      'deepseek/deepseek-chat-v3-0324': { type: 'text' },
-      'anthropic/claude-sonnet-4': { type: 'text' },
-      'anthropic/claude-3.7-sonnet': { type: 'text' },
+      'openai/gpt-4o': { type: 'text' },
+      'openai/gpt-4o-mini': { type: 'text' },
+      'deepseek/deepseek-chat': { type: 'text' },
+      'anthropic/claude-3.5-sonnet': { type: 'text' },
+      'anthropic/claude-3-haiku': { type: 'text' },
       // image models
       'google/imagen-4': { type: 'image' },
       // 'google/imagen-4-ultra': { type: 'image' },

@@ -23,7 +23,15 @@
     "env:remote": "node switch-env.js remote",
     "dev:local": "node switch-env.js local && vite",
     "dev:remote": "node switch-env.js remote && vite",
-    "test:twitter": "node scripts/test-twitter-oauth.js"
+    "test:twitter": "node scripts/test-twitter-oauth.js",
+    "docker:build": "docker build -t genai-tool .",
+    "docker:run": "docker run -p 8080:8080 genai-tool",
+    "docker:dev": "docker-compose --env-file .env.docker up --build",
+    "docker:dev:detached": "docker-compose --env-file .env.docker up --build -d",
+    "docker:stop": "docker-compose down",
+    "docker:clean": "docker-compose down -v --rmi all",
+    "docker:logs": "docker-compose logs -f",
+    "docker:shell": "docker-compose exec genai-app sh"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "^0.18.0",

@@ -294,7 +294,31 @@ class ChatService {
           model: textModel.model || 'openai/gpt-4o-mini',
           messages: apiMessages,
           temperature: 0.7,
-          max_tokens: 2000
+          max_tokens: 2000,
+          tools: [
+            {
+              type: 'function',
+              function: {
+                name: 'generate_image',
+                description: 'Generate an image based on a detailed prompt',
+                parameters: {
+                  type: 'object',
+                  properties: {
+                    prompt: {
+                      type: 'string',
+                      description: 'Detailed image generation prompt'
+                    },
+                    style: {
+                      type: 'string',
+                      description: 'Art style or aesthetic direction'
+                    }
+                  },
+                  required: ['prompt']
+                }
+              }
+            }
+          ],
+          tool_choice: 'auto'
         })
       })
 

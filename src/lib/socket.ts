@@ -19,20 +19,31 @@ export class SocketIOManager {
   private connectionTimeout: NodeJS.Timeout | null = null
 
   constructor(private config: SocketConfig = {}) {
-    // Temporarily disable auto-connect until WebSocket backend is available
-    // if (config.autoConnect !== false) {
-    //   this.connect()
-    // }
-    console.log('🔌 SocketIOManager initialized but auto-connect disabled (using HTTP APIs instead)')
+    if (config.autoConnect !== false) {
+      this.connect()
+    }
+    console.log('🔌 SocketIOManager initialized for Jaaz backend')
   }
 
   connect(serverUrl?: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      // WebSocket disabled - using HTTP APIs instead
-      console.log('🔌 WebSocket connection disabled, using HTTP APIs instead')
-      this.connectionState = 'disconnected'
-      resolve(false)
-      return
+      const url = serverUrl || this.config.serverUrl
+
+      // Clear existing timers
+      this.clearTimers()
+
+      // Set connection state
+      this.connectionState = 'connecting'
+
+      if (this.socket) {
+        this.socket.disconnect()
+        this.socket.removeAllListeners()
+      }
+
+      // Set connection timeout
+      this.connectionTimeout = setTimeout(() => {
+        reject(new Error('Connection timeout'))
+      }, 10000)
 
       this.socket = io(url, {
         transports: ['polling', 'websocket'],
@@ -201,9 +212,9 @@ export class SocketIOManager {
   }
 
   ping(data: unknown) {
-    // WebSocket disabled - using HTTP APIs instead
-    console.log('🔌 WebSocket ping skipped (using HTTP APIs)')
-    return
+    if (this.socket && this.connected) {
+      this.socket.emit('ping', data)
+    }
   }
 
   disconnect() {
@@ -226,8 +237,7 @@ export class SocketIOManager {
   }
 
   isConnected(): boolean {
-    // WebSocket disabled - always return false
-    return false
+    return this.connected
   }
 
   getConnectionState(): string {
@@ -248,5 +258,5 @@ export class SocketIOManager {
 }
 
 export const socketManager = new SocketIOManager({
-  serverUrl: import.meta.env.VITE_JAAZ_WEBSOCKET_URL || 'ws://localhost:8080',
+  serverUrl: import.meta.env.VITE_JAAZ_BACKEND_URL || 'http://localhost:57988',
 })

@@ -26,7 +26,10 @@ export const AIDesigner: React.FC = () => {
   const [canvasCollapsed, setCanvasCollapsed] = React.useState(false);
   const [sessionList, setSessionList] = React.useState<Session[]>([]);
   const { canvasId: routeCanvasId } = useParams();
-  const canvasId = routeCanvasId || generateUUID();
+  
+  // Generate stable canvas ID - only generate once and persist
+  const [canvasId] = React.useState(() => routeCanvasId || generateUUID());
+  
   const { setShowSettingsDialog } = useConfigs();
   const navigate = useNavigate();
 

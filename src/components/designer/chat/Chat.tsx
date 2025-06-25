@@ -87,7 +87,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     initCanvas ? 'text' : false
   )
 
-  const sessionId = session?.id || generateUUID()
+  // Generate stable session ID - only generate once and persist
+  const [fallbackSessionId] = useState(() => generateUUID())
+  const sessionId = session?.id || fallbackSessionId
 
   const sessionIdRef = useRef<string>(sessionId)
   const [expandingToolCalls, setExpandingToolCalls] = useState<string[]>([])

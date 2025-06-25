@@ -24,7 +24,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import { PhotoProvider } from 'react-photo-view'
 import { toast } from 'sonner'
-import ShinyText from '../ui/shiny-text'
+import ShinyText from '../../ui/shiny-text'
 import ChatTextarea from './ChatTextarea'
 import MessageRegular from './Message/Regular'
 import ToolCallContent from './Message/ToolCallContent'
@@ -33,7 +33,7 @@ import SessionSelector from './SessionSelector'
 import ChatSpinner from './Spinner'
 import ToolcallProgressUpdate from './ToolcallProgressUpdate'
 
-import { useConfigs } from '@/contexts/configs'
+import { useConfigs } from '@/contexts/ConfigsContext'
 import 'react-photo-view/dist/react-photo-view.css'
 import { DEFAULT_SYSTEM_PROMPT } from '@/constants'
 

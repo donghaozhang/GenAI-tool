@@ -1,14 +1,14 @@
 import { Session } from '@/types/types'
 import { PlusIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '../ui/button'
+import { Button } from '../../ui/button'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select'
+} from '../../ui/select'
 
 type SessionSelectorProps = {
   session: Session | null

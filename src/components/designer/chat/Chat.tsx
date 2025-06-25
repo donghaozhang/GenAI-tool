@@ -12,8 +12,6 @@ import {
 import { useSearchParams } from 'react-router-dom'
 import { produce } from 'immer'
 import { motion } from 'motion/react'
-import { nanoid } from 'nanoid'
-
 // Generate a UUID v4
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {

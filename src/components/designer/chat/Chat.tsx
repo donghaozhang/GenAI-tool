@@ -363,27 +363,67 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setPending('text')
       setMessages(data)
 
+      // Create a new session if none exists
+      let currentSessionId = sessionId
+      if (!currentSessionId) {
+        currentSessionId = nanoid()
+        const newSession: Session = {
+          id: currentSessionId,
+          title: typeof data[0]?.content === 'string' ? data[0].content.substring(0, 50) : 'New Chat',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          model: configs.textModel.model,
+          provider: configs.textModel.provider,
+        }
+        setSessionList((prev) => [...prev, newSession])
+        setSession(newSession)
+      }
+
       sendMessages({
-        sessionId: sessionId!,
+        sessionId: currentSessionId,
         canvasId: canvasId,
         newMessages: data,
         textModel: configs.textModel,
         imageModel: configs.imageModel,
         systemPrompt:
           localStorage.getItem('system_prompt') || DEFAULT_SYSTEM_PROMPT,
+      }).then((responseMessages) => {
+        // Update messages with the response from the server
+        if (responseMessages && responseMessages.length > 0) {
+          setMessages(responseMessages.map(msg => {
+            // Parse the content if it's a JSON string
+            let content = msg.content
+            try {
+              if (typeof content === 'string' && content.startsWith('{')) {
+                const parsed = JSON.parse(content)
+                content = parsed.content || content
+              }
+            } catch (e) {
+              // Keep original content if parsing fails
+            }
+            return {
+              ...msg,
+              content
+            }
+          }))
+        }
+        setPending(false)
+      }).catch((error) => {
+        console.error('Chat error:', error)
+        setPending(false)
       })
 
-      if (searchSessionId !== sessionId) {
+      if (searchSessionId !== currentSessionId) {
         window.history.pushState(
           {},
           '',
-          `/canvas/${canvasId}?sessionId=${sessionId}`
+          `/canvas/${canvasId}?sessionId=${currentSessionId}`
         )
       }
 
       scrollToBottom()
     },
-    [canvasId, sessionId, searchSessionId, scrollToBottom]
+    [canvasId, sessionId, searchSessionId, scrollToBottom, setSessionList]
   )
 
   const handleCancelChat = useCallback(() => {

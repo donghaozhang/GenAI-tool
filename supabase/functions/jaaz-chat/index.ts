@@ -111,7 +111,7 @@ class ChatDatabaseService {
 class ChatService {
   public dbService = new ChatDatabaseService()
 
-  async handleChat(data: ChatRequest): Promise<void> {
+  async handleChat(data: ChatRequest): Promise<ChatMessage[]> {
     const { messages, session_id, canvas_id, text_model, image_model, system_prompt } = data
 
     try {
@@ -138,8 +138,12 @@ class ChatService {
         )
       }
 
-      // Process with AI (simplified for now - will be enhanced with LangGraph)
-      await this.processWithAI(messages, session_id, text_model, system_prompt)
+      // Process with AI and get response
+      const aiResponse = await this.processWithAI(messages, session_id, text_model, system_prompt)
+
+      // Return all messages including the new AI response
+      const allMessages = await this.dbService.getSessionMessages(session_id)
+      return allMessages
 
     } catch (error) {
       console.error('Error handling chat:', error)
@@ -194,9 +198,9 @@ serve(async (req) => {
       const data: ChatRequest = await req.json()
       const chatService = new ChatService()
       
-      await chatService.handleChat(data)
+      const messages = await chatService.handleChat(data)
       
-      return new Response(JSON.stringify({ status: 'done' }), {
+      return new Response(JSON.stringify(messages), {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',

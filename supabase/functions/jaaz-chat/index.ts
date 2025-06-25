@@ -41,6 +41,51 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 
 // Database service for chat
 class ChatDatabaseService {
+  /**
+   * Atomically create a chat session with the first message in a single transaction
+   */
+  async createSessionWithFirstMessage(
+    sessionId: string,
+    model: string,
+    provider: string,
+    role: string,
+    content: string,
+    canvasId?: string,
+    title?: string,
+    userId?: string
+  ) {
+    const finalUserId = userId || null
+    const finalTitle = title || 'New Chat'
+    
+    console.log('💾 Creating session with first message atomically:', {
+      sessionId, model, provider, canvasId, title: finalTitle, userId: finalUserId, role, content
+    })
+    
+    // Use the database function for atomic creation
+    const { data, error } = await supabase
+      .rpc('create_session_with_first_message', {
+        p_session_id: sessionId,
+        p_model: model,
+        p_provider: provider,
+        p_canvas_id: canvasId || null,
+        p_title: finalTitle,
+        p_user_id: finalUserId,
+        p_message_role: role,
+        p_message_content: content
+      })
+    
+    if (error) {
+      console.error('❌ Error creating session with first message:', error)
+      throw error
+    }
+    
+    console.log('✅ Session and first message created atomically:', data)
+    return data
+  }
+
+  /**
+   * Create a standalone chat session (for existing session reuse)
+   */
   async createChatSession(
     sessionId: string, 
     model: string, 
@@ -76,6 +121,9 @@ class ChatDatabaseService {
     console.log('✅ Chat session created:', data)
   }
 
+  /**
+   * Create a message for an existing session
+   */
   async createMessage(sessionId: string, role: string, content: string) {
     console.log('💾 Creating message:', { sessionId, role, content })
     
@@ -97,6 +145,24 @@ class ChatDatabaseService {
     console.log('✅ Message created:', data)
   }
 
+  /**
+   * Check if a session exists
+   */
+  async sessionExists(sessionId: string): Promise<boolean> {
+    const { data, error } = await supabase
+      .from('chat_sessions')
+      .select('id')
+      .eq('id', sessionId)
+      .single()
+    
+    if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+      console.error('Error checking session existence:', error)
+      throw error
+    }
+    
+    return !!data
+  }
+
   async getSessionMessages(sessionId: string) {
     const { data, error } = await supabase
       .from('chat_messages')
@@ -109,6 +175,7 @@ class ChatDatabaseService {
       throw error
     }
     
+    // Return messages as-is since content is now stored as plain text
     return data || []
   }
 
@@ -135,31 +202,46 @@ class ChatService {
     const { messages, session_id, canvas_id, text_model, image_model, system_prompt } = data
 
     try {
-      // Create new session if this is the first message
-      if (messages.length === 1) {
-        const prompt = messages[0].content
+      // Check if this is a new session or continuation
+      const sessionExists = await this.dbService.sessionExists(session_id)
+      
+      if (!sessionExists && messages.length > 0) {
+        // New session - create session and first message atomically
+        const firstMessage = messages[0]
+        const prompt = firstMessage.content
         const title = typeof prompt === 'string' ? prompt.substring(0, 200) : 'New Chat'
-        await this.dbService.createChatSession(
-          session_id, 
-          text_model.model, 
-          text_model.provider, 
-          canvas_id, 
+        const messageContent = typeof firstMessage.content === 'string' 
+          ? firstMessage.content 
+          : JSON.stringify(firstMessage.content)
+        
+        await this.dbService.createSessionWithFirstMessage(
+          session_id,
+          text_model.model,
+          text_model.provider,
+          firstMessage.role,
+          messageContent,
+          canvas_id,
           title
         )
-      }
-
-      // Save the latest message
-      if (messages.length > 0) {
-        const lastMessage = messages[messages.length - 1]
-        await this.dbService.createMessage(
-          session_id, 
-          lastMessage.role, 
-          JSON.stringify(lastMessage)
-        )
+        
+        // Save any additional messages if there are more than one
+        for (let i = 1; i < messages.length; i++) {
+          const msg = messages[i]
+          const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)
+          await this.dbService.createMessage(session_id, msg.role, content)
+        }
+      } else if (sessionExists) {
+        // Existing session - just save the latest message(s)
+        for (const message of messages) {
+          const content = typeof message.content === 'string' ? message.content : JSON.stringify(message.content)
+          await this.dbService.createMessage(session_id, message.role, content)
+        }
+      } else {
+        throw new Error('No messages provided for new session')
       }
 
       // Process with AI and get response
-      const aiResponse = await this.processWithAI(messages, session_id, text_model, system_prompt)
+      await this.processWithAI(messages, session_id, text_model, system_prompt)
 
       // Return all messages including the new AI response
       const allMessages = await this.dbService.getSessionMessages(session_id)
@@ -177,19 +259,82 @@ class ChatService {
     textModel: any, 
     systemPrompt?: string
   ) {
-    // TODO: Implement LangGraph integration
-    // For now, we'll use a simple AI response
-    
-    const response = {
-      role: 'assistant' as const,
-      content: `I received your message. This is a placeholder response from the Jaaz chat system. Session: ${sessionId}`
+    try {
+      // Get OpenRouter API key from environment
+      const OPENROUTER_API_KEY = Deno.env.get('OPENROUTER_API_KEY')
+      
+      if (!OPENROUTER_API_KEY) {
+        throw new Error('OPENROUTER_API_KEY not found in environment variables')
+      }
+
+      // Prepare messages for OpenRouter API
+      const apiMessages = messages.map(msg => ({
+        role: msg.role,
+        content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)
+      }))
+
+      // Add system prompt if provided
+      if (systemPrompt) {
+        apiMessages.unshift({ role: 'system', content: systemPrompt })
+      }
+
+      console.log('🤖 Calling OpenRouter API with model:', textModel.model)
+      console.log('📤 API Messages:', apiMessages)
+
+      // Call OpenRouter API
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://your-app-domain.com',
+          'X-Title': 'Jaaz AI Designer'
+        },
+        body: JSON.stringify({
+          model: textModel.model || 'openai/gpt-4o-mini',
+          messages: apiMessages,
+          temperature: 0.7,
+          max_tokens: 2000
+        })
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ OpenRouter API error:', response.status, errorText)
+        throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`)
+      }
+
+      const data = await response.json()
+      const aiContent = data.choices[0].message.content
+
+      console.log('✅ AI response received:', aiContent)
+
+      // Create AI response message
+      const aiResponse = {
+        role: 'assistant' as const,
+        content: aiContent
+      }
+
+      // Save AI response to database
+      await this.dbService.createMessage(sessionId, 'assistant', aiContent)
+
+      console.log(`✅ Chat processing completed for session: ${sessionId}`)
+      return aiResponse
+
+    } catch (error) {
+      console.error('❌ Error in processWithAI:', error)
+      
+      // Create error response
+      const errorResponse = {
+        role: 'assistant' as const,
+        content: `I apologize, but I encountered an error processing your request. Please try again. Error: ${error.message}`
+      }
+
+      // Save error response to database
+      await this.dbService.createMessage(sessionId, 'assistant', errorResponse.content)
+      
+      return errorResponse
     }
-
-    // Save AI response
-    await this.dbService.createMessage(sessionId, 'assistant', JSON.stringify(response))
-
-    // TODO: Send WebSocket notification when done
-    console.log(`Chat processing completed for session: ${sessionId}`)
   }
 }
 

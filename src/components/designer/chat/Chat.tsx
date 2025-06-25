@@ -12,13 +12,9 @@ import {
 import { useSearchParams } from 'react-router-dom'
 import { produce } from 'immer'
 import { motion } from 'motion/react'
-// Generate a UUID v4
+// Use native browser UUID generation
 function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
+  return crypto.randomUUID();
 }
 import {
   Dispatch,
@@ -317,12 +313,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const initChat = useCallback(async () => {
     if (!sessionId) {
+      console.log('⚠️ No sessionId available, skipping chat initialization')
       return
     }
 
     sessionIdRef.current = sessionId
 
     try {
+      console.log(`🔄 Initializing chat for session: ${sessionId}`)
       // Use our getChatSession API function instead of direct fetch
       const { getChatSession } = await import('@/api/chat')
       const msgs = await getChatSession(sessionId)
@@ -330,9 +328,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       if (msgs && msgs.length > 0) {
         setInitCanvas(false)
       }
+      console.log(`✅ Chat initialized with ${msgs?.length || 0} messages`)
     } catch (error) {
-      console.error('Failed to load chat session:', error)
+      console.error('❌ Failed to load chat session:', error)
       setMessages([])
+      // Show user-friendly error message
+      toast.error('Failed to load chat history. Starting fresh session.')
     }
 
     scrollToBottom()
@@ -374,6 +375,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       let currentSessionId = sessionId
       if (!currentSessionId) {
         currentSessionId = generateUUID()
+        console.log(`🆕 Creating new session: ${currentSessionId}`)
         const newSession: Session = {
           id: currentSessionId,
           title: typeof data[0]?.content === 'string' ? data[0].content.substring(0, 50) : 'New Chat',
@@ -386,6 +388,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         setSession(newSession)
       }
 
+      console.log(`📤 Sending messages to session: ${currentSessionId}`)
+
       sendMessages({
         sessionId: currentSessionId,
         canvasId: canvasId,
@@ -395,29 +399,53 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         systemPrompt:
           localStorage.getItem('system_prompt') || DEFAULT_SYSTEM_PROMPT,
       }).then((responseMessages) => {
+        console.log(`✅ Received response with ${responseMessages?.length || 0} messages`)
+        console.log('🔍 Raw response messages:', responseMessages)
+        
         // Update messages with the response from the server
         if (responseMessages && responseMessages.length > 0) {
-          setMessages(responseMessages.map(msg => {
-            // Parse the content if it's a JSON string
+          const processedMessages = responseMessages.map(msg => {
+            console.log('🔍 Processing message:', msg)
+            
+            // Content should now be plain text from the backend
             let content = msg.content
-            try {
-              if (typeof content === 'string' && content.startsWith('{')) {
-                const parsed = JSON.parse(content)
-                content = parsed.content || content
+            console.log('🔍 Original content:', content, 'Type:', typeof content)
+            
+            // If content is an object (old format), extract the actual content
+            if (typeof content === 'object' && content !== null) {
+              if (content.content) {
+                content = content.content
+                console.log('🔍 Extracted content from object:', content)
+              } else if (content.role && content.content) {
+                // Handle legacy format where entire message was stored
+                content = content.content
+                console.log('🔍 Extracted content from legacy message object:', content)
+              } else {
+                // Fallback to stringifying the object
+                content = JSON.stringify(content)
+                console.log('🔍 Fallback: stringified object content:', content)
               }
-            } catch (e) {
-              // Keep original content if parsing fails
             }
-            return {
+            
+            const processedMsg = {
               ...msg,
-              content
+              content,
+              // Ensure proper timestamp format
+              timestamp: msg.created_at ? new Date(msg.created_at) : new Date()
             }
-          }))
+            
+            console.log('🔍 Final processed message:', processedMsg)
+            return processedMsg
+          })
+          
+          console.log('📝 All processed messages:', processedMessages)
+          setMessages(processedMessages)
         }
         setPending(false)
       }).catch((error) => {
-        console.error('Chat error:', error)
+        console.error('❌ Chat error:', error)
         setPending(false)
+        toast.error('Failed to send message. Please try again.')
       })
 
       if (searchSessionId !== currentSessionId) {

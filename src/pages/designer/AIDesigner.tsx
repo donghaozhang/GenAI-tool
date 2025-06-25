@@ -14,16 +14,11 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useParams } from 'react-router-dom';
-import { nanoid } from 'nanoid';
 import { useConfigs } from '@/contexts/ConfigsContext';
 
-// Generate a UUID v4
+// Use native browser UUID generation
 function generateUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    const r = Math.random() * 16 | 0;
-    const v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
+  return crypto.randomUUID();
 }
 
 export const AIDesigner: React.FC = () => {

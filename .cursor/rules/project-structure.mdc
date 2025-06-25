@@ -14,13 +14,23 @@ This is a React + TypeScript + Vite application focused on AI model marketplace 
 
 ## Key Pages
 - [AIModelMarketplace.tsx](mdc:src/pages/AIModelMarketplace.tsx) - Main marketplace interface with optimized layout
+- [AIDesigner.tsx](mdc:src/pages/designer/AIDesigner.tsx) - ✅ **NEW**: Jaaz AI Designer interface with chat + canvas
 - [NotFound.tsx](mdc:src/pages/NotFound.tsx) - 404 page with AI marketplace theme
 
-## Core Components Structure
+## Core Components Structure (✅ Updated with Jaaz Integration)
 ```
 src/components/
 ├── auth/ - Authentication components
 ├── marketplace/ - AI marketplace components (main focus)
+├── designer/ - ✅ **NEW**: Complete Jaaz AI design system
+│   ├── chat/ - Jaaz chat interface with streaming AI responses
+│   ├── canvas/ - Jaaz canvas system with Excalidraw integration
+│   └── store/ - Zustand state management for Jaaz features
+├── agent_studio/ - ✅ **NEW**: Jaaz visual workflow editor
+├── settings/ - ✅ **NEW**: Jaaz configuration and provider settings
+├── common/ - ✅ **NEW**: Shared Jaaz components (NotificationPanel, LanguageSwitcher)
+├── sidebar/ - ✅ **NEW**: Jaaz navigation and file management
+├── home/ - ✅ **NEW**: Jaaz home components
 ├── ui/ - Reusable UI components (shadcn/ui)
 └── UserProfile.tsx - User profile component
 ```
@@ -43,12 +53,22 @@ src/components/
 - [env.ts](mdc:src/config/env.ts) - **Dynamic environment configuration** with local/remote switching
 - [client.ts](mdc:src/integrations/supabase/client.ts) - Supabase client setup
 
+## ✅ Jaaz Integration Routes (NEW)
+```
+/designer - AI Designer interface with chat + canvas
+/canvas - Canvas management and list
+/canvas/:canvasId - Individual canvas with chat integration
+/agent-studio - Visual workflow editor for AI operations
+/settings - Jaaz provider and model configuration
+```
+
 ## Environment Management
-- [.env](mdc:.env) - **Flexible environment configuration** with local/remote Supabase settings
+- [.env](mdc:.env) - **Updated with Jaaz configuration** (VITE_JAAZ_BACKEND_URL)
 - [switch-env.js](mdc:switch-env.js) - **Environment switching utility** for seamless local/remote transitions
 - **Environment Scripts**: `npm run env:local`, `npm run env:remote`, `npm run dev:local`, `npm run dev:remote`
 - **Local Supabase Support**: Automatic configuration for `http://127.0.0.1:54321`
 - **Remote Supabase Support**: Production environment configuration
+- **Jaaz Backend**: Configured for original FastAPI backend on `http://localhost:8000`
 
 ## Service Layer
 - [imageGeneration.ts](mdc:src/services/imageGeneration.ts) - AI image generation with single and batch processing support

@@ -10,12 +10,18 @@ This document outlines the development workflow for the GenAI Tool project.
 ## Project Setup
 1. Clone the repository
 2. Copy [.env.example](mdc:.env.example) to `.env` and fill in required values
-3. Run `npm install` to install dependencies
+3. Run `npm install` to install dependencies ✅ **Includes Jaaz packages**
 4. **Environment Setup**:
    - For local development: `npm run env:local` (uses local Supabase)
    - For remote development: `npm run env:remote` (uses production Supabase)
+   - **For Jaaz Integration**: Ensure `VITE_JAAZ_BACKEND_URL=http://localhost:8000`
 5. **Start Local Supabase** (if using local environment): `npm run local:supabase`
-6. Start development server: `npm run dev` or use environment-specific commands
+6. **✅ NEW: Start Jaaz Backend** (for full functionality): 
+   ```bash
+   cd jaaz-source/server
+   python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+   ```
+7. Start development server: `npm run dev` (runs on port 8081 with Jaaz integration)
 
 ## Environment Configuration System
 
@@ -91,15 +97,17 @@ window.open(testUrl, '_blank');
 - **Backup**: `http://localhost:8081/` (if 8080 is busy)
 - **Fallback**: `http://localhost:8082/` (if both above are busy)
 
-## Technology Stack
+## Technology Stack (✅ Updated with Jaaz Integration)
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS + shadcn/ui components
-- **Backend**: Supabase (authentication, database, Edge Functions)
-- **State Management**: React Context (AuthContext)
-- **Routing**: React Router
-- **UI Components**: shadcn/ui in [components/ui/](mdc:src/components/ui)
-- **Environment Management**: Dynamic local/remote configuration
+- **Backend**: Supabase (authentication, database, Edge Functions) + Jaaz FastAPI backend
+- **State Management**: React Context (AuthContext) + Zustand (Jaaz stores)
+- **Routing**: React Router with Jaaz routes
+- **UI Components**: shadcn/ui + Complete Jaaz component system
+- **Canvas**: Excalidraw integration for design workflows
+- **WebSocket**: Socket.io for real-time AI interactions
+- **Environment Management**: Dynamic local/remote configuration + Jaaz backend config
 
 ## File Organization Principles
 - Components are organized by feature (auth, marketplace, ui)

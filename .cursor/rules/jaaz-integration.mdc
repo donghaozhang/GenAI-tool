@@ -1,0 +1,231 @@
+# Jaaz Integration Development Rules
+
+## Overview
+Rules and best practices for developing with the integrated Jaaz AI design agent system within the GenAI-tool project.
+
+## Core Integration Principles
+
+### 1. Component Integration Approach
+- **Copy First, Adapt Second**: Always copy complete Jaaz components from `jaaz-source/` before attempting to modify
+- **Maintain Component Integrity**: Preserve original Jaaz component functionality and structure
+- **Fix Import Paths**: Update all imports to use `@/` alias and correct paths
+- **Resolve Dependencies**: Install required packages rather than removing functionality
+
+### 2. Import Path Standards
+```typescript
+// ✅ CORRECT - Use @/ alias for all imports
+import { Button } from '@/components/ui/button'
+import { useTheme } from '@/hooks/jaaz/use-theme'
+import { LOGO_URL } from '@/constants'
+
+// ❌ INCORRECT - Relative paths or missing alias
+import { Button } from '../ui/button'
+import { useTheme } from '@/hooks/use-theme'
+```
+
+### 3. Component Structure Rules
+- **UI Components**: All UI components must use `@/components/ui/*` imports
+- **Jaaz Hooks**: Custom hooks should be placed in `@/hooks/jaaz/` and imported accordingly
+- **Common Components**: Shared components go in `@/components/common/`
+- **Constants**: All constants must be defined in `@/constants/` and properly exported
+
+## Backend Integration
+
+### 1. Original Jaaz Backend Connection
+```typescript
+// ✅ CORRECT - Use environment variable for backend URL
+const API_BASE_URL = import.meta.env.VITE_JAAZ_BACKEND_URL || 'http://localhost:8000'
+
+// Socket connection configuration
+export const socketManager = new SocketIOManager({
+  serverUrl: process.env.VITE_JAAZ_BACKEND_URL || 'http://localhost:8000',
+})
+```
+
+### 2. API Endpoint Configuration
+- **Base URL**: Always use `VITE_JAAZ_BACKEND_URL` environment variable
+- **WebSocket**: Configure socket connections to use the same backend URL
+- **Error Handling**: Implement proper error handling for backend connectivity issues
+- **Fallback**: Provide sensible defaults for development environment
+
+## Dependency Management
+
+### 1. Required Jaaz Dependencies
+```json
+{
+  "@xyflow/react": "^12.x",        // Agent Studio workflow editor
+  "lodash.debounce": "^4.x",       // Performance optimizations
+  "file-saver": "^2.x",            // Canvas export functionality
+  "jszip": "^3.x"                  // Multi-file export support
+}
+```
+
+### 2. Installation Rules
+- **Install, Don't Remove**: When encountering missing dependencies, install them rather than removing functionality
+- **Version Compatibility**: Use compatible versions that work with existing dependencies
+- **Build Verification**: Always verify build success after adding new dependencies
+
+## Routing Integration
+
+### 1. Route Configuration
+```typescript
+// ✅ CORRECT - Complete route setup
+<Route path="/designer" element={<AIDesigner />} />
+<Route path="/canvas/:canvasId" element={<AIDesigner />} />
+<Route path="/canvas" element={<CanvasList />} />
+<Route path="/agent-studio" element={<AgentStudio />} />
+<Route path="/settings" element={<Settings />} />
+```
+
+### 2. Navigation Standards
+- **Dynamic Routes**: Use URL parameters for canvas IDs and other dynamic content
+- **Navigation Integration**: Add navigation buttons to all major Jaaz features
+- **Breadcrumbs**: Implement proper navigation breadcrumbs where appropriate
+
+## Component Development Rules
+
+### 1. Canvas System
+```typescript
+// ✅ CORRECT - Use Jaaz CanvasExcali component
+import CanvasExcali from '@/components/designer/canvas/CanvasExcali'
+import CanvasHeader from '@/components/designer/canvas/CanvasHeader'
+
+// Provide all required props
+<CanvasHeader 
+  canvasId={canvasId} 
+  canvasName="AI Canvas"
+  onNameChange={() => {}}
+  onNameSave={() => {}}
+/>
+```
+
+### 2. Theme Integration
+```typescript
+// ✅ CORRECT - Use Jaaz theme system
+import { useTheme } from '@/hooks/jaaz/use-theme'
+import { ThemeProviderContext } from '@/contexts/ThemeContext'
+```
+
+### 3. State Management
+- **Zustand Stores**: Use existing Jaaz Zustand stores for state management
+- **Context Providers**: Integrate with existing React context providers
+- **State Updates**: Follow Jaaz patterns for state updates and selectors
+
+## Error Resolution Patterns
+
+### 1. Missing Component Errors
+```bash
+# When encountering missing component errors:
+# 1. Find the component in jaaz-source/
+# 2. Copy to appropriate location
+# 3. Fix import paths
+# 4. Update any router imports to use react-router-dom
+
+cp /path/to/jaaz-source/component.tsx /path/to/destination/
+```
+
+### 2. Import Path Fixes
+```typescript
+// ❌ Common import errors to fix:
+import { useNavigate } from '@tanstack/react-router'  // Wrong router
+import { Button } from '../ui/button'                // Wrong path
+import { useTheme } from '@/hooks/use-theme'         // Wrong hook location
+
+// ✅ Correct imports:
+import { useNavigate } from 'react-router-dom'       // Correct router
+import { Button } from '@/components/ui/button'     // Correct path
+import { useTheme } from '@/hooks/jaaz/use-theme'   // Correct location
+```
+
+### 3. Constant Definition
+```typescript
+// ✅ CORRECT - Define all required constants
+export const LOGO_URL = 'https://raw.githubusercontent.com/11cafe/jaaz/refs/heads/main/assets/icons/jaaz.png'
+export const DEFAULT_SYSTEM_PROMPT = `You are a professional art design agent...`
+```
+
+## Development Workflow
+
+### 1. Component Integration Process
+1. **Identify Missing Component**: Note the specific error and component name
+2. **Locate in Jaaz Source**: Find the component in `jaaz-source/react/src/`
+3. **Copy Component**: Copy to appropriate location in main project
+4. **Fix Imports**: Update all import paths to use correct aliases
+5. **Install Dependencies**: Add any missing npm packages
+6. **Test Build**: Verify successful compilation
+7. **Test Functionality**: Ensure component works as expected
+
+### 2. Testing Requirements
+- **Build Success**: All components must compile without errors
+- **Route Functionality**: All new routes must be accessible and functional
+- **Component Rendering**: Components must render without runtime errors
+- **Integration Testing**: Test interaction between Jaaz and existing components
+
+## Performance Considerations
+
+### 1. Code Splitting
+```typescript
+// ✅ RECOMMENDED - Use dynamic imports for heavy Jaaz components
+const AgentStudio = lazy(() => import('@/components/agent_studio/AgentStudio'))
+const CanvasExcali = lazy(() => import('@/components/designer/canvas/CanvasExcali'))
+```
+
+### 2. Bundle Optimization
+- **Tree Shaking**: Ensure proper tree shaking for unused Jaaz components
+- **Dynamic Imports**: Use dynamic imports for optional features
+- **Asset Optimization**: Optimize imported assets and dependencies
+
+## Security Considerations
+
+### 1. API Key Management
+- **Environment Variables**: Store all API keys in environment variables
+- **No Hardcoding**: Never hardcode API keys or sensitive configuration
+- **Local Development**: Use local development keys separate from production
+
+### 2. Backend Communication
+- **HTTPS in Production**: Ensure all production API calls use HTTPS
+- **Input Validation**: Validate all user inputs before sending to backend
+- **Error Handling**: Implement proper error handling without exposing sensitive information
+
+## Troubleshooting Guide
+
+### 1. Common Build Errors
+- **Missing Dependencies**: Install required packages instead of removing functionality
+- **Import Path Errors**: Use `@/` alias consistently for all imports
+- **Router Conflicts**: Use `react-router-dom` instead of `@tanstack/react-router`
+
+### 2. Runtime Errors
+- **Undefined Constants**: Add missing constants to `@/constants/`
+- **Missing Components**: Copy components from Jaaz source
+- **Hook Errors**: Ensure hooks are in correct location (`@/hooks/jaaz/`)
+
+### 3. WebSocket Connection Issues
+- **Backend URL**: Verify `VITE_JAAZ_BACKEND_URL` is correctly set
+- **Port Configuration**: Ensure backend is running on correct port (8000)
+- **CORS Issues**: Configure backend CORS settings if needed
+
+## Documentation Requirements
+
+### 1. Component Documentation
+- **Document New Components**: Add all new Jaaz components to component-structure.md
+- **Update Integration Status**: Keep jaaz-integration-analysis.md current
+- **Route Documentation**: Document all new routes in development-setup.md
+
+### 2. API Documentation
+- **Endpoint Changes**: Document any API endpoint modifications
+- **Authentication**: Document authentication flow changes
+- **WebSocket Events**: Document socket event handling
+
+## Version Control
+
+### 1. Commit Practices
+- **Atomic Commits**: Make focused commits for each integration step
+- **Descriptive Messages**: Use clear commit messages describing integration progress
+- **Branch Strategy**: Use feature branches for integration work
+
+### 2. Branch Management
+- **Integration Branch**: Use `feature/jaaz-integration` for all Jaaz work
+- **Testing**: Ensure all tests pass before merging
+- **Documentation**: Update documentation in same commit as code changes
+
+This rule set ensures consistent, maintainable, and scalable integration of Jaaz components while preserving the integrity of both systems.

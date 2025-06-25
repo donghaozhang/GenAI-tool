@@ -1,0 +1,25 @@
+fastapi
+uvicorn[standard]
+anthropic
+mcp
+toml
+pyinstaller
+openai
+ollama
+httpx
+gunicorn
+aiosqlite
+requests
+Pillow
+nanoid
+python-multipart
+aiofiles
+certifi
+websocket-client # needed for comfyui execution
+rich # needed for comfyui execution
+typer # needed for comfyui execution
+langgraph
+langchain_ollama
+langchain_openai
+python-socketio==5.13.0
+langgraph-swarm

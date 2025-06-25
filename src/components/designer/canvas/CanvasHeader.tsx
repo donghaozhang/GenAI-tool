@@ -1,3 +1,5 @@
+import LanguageSwitcher from '@/components/common/LanguageSwitcher'
+import { NotificationPanel } from '@/components/common/NotificationPanel'
 import ThemeButton from '@/components/theme/ThemeButton'
 import { Input } from '@/components/ui/input'
 import { useNavigate } from 'react-router-dom'
@@ -72,9 +74,9 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
         <Button
           size={'sm'}
           variant="ghost"
-          onClick={() => setShowSettingsDialog(true)}
+          onClick={() => navigate('/settings')}
         >
-          <SettingsIcon size={30} />
+          <SettingsIcon size={20} />
         </Button>
         <LanguageSwitcher />
         <ThemeButton />

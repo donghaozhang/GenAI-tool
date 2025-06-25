@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useConfigs } from '@/contexts/configs'
+import { useConfigs } from '@/contexts/ConfigsContext'
 import ComfuiWorkflowSetting from './ComfuiWorkflowSetting'
 
 interface ComfyuiSettingProps {

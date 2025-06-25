@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { useCanvas } from '@/contexts/canvas'
+import { useCanvas } from '@/contexts/CanvasContext'
 import { useTranslation } from 'react-i18next'
 import { PhotoView } from 'react-photo-view'
 

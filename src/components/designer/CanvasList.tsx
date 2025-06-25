@@ -1,7 +1,7 @@
 import { listCanvases } from '@/api/canvas'
 import CanvasCard from '@/components/home/CanvasCard'
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslation } from 'react-i18next'
 
@@ -10,11 +10,12 @@ const CanvasList: React.FC = () => {
   const { data: canvases, refetch } = useQuery({
     queryKey: ['canvases'],
     queryFn: listCanvases,
+    enabled: false, // Disable API call for now
   })
 
   const navigate = useNavigate()
   const handleCanvasClick = (id: string) => {
-    navigate({ to: '/canvas/$id', params: { id } })
+    navigate(`/canvas/${id}`)
   }
 
   return (

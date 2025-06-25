@@ -1,5 +1,5 @@
 import { Separator } from '@/components/ui/separator'
-import { useCanvas } from '@/contexts/canvas'
+import { useCanvas } from '@/contexts/CanvasContext'
 import { useState } from 'react'
 import CanvasMenuButton from './CanvasMenuButton'
 import { ToolType } from './CanvasMenuIcon'

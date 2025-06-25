@@ -1,4 +1,4 @@
-import { useCanvas } from '@/contexts/canvas'
+import { useCanvas } from '@/contexts/CanvasContext'
 import { TCanvasAddImagesToChatEvent } from '@/lib/event'
 import { ExcalidrawImageElement } from '@excalidraw/excalidraw/element/types'
 import { AnimatePresence } from 'motion/react'

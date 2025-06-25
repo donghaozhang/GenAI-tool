@@ -6,7 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useCanvas } from '@/contexts/canvas'
+import { useCanvas } from '@/contexts/CanvasContext'
 import { cn } from '@/lib/utils'
 import { Minus, Plus } from 'lucide-react'
 import { useState } from 'react'

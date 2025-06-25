@@ -5,7 +5,7 @@ import { LOGO_URL } from '@/constants'
 import { LLMConfig } from '@/types/types'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/contexts/AuthContext'
-import { useConfigs } from '@/contexts/configs'
+import { useConfigs } from '@/contexts/ConfigsContext'
 import AddModelsList from './AddModelsList'
 
 interface JaazSettingProps {

@@ -7,7 +7,14 @@
       "Bash(git commit:*)",
       "Bash(npm install:*)",
       "Bash(npm run build:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(git push:*)",
+      "Bash(ls:*)",
+      "Bash(git clone:*)",
+      "Bash(git checkout:*)",
+      "Bash(rm:*)",
+      "Bash(npm run:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

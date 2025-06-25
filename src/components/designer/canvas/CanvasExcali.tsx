@@ -1,5 +1,5 @@
 import { saveCanvas } from '@/api/canvas'
-import { useCanvas } from '@/contexts/canvas'
+import { useCanvas } from '@/contexts/CanvasContext'
 import useDebounce from '@/hooks/use-debounce'
 import { useTheme } from '@/hooks/use-theme'
 import { eventBus } from '@/lib/event'

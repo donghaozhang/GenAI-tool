@@ -1,6 +1,7 @@
 import React from 'react';
-import { Chat } from '@/components/designer/chat/Chat';
+import Chat from '@/components/designer/chat/Chat';
 import { Canvas } from '@/components/designer/canvas/Canvas';
+import { Session } from '@/types/types';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -15,6 +16,8 @@ import { cn } from '@/lib/utils';
 export const AIDesigner: React.FC = () => {
   const [chatCollapsed, setChatCollapsed] = React.useState(false);
   const [canvasCollapsed, setCanvasCollapsed] = React.useState(false);
+  const [sessionList, setSessionList] = React.useState<Session[]>([]);
+  const canvasId = 'default-canvas';
 
   const toggleChat = () => {
     setChatCollapsed(!chatCollapsed);
@@ -65,7 +68,7 @@ export const AIDesigner: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 flex overflow-hidden">
         {/* Chat Panel */}
-        <div className={cn('transition-all duration-300 border-r border-gray-200 dark:border-gray-700', chatCollapsed ? 'w-0' : 'w-1/3 min-w-[300px] max-w-[500px]')}>{!chatCollapsed && (<div className="h-full p-4"> <Chat /> </div>)}</div>
+        <div className={cn('transition-all duration-300 border-r border-gray-200 dark:border-gray-700', chatCollapsed ? 'w-0' : 'w-1/3 min-w-[300px] max-w-[500px]')}>{!chatCollapsed && (<div className="h-full p-4"> <Chat canvasId={canvasId} sessionList={sessionList} setSessionList={setSessionList} /> </div>)}</div>
         {/* Resize Handle */}
         {!chatCollapsed && !canvasCollapsed && <div className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 cursor-col-resize transition-colors" />}
         {/* Canvas Panel */}

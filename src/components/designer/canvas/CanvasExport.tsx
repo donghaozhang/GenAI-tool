@@ -1,4 +1,4 @@
-import { useCanvas } from '@/contexts/canvas'
+import { useCanvas } from '@/contexts/CanvasContext'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { ImageDown } from 'lucide-react'

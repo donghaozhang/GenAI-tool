@@ -7,7 +7,7 @@ import {
   SelectGroup,
   SelectLabel,
 } from '@/components/ui/select'
-import { useConfigs } from '@/contexts/configs'
+import { useConfigs } from '@/contexts/ConfigsContext'
 import { PROVIDER_NAME_MAPPING } from '@/constants'
 
 const ModelSelector: React.FC = () => {

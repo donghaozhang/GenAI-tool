@@ -1,7 +1,7 @@
 import { cancelChat } from '@/api/chat'
 import { uploadImage } from '@/api/upload'
 import { Button } from '@/components/ui/button'
-import { useConfigs } from '@/contexts/configs'
+import { useConfigs } from '@/contexts/ConfigsContext'
 import { eventBus, TCanvasAddImagesToChatEvent } from '@/lib/event'
 import { cn, dataURLToFile } from '@/lib/utils'
 import { Message, Model } from '@/types/types'

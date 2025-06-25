@@ -1,4 +1,4 @@
-import useCanvasStore from '@/stores/canvas'
+import useCanvasStore from '@/components/designer/store/canvas'
 import { createContext, useContext } from 'react'
 
 export const CanvasContext = createContext<{

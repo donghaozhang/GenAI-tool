@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Hotkey } from '@/components/ui/hotkey'
-import { useCanvas } from '@/contexts/canvas'
+import { useCanvas } from '@/contexts/CanvasContext'
 import { eventBus, TCanvasAddImagesToChatEvent } from '@/lib/event'
 import { useKeyPress } from 'ahooks'
 import { motion } from 'motion/react'

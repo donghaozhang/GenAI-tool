@@ -1,6 +1,6 @@
 import { listModels } from '@/api/model'
 import { DEFAULT_MODEL_LIST, DEFAULT_PROVIDERS_CONFIG } from '@/constants'
-import useConfigsStore from '@/stores/configs'
+import useConfigsStore from '@/components/designer/store/configs'
 import { useQuery } from '@tanstack/react-query'
 import { createContext, useContext, useEffect } from 'react'
 
@@ -21,14 +21,10 @@ export const ConfigsProvider = ({
   const { data, refetch: refreshModels } = useQuery({
     queryKey: ['list_models'],
     queryFn: () => listModels(),
+    enabled: false, // Disable the API call for now
   })
-  // merge default models with the models from the server config to get the latest default models
-  const modelList = [
-    ...(data || []),
-    ...DEFAULT_MODEL_LIST.filter(
-      (m) => !data?.find((d) => d.provider == m.provider && d.model == m.model)
-    ),
-  ]
+  // Use default models for now since API is not available
+  const modelList = DEFAULT_MODEL_LIST
   useEffect(() => {
     if (!modelList) return
     if (modelList.length > 0) {
@@ -61,7 +57,7 @@ export const ConfigsProvider = ({
       setTextModels(textModels || [])
       setImageModels(imageModels || [])
     }
-  }, [data, setImageModel, setTextModel, setTextModels, setImageModels])
+  }, [setImageModel, setTextModel, setTextModels, setImageModels])
 
   return (
     <ConfigsContext.Provider

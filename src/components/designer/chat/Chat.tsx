@@ -9,7 +9,7 @@ import {
   PendingType,
   Session,
 } from '@/types/types'
-import { useSearch } from '@tanstack/react-router'
+import { useSearchParams } from 'react-router-dom'
 import { produce } from 'immer'
 import { motion } from 'motion/react'
 import { nanoid } from 'nanoid'
@@ -52,10 +52,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [session, setSession] = useState<Session | null>(null)
   const { initCanvas, setInitCanvas } = useConfigs()
 
-  const search = useSearch({ from: '/canvas/$id' }) as {
-    sessionId: string
-  }
-  const searchSessionId = search.sessionId || ''
+  const [searchParams] = useSearchParams()
+  const searchSessionId = searchParams.get('sessionId') || ''
 
   useEffect(() => {
     if (sessionList.length > 0) {
@@ -81,7 +79,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const sessionIdRef = useRef<string>(session?.id || nanoid())
   const [expandingToolCalls, setExpandingToolCalls] = useState<string[]>([])
 
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
   const isAtBottomRef = useRef(false)
 
   const scrollToBottom = useCallback(() => {
@@ -89,10 +87,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       return
     }
     setTimeout(() => {
-      scrollRef.current?.scrollTo({
-        top: scrollRef.current!.scrollHeight,
-        behavior: 'smooth',
-      })
+      const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement
+      if (viewport) {
+        viewport.scrollTo({
+          top: viewport.scrollHeight,
+          behavior: 'smooth',
+        })
+      }
     }, 200)
   }, [])
 
@@ -272,14 +273,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      if (scrollRef.current) {
+      const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement
+      if (viewport) {
         isAtBottomRef.current =
-          scrollRef.current.scrollHeight - scrollRef.current.scrollTop <=
-          scrollRef.current.clientHeight + 1
+          viewport.scrollHeight - viewport.scrollTop <=
+          viewport.clientHeight + 1
       }
     }
-    const scrollEl = scrollRef.current
-    scrollEl?.addEventListener('scroll', handleScroll)
+    const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement
+    viewport?.addEventListener('scroll', handleScroll)
 
     eventBus.on('Socket::Session::Delta', handleDelta)
     eventBus.on('Socket::Session::ToolCall', handleToolCall)
@@ -290,7 +292,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     eventBus.on('Socket::Session::Error', handleError)
     eventBus.on('Socket::Session::Info', handleInfo)
     return () => {
-      scrollEl?.removeEventListener('scroll', handleScroll)
+      viewport?.removeEventListener('scroll', handleScroll)
 
       eventBus.off('Socket::Session::Delta', handleDelta)
       eventBus.off('Socket::Session::ToolCall', handleToolCall)
@@ -398,7 +400,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <Blur className="absolute top-0 left-0 right-0 h-full" />
         </header>
 
-        <ScrollArea className="h-[calc(100vh-45px)]" viewportRef={scrollRef}>
+        <ScrollArea ref={scrollAreaRef} className="h-[calc(100vh-45px)]">
           {messages.length > 0 ? (
             <div className="flex-1 px-4 pb-50 pt-15">
               {/* Messages */}

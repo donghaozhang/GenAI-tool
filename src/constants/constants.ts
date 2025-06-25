@@ -47,8 +47,8 @@ export const DEFAULT_PROVIDERS_CONFIG: { [key: string]: LLMConfig } = {
     models: {
       'claude-3-7-sonnet-latest': { type: 'text' },
     },
-    url: 'https://api.anthropic.com/v1/',
-    api_key: '',
+    url: config.api.anthropic.baseUrl,
+    api_key: config.api.anthropic.apiKey || '',
     max_tokens: 8192,
   },
   openai: {

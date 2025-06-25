@@ -41,6 +41,10 @@ export const config = {
       baseUrl: import.meta.env.VITE_REPLICATE_API_BASE_URL || 'https://api.replicate.com/v1',
       apiKey: import.meta.env.VITE_REPLICATE_API_TOKEN,
     },
+    anthropic: {
+      baseUrl: import.meta.env.VITE_ANTHROPIC_API_BASE_URL || 'https://api.anthropic.com/v1',
+      apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY,
+    },
     elevenlabs: {
       baseUrl: import.meta.env.VITE_ELEVENLABS_API_BASE_URL || 'https://api.elevenlabs.io',
     },
@@ -89,6 +93,7 @@ if (import.meta.env.DEV) {
     console.log(`💳 Stripe Available: ${config.stripe.publishableKey ? '✅' : '❌'}`);
     console.log(`🎯 FAL API Available: ${config.api.fal.apiKey ? '✅' : '❌'}`);
     console.log(`🔄 Replicate API Available: ${config.api.replicate.apiKey ? '✅' : '❌'}`);
+    console.log(`🤖 Anthropic API Available: ${config.api.anthropic.apiKey ? '✅' : '❌'}`);
   } catch (error) {
     console.warn('Environment validation warning:', error);
   }

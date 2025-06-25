@@ -72,6 +72,13 @@ export default function ComfyuiSetting({
       return
     }
 
+    // TODO: Implement ComfyUI object_info API with Supabase backend
+    // For now, gracefully handle missing ComfyUI integration
+    console.log('ComfyUI object_info API not yet implemented for URL:', comfyUrl)
+    setComfyuiModels([])
+    return
+    
+    /*
     fetch(`/api/comfyui/object_info`, {
       method: 'POST',
       headers: {
@@ -96,6 +103,7 @@ export default function ComfyuiSetting({
         console.error('Failed to fetch ComfyUI models:', error)
         setComfyuiModels([])
       })
+    */
   }, [comfyUrl])
 
   // Check ComfyUI status when URL is provided
@@ -128,7 +136,7 @@ export default function ComfyuiSetting({
       }
     } catch (error) {
       console.log(
-        'ComfyUI connection failed:',
+        'ComfyUI connection failed (this is normal if ComfyUI is not installed/running):',
         error instanceof Error ? error.message : String(error)
       )
       setComfyUIStatus('not-running')

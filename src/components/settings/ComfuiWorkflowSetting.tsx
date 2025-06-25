@@ -37,6 +37,12 @@ export default function ComfuiWorkflowSetting() {
   const [showAddWorkflowDialog, setShowAddWorkflowDialog] = useState(false)
   const [workflows, setWorkflows] = useState<ComfyWorkflow[]>([])
   useEffect(() => {
+    // TODO: Implement ComfyUI workflow API with Supabase backend
+    // For now, set empty workflows to prevent errors
+    console.log('ComfyUI workflows API not yet implemented')
+    setWorkflows([])
+    
+    /* 
     fetch('/api/settings/comfyui/list_workflows')
       .then((res) => res.json())
       .then((data) => {
@@ -54,6 +60,7 @@ export default function ComfuiWorkflowSetting() {
         })
         setWorkflows(workflows)
       })
+    */
   }, [])
   return (
     <div className="space-y-4">
@@ -176,6 +183,12 @@ function AddWorkflowDialog({ onClose }: { onClose: () => void }) {
       setError('Please enter a workflow name')
       return
     }
+    // TODO: Implement ComfyUI create_workflow API with Supabase backend
+    console.log('ComfyUI create_workflow API not yet implemented')
+    toast.error('ComfyUI workflow creation not yet available - feature coming soon!')
+    return
+    
+    /*
     fetch('/api/settings/comfyui/create_workflow', {
       method: 'POST',
       headers: {
@@ -195,6 +208,7 @@ function AddWorkflowDialog({ onClose }: { onClose: () => void }) {
         toast.error(`Failed to create workflow: ${data.message}`)
       }
     })
+    */
   }
   return (
     <Dialog

@@ -68,18 +68,28 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       }
       setSession(_session)
     } else {
-      setSession(null)
+      // Create a default session when no sessions exist
+      const defaultSession: Session = {
+        id: generateUUID(),
+        name: 'New Chat',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        canvas_id: canvasId,
+        user_id: '', // Will be set by backend
+      }
+      setSessionList([defaultSession])
+      setSession(defaultSession)
     }
-  }, [sessionList, searchSessionId])
+  }, [sessionList, searchSessionId, canvasId, setSessionList])
 
   const [messages, setMessages] = useState<Message[]>([])
   const [pending, setPending] = useState<PendingType>(
     initCanvas ? 'text' : false
   )
 
-  const sessionId = session?.id
+  const sessionId = session?.id || generateUUID()
 
-  const sessionIdRef = useRef<string>(session?.id || generateUUID())
+  const sessionIdRef = useRef<string>(sessionId)
   const [expandingToolCalls, setExpandingToolCalls] = useState<string[]>([])
 
   const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -283,33 +293,45 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           viewport.clientHeight + 1
       }
     }
+    
     const viewport = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement
     viewport?.addEventListener('scroll', handleScroll)
 
-    eventBus.on('Socket::Session::Delta', handleDelta)
-    eventBus.on('Socket::Session::ToolCall', handleToolCall)
-    eventBus.on('Socket::Session::ToolCallArguments', handleToolCallArguments)
-    eventBus.on('Socket::Session::ImageGenerated', handleImageGenerated)
-    eventBus.on('Socket::Session::AllMessages', handleAllMessages)
-    eventBus.on('Socket::Session::Done', handleDone)
-    eventBus.on('Socket::Session::Error', handleError)
-    eventBus.on('Socket::Session::Info', handleInfo)
+    // Register event handlers with proper cleanup tracking
+    const eventHandlers = [
+      { event: 'Socket::Session::Delta', handler: handleDelta },
+      { event: 'Socket::Session::ToolCall', handler: handleToolCall },
+      { event: 'Socket::Session::ToolCallArguments', handler: handleToolCallArguments },
+      { event: 'Socket::Session::ImageGenerated', handler: handleImageGenerated },
+      { event: 'Socket::Session::AllMessages', handler: handleAllMessages },
+      { event: 'Socket::Session::Done', handler: handleDone },
+      { event: 'Socket::Session::Error', handler: handleError },
+      { event: 'Socket::Session::Info', handler: handleInfo },
+    ] as const
+
+    // Register all event handlers
+    eventHandlers.forEach(({ event, handler }) => {
+      eventBus.on(event, handler)
+    })
+
     return () => {
       viewport?.removeEventListener('scroll', handleScroll)
 
-      eventBus.off('Socket::Session::Delta', handleDelta)
-      eventBus.off('Socket::Session::ToolCall', handleToolCall)
-      eventBus.off(
-        'Socket::Session::ToolCallArguments',
-        handleToolCallArguments
-      )
-      eventBus.off('Socket::Session::ImageGenerated', handleImageGenerated)
-      eventBus.off('Socket::Session::AllMessages', handleAllMessages)
-      eventBus.off('Socket::Session::Done', handleDone)
-      eventBus.off('Socket::Session::Error', handleError)
-      eventBus.off('Socket::Session::Info', handleInfo)
+      // Cleanup all event handlers
+      eventHandlers.forEach(({ event, handler }) => {
+        eventBus.off(event, handler)
+      })
     }
-  })
+  }, [
+    handleDelta,
+    handleToolCall, 
+    handleToolCallArguments,
+    handleImageGenerated,
+    handleAllMessages,
+    handleDone,
+    handleError,
+    handleInfo
+  ])
 
   const initChat = useCallback(async () => {
     if (!sessionId) {

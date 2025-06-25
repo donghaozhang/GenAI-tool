@@ -65,9 +65,32 @@ Successfully copied existing Jaaz components and adapted them to work with our S
 - [ ] **Improve error handling and logging**
   - [ ] Add comprehensive error boundaries
   - [ ] Implement proper error recovery mechanisms
-- [ ] **Chat functionality refinements**
+- [x] **Chat functionality refinements**
+  - [x] ✅ **FIXED**: ERR_CONNECTION_REFUSED error in chat API (June 25, 2025)
+    - Root cause: Local Supabase not running, Docker daemon not available
+    - Solution: Switched to remote environment (`npm run env:remote`)
+    - Status: Chat API now connects to remote Supabase Edge Functions
+    - Dev server: Running on http://localhost:8081 (port 8080 was in use)
   - [ ] Ensure AI responses are consistently working
   - [ ] Fix any remaining chat API endpoint issues
+
+### 🐳 **Priority 1.5: Docker Implementation** ✅ COMPLETED (June 25, 2025)
+- [x] **Docker Setup Complete**
+  - [x] ✅ Created `Dockerfile` for main application with Node.js 18 Alpine
+  - [x] ✅ Created comprehensive `docker-compose.yml` with full Supabase stack
+  - [x] ✅ Added Docker commands to `package.json` for easy development
+  - [x] ✅ Created `.env.docker` for Docker environment configuration
+  - [x] ✅ Added `.dockerignore` for optimized builds
+- [x] **Docker Services Included**:
+  - [x] Main GenAI Tool application
+  - [x] Supabase PostgreSQL database
+  - [x] Supabase Auth (GoTrue)
+  - [x] Supabase REST API (PostgREST)
+  - [x] Supabase Realtime
+  - [x] Supabase Storage
+  - [x] Supabase Edge Functions (Deno)
+  - [x] Kong API Gateway
+  - [x] Inbucket email testing
 
 ### 🔧 **Priority 2: Integration Polish**
 - [ ] **Route Integration**
@@ -135,6 +158,28 @@ Successfully copied existing Jaaz components and adapted them to work with our S
 
 ## 🚀 **Quick Start Commands** (Ready to Use)
 
+### 🐳 **Docker Development (Recommended)**
+```bash
+# Start full development environment with local Supabase
+npm run docker:dev
+
+# Or run in detached mode
+npm run docker:dev:detached
+
+# View logs
+npm run docker:logs
+
+# Stop all services
+npm run docker:stop
+
+# Clean up everything (volumes, images)
+npm run docker:clean
+
+# Access shell in main container
+npm run docker:shell
+```
+
+### 🖥️ **Traditional Development**
 ```bash
 # Start the integrated application
 npm run dev

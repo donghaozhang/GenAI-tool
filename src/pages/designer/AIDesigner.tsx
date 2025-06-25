@@ -13,7 +13,7 @@ import {
   Home
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useConfigs } from '@/contexts/ConfigsContext';
 
 // Use native browser UUID generation
@@ -28,6 +28,7 @@ export const AIDesigner: React.FC = () => {
   const { canvasId: routeCanvasId } = useParams();
   const canvasId = routeCanvasId || generateUUID();
   const { setShowSettingsDialog } = useConfigs();
+  const navigate = useNavigate();
 
   const toggleChat = () => {
     setChatCollapsed(!chatCollapsed);
@@ -57,11 +58,39 @@ export const AIDesigner: React.FC = () => {
 
           <Separator orientation="vertical" className="h-6" />
 
-          <nav className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="gap-2" onClick={() => (window.location.href = '/')}> <Home className="w-4 h-4" /> Home </Button>
-            <Button variant="ghost" size="sm" className="gap-2" onClick={() => (window.location.href = '/ai-marketplace')}> <Layout className="w-4 h-4" /> Marketplace </Button>
-            <Button variant="ghost" size="sm" className="gap-2" onClick={() => (window.location.href = '/canvas')}> <Palette className="w-4 h-4" /> Canvas </Button>
-            <Button variant="ghost" size="sm" className="gap-2" onClick={() => (window.location.href = '/agent-studio')}> <Settings className="w-4 h-4" /> Agents </Button>
+          <nav className="hidden md:flex items-center gap-2">
+            <Button variant="ghost" size="sm" className="gap-2" onClick={() => navigate('/')}> 
+              <Home className="w-4 h-4" /> 
+              <span className="hidden lg:inline">Home</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="gap-2" onClick={() => navigate('/marketplace')}> 
+              <Layout className="w-4 h-4" /> 
+              <span className="hidden lg:inline">Marketplace</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="gap-2" onClick={() => navigate('/canvas')}> 
+              <Palette className="w-4 h-4" /> 
+              <span className="hidden lg:inline">Canvas</span>
+            </Button>
+            <Button variant="ghost" size="sm" className="gap-2" onClick={() => navigate('/agent-studio')}> 
+              <Settings className="w-4 h-4" /> 
+              <span className="hidden lg:inline">Agents</span>
+            </Button>
+          </nav>
+          
+          {/* Mobile nav */}
+          <nav className="flex md:hidden items-center gap-1">
+            <Button variant="ghost" size="sm" className="p-2" onClick={() => navigate('/')}> 
+              <Home className="w-4 h-4" /> 
+            </Button>
+            <Button variant="ghost" size="sm" className="p-2" onClick={() => navigate('/marketplace')}> 
+              <Layout className="w-4 h-4" /> 
+            </Button>
+            <Button variant="ghost" size="sm" className="p-2" onClick={() => navigate('/canvas')}> 
+              <Palette className="w-4 h-4" /> 
+            </Button>
+            <Button variant="ghost" size="sm" className="p-2" onClick={() => navigate('/agent-studio')}> 
+              <Settings className="w-4 h-4" /> 
+            </Button>
           </nav>
         </div>
 
@@ -80,9 +109,17 @@ export const AIDesigner: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 flex overflow-hidden">
         {/* Chat Panel */}
-        <div className={cn('transition-all duration-300 border-r border-gray-200 dark:border-gray-700', chatCollapsed ? 'w-0' : 'w-1/3 min-w-[300px] max-w-[500px]')}>{!chatCollapsed && (<div className="h-full p-4"> <Chat canvasId={canvasId} sessionList={sessionList} setSessionList={setSessionList} /> </div>)}</div>
-        {/* Resize Handle */}
-        {!chatCollapsed && !canvasCollapsed && <div className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 cursor-col-resize transition-colors" />}
+        <div className={cn('transition-all duration-300 border-r border-gray-200 dark:border-gray-700', 
+          chatCollapsed ? 'w-0' : 'w-full md:w-1/3 md:min-w-[300px] md:max-w-[500px]'
+        )}>
+          {!chatCollapsed && (
+            <div className="h-full p-2 md:p-4"> 
+              <Chat canvasId={canvasId} sessionList={sessionList} setSessionList={setSessionList} /> 
+            </div>
+          )}
+        </div>
+        {/* Resize Handle - Hidden on mobile */}
+        {!chatCollapsed && !canvasCollapsed && <div className="hidden md:block w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 cursor-col-resize transition-colors" />}
         {/* Canvas Panel */}
         <div className={cn('flex-1 transition-all duration-300 flex flex-col', canvasCollapsed && 'w-0 overflow-hidden')}>
           {!canvasCollapsed && (

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { User, LogIn, Plus, Palette } from 'lucide-react';
+import { User, LogIn, Plus, Palette, Settings, Layers3 } from 'lucide-react';
 import { UserProfile } from '@/components/UserProfile';
 import { SearchBar } from '../components/marketplace/SearchBar';
 import { CategoryFilter } from '../components/marketplace/CategoryFilter';
@@ -92,21 +92,76 @@ const AIModelMarketplace = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white">marketartAI</h1>
-              <p className="text-gray-400 mt-1">Discover and use cutting-edge AI models with pipeline capabilities</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">marketartAI</h1>
+              <p className="text-gray-400 mt-1 text-sm md:text-base hidden sm:block">Discover and use cutting-edge AI models with pipeline capabilities</p>
             </div>
             
-            {/* Auth Status */}
-            <div className="flex items-center space-x-4">
-              <Button
-                onClick={() => navigate('/designer')}
-                size="sm"
-                variant="outline"
-                className="border-purple-500 text-purple-400 hover:bg-purple-500/10"
-              >
-                <Palette className="mr-2 h-4 w-4" />
-                AI Designer
-              </Button>
+            {/* Navigation - Responsive */}
+            <div className="flex items-center space-x-2 lg:space-x-4">
+              {/* Main Navigation */}
+              <div className="hidden md:flex items-center space-x-2">
+                <Button
+                  onClick={() => navigate('/designer')}
+                  size="sm"
+                  variant="outline"
+                  className="border-purple-500 text-purple-400 hover:bg-purple-500/10"
+                >
+                  <Palette className="mr-2 h-4 w-4" />
+                  <span className="hidden lg:inline">AI Designer</span>
+                  <span className="lg:hidden">Designer</span>
+                </Button>
+                
+                <Button
+                  onClick={() => navigate('/canvas')}
+                  size="sm"
+                  variant="outline"
+                  className="border-blue-500 text-blue-400 hover:bg-blue-500/10"
+                >
+                  <Layers3 className="mr-2 h-4 w-4" />
+                  <span className="hidden lg:inline">Canvas</span>
+                </Button>
+                
+                <Button
+                  onClick={() => navigate('/agent-studio')}
+                  size="sm"
+                  variant="outline"
+                  className="border-green-500 text-green-400 hover:bg-green-500/10"
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span className="hidden lg:inline">Agent Studio</span>
+                  <span className="lg:hidden">Agents</span>
+                </Button>
+              </div>
+              
+              {/* Mobile Navigation - Icons only */}
+              <div className="flex md:hidden items-center space-x-2">
+                <Button
+                  onClick={() => navigate('/designer')}
+                  size="sm"
+                  variant="outline"
+                  className="border-purple-500 text-purple-400 hover:bg-purple-500/10 p-2"
+                >
+                  <Palette className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  onClick={() => navigate('/canvas')}
+                  size="sm"
+                  variant="outline"
+                  className="border-blue-500 text-blue-400 hover:bg-blue-500/10 p-2"
+                >
+                  <Layers3 className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  onClick={() => navigate('/agent-studio')}
+                  size="sm"
+                  variant="outline"
+                  className="border-green-500 text-green-400 hover:bg-green-500/10 p-2"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </div>
               
               {user ? (
                 <>

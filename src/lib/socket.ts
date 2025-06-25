@@ -13,6 +13,10 @@ export class SocketIOManager {
   private reconnectAttempts = 0
   private maxReconnectAttempts = 5
   private reconnectDelay = 1000
+  private maxReconnectDelay = 30000
+  private connectionState: 'disconnected' | 'connecting' | 'connected' | 'reconnecting' = 'disconnected'
+  private heartbeatInterval: NodeJS.Timeout | null = null
+  private connectionTimeout: NodeJS.Timeout | null = null
 
   constructor(private config: SocketConfig = {}) {
     if (config.autoConnect !== false) {
@@ -24,31 +28,49 @@ export class SocketIOManager {
     return new Promise((resolve, reject) => {
       const url = serverUrl || this.config.serverUrl
 
+      // Clear existing timers
+      this.clearTimers()
+
+      // Set connection state
+      this.connectionState = 'connecting'
+
       if (this.socket) {
         this.socket.disconnect()
+        this.socket.removeAllListeners()
       }
+
+      // Set connection timeout
+      this.connectionTimeout = setTimeout(() => {
+        reject(new Error('Connection timeout'))
+      }, 10000)
 
       this.socket = io(url, {
         transports: ['polling', 'websocket'],
         upgrade: true,
-        reconnection: true,
-        reconnectionAttempts: this.maxReconnectAttempts,
-        reconnectionDelay: this.reconnectDelay,
+        reconnection: false, // Handle reconnection manually for better control
+        timeout: 5000,
+        forceNew: true,
       })
 
       this.socket.on('connect', () => {
         console.log('✅ Socket.IO connected:', this.socket?.id)
         this.connected = true
+        this.connectionState = 'connected'
         this.reconnectAttempts = 0
+        this.clearTimers()
+        this.startHeartbeat()
         resolve(true)
       })
 
       this.socket.on('connect_error', (error) => {
         console.error('❌ Socket.IO connection error:', error)
         this.connected = false
-        this.reconnectAttempts++
-
-        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+        this.connectionState = 'disconnected'
+        this.clearTimers()
+        
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+          this.scheduleReconnect()
+        } else {
           reject(
             new Error(
               `Failed to connect after ${this.maxReconnectAttempts} attempts`
@@ -60,6 +82,17 @@ export class SocketIOManager {
       this.socket.on('disconnect', (reason) => {
         console.log('🔌 Socket.IO disconnected:', reason)
         this.connected = false
+        this.connectionState = 'disconnected'
+        this.clearTimers()
+        
+        // Auto-reconnect on unexpected disconnections
+        if (reason === 'io server disconnect') {
+          // Server initiated disconnect, don't reconnect
+          console.log('🚫 Server initiated disconnect, not reconnecting')
+        } else {
+          // Client-side disconnect or transport error, attempt reconnect
+          this.scheduleReconnect()
+        }
       })
 
       this.registerEventHandlers()
@@ -127,6 +160,56 @@ export class SocketIOManager {
     }
   }
 
+  private clearTimers() {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval)
+      this.heartbeatInterval = null
+    }
+    if (this.connectionTimeout) {
+      clearTimeout(this.connectionTimeout)
+      this.connectionTimeout = null
+    }
+  }
+
+  private startHeartbeat() {
+    this.heartbeatInterval = setInterval(() => {
+      if (this.connected && this.socket) {
+        this.socket.emit('ping', { timestamp: Date.now() })
+      }
+    }, 30000) // Ping every 30 seconds
+  }
+
+  private scheduleReconnect() {
+    if (this.connectionState === 'reconnecting') {
+      return // Already reconnecting
+    }
+
+    this.connectionState = 'reconnecting'
+    this.reconnectAttempts++
+    
+    // Exponential backoff with jitter
+    const baseDelay = Math.min(
+      this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
+      this.maxReconnectDelay
+    )
+    const jitter = Math.random() * 1000
+    const delay = baseDelay + jitter
+
+    console.log(`🔄 Scheduling reconnect attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${Math.round(delay)}ms`)
+
+    setTimeout(() => {
+      if (this.reconnectAttempts <= this.maxReconnectAttempts) {
+        this.connect().catch((error) => {
+          console.error('❌ Reconnection failed:', error)
+          if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+            console.error('💀 Max reconnection attempts reached, giving up')
+            this.connectionState = 'disconnected'
+          }
+        })
+      }
+    }, delay)
+  }
+
   ping(data: unknown) {
     if (this.socket && this.connected) {
       this.socket.emit('ping', data)
@@ -134,16 +217,34 @@ export class SocketIOManager {
   }
 
   disconnect() {
+    this.clearTimers()
     if (this.socket) {
       this.socket.disconnect()
+      this.socket.removeAllListeners()
       this.socket = null
       this.connected = false
+      this.connectionState = 'disconnected'
       console.log('🔌 Socket.IO manually disconnected')
     }
   }
 
+  forceReconnect() {
+    console.log('🔄 Forcing reconnection...')
+    this.reconnectAttempts = 0
+    this.disconnect()
+    return this.connect()
+  }
+
   isConnected(): boolean {
     return this.connected
+  }
+
+  getConnectionState(): string {
+    return this.connectionState
+  }
+
+  getReconnectAttempts(): number {
+    return this.reconnectAttempts
   }
 
   getSocketId(): string | undefined {

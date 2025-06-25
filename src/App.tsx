@@ -22,49 +22,62 @@ import AgentStudio from "./components/agent_studio/AgentStudio";
 import CanvasList from "./components/designer/CanvasList";
 import SettingsDialog from "./components/settings/dialog";
 import Settings from "./pages/Settings";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 import "@/utils/env-check"; // Initialize environment variable check
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <AuthProvider>
-        <ConfigsProvider>
-          <CanvasProvider>
-            <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/marketplace" element={<AIModelMarketplace />} />
-            <Route path="/ai-marketplace" element={<AIModelMarketplace />} />
-            <Route path="/designer" element={<AIDesigner />} />
-            <Route path="/ai-designer" element={<AIDesigner />} />
-            <Route path="/canvas/:canvasId" element={<AIDesigner />} />
-            <Route path="/canvas" element={<CanvasList />} />
-            <Route path="/agent-studio" element={<AgentStudio />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/pricing" element={<PricingPlans />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/payment/success" element={<PaymentSuccess />} />
-            <Route path="/twitter-test" element={<TwitterTest />} />
-            <Route path="/google-test" element={<GoogleOAuthTest />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          
-          {/* Settings Dialog - Available from anywhere */}
-          <SettingsDialog />
-            </BrowserRouter>
-          </CanvasProvider>
-        </ConfigsProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <ErrorBoundary fallback={<div className="p-4 text-center">Authentication error. Please refresh the page.</div>}>
+          <AuthProvider>
+            <ErrorBoundary fallback={<div className="p-4 text-center">Configuration error. Please check your settings.</div>}>
+              <ConfigsProvider>
+                <ErrorBoundary fallback={<div className="p-4 text-center">Canvas error. Please try refreshing.</div>}>
+                  <CanvasProvider>
+                    <BrowserRouter>
+                      <ErrorBoundary>
+                        <Routes>
+                          <Route path="/" element={<ErrorBoundary><Index /></ErrorBoundary>} />
+                          <Route path="/auth" element={<ErrorBoundary><AuthPage /></ErrorBoundary>} />
+                          <Route path="/marketplace" element={<ErrorBoundary><AIModelMarketplace /></ErrorBoundary>} />
+                          <Route path="/ai-marketplace" element={<ErrorBoundary><AIModelMarketplace /></ErrorBoundary>} />
+                          <Route path="/designer" element={<ErrorBoundary><AIDesigner /></ErrorBoundary>} />
+                          <Route path="/ai-designer" element={<ErrorBoundary><AIDesigner /></ErrorBoundary>} />
+                          <Route path="/canvas/:canvasId" element={<ErrorBoundary><AIDesigner /></ErrorBoundary>} />
+                          <Route path="/canvas" element={<ErrorBoundary><CanvasList /></ErrorBoundary>} />
+                          <Route path="/agent-studio" element={<ErrorBoundary><AgentStudio /></ErrorBoundary>} />
+                          <Route path="/settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
+                          <Route path="/pricing" element={<ErrorBoundary><PricingPlans /></ErrorBoundary>} />
+                          <Route path="/payment" element={<ErrorBoundary><Payment /></ErrorBoundary>} />
+                          <Route path="/payment/success" element={<ErrorBoundary><PaymentSuccess /></ErrorBoundary>} />
+                          <Route path="/twitter-test" element={<ErrorBoundary><TwitterTest /></ErrorBoundary>} />
+                          <Route path="/google-test" element={<ErrorBoundary><GoogleOAuthTest /></ErrorBoundary>} />
+                          <Route path="/privacy" element={<ErrorBoundary><PrivacyPolicy /></ErrorBoundary>} />
+                          <Route path="/terms" element={<ErrorBoundary><TermsOfService /></ErrorBoundary>} />
+                          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                          <Route path="*" element={<ErrorBoundary><NotFound /></ErrorBoundary>} />
+                        </Routes>
+                      </ErrorBoundary>
+                      
+                      {/* Settings Dialog - Available from anywhere */}
+                      <ErrorBoundary fallback={<div>Settings unavailable</div>}>
+                        <SettingsDialog />
+                      </ErrorBoundary>
+                    </BrowserRouter>
+                  </CanvasProvider>
+                </ErrorBoundary>
+              </ConfigsProvider>
+            </ErrorBoundary>
+          </AuthProvider>
+        </ErrorBoundary>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

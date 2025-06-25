@@ -91,6 +91,20 @@ class ChatDatabaseService {
     
     return data || []
   }
+
+  async getAllChatSessions() {
+    const { data, error } = await supabase
+      .from('chat_sessions')
+      .select('*')
+      .order('updated_at', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching chat sessions:', error)
+      throw error
+    }
+    
+    return data || []
+  }
 }
 
 // Chat service
@@ -170,8 +184,13 @@ serve(async (req) => {
 
   try {
     const { pathname } = new URL(req.url)
+    console.log('📍 Incoming request path:', pathname, 'Method:', req.method)
     
-    if (pathname === '/api/chat' && req.method === 'POST') {
+    // Remove function name prefix from pathname for routing
+    const routePath = pathname.replace('/jaaz-chat', '') || '/'
+    console.log('🛤️ Route path:', routePath)
+    
+    if (routePath === '/api/chat' && req.method === 'POST') {
       const data: ChatRequest = await req.json()
       const chatService = new ChatService()
       
@@ -185,8 +204,8 @@ serve(async (req) => {
       })
     }
     
-    if (pathname.startsWith('/api/chat_session/') && req.method === 'GET') {
-      const sessionId = pathname.split('/').pop()
+    if (routePath.startsWith('/api/chat_session/') && req.method === 'GET') {
+      const sessionId = routePath.split('/').pop()
       const chatService = new ChatService()
       
       const messages = await chatService.dbService.getSessionMessages(sessionId!)
@@ -199,8 +218,21 @@ serve(async (req) => {
       })
     }
     
-    if (pathname.startsWith('/api/cancel/') && req.method === 'POST') {
-      const sessionId = pathname.split('/').pop()
+    if (routePath === '/api/chat_sessions' && req.method === 'GET') {
+      const chatService = new ChatService()
+      
+      const sessions = await chatService.dbService.getAllChatSessions()
+      
+      return new Response(JSON.stringify(sessions), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        }
+      })
+    }
+    
+    if (routePath.startsWith('/api/cancel/') && req.method === 'POST') {
+      const sessionId = routePath.split('/').pop()
       
       // TODO: Implement task cancellation
       console.log(`Cancelling session: ${sessionId}`)
@@ -213,7 +245,16 @@ serve(async (req) => {
       })
     }
 
-    return new Response(JSON.stringify({ error: 'Not found' }), {
+    return new Response(JSON.stringify({ 
+      error: 'Not found', 
+      debug: {
+        pathname,
+        routePath,
+        method: req.method,
+        url: req.url,
+        message: 'Available routes: POST /api/chat, GET /api/chat_session/{id}, POST /api/cancel/{id}'
+      }
+    }), {
       status: 404,
       headers: {
         'Content-Type': 'application/json',

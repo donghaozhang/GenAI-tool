@@ -13,6 +13,15 @@ import { useSearchParams } from 'react-router-dom'
 import { produce } from 'immer'
 import { motion } from 'motion/react'
 import { nanoid } from 'nanoid'
+
+// Generate a UUID v4
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
 import {
   Dispatch,
   SetStateAction,
@@ -76,7 +85,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const sessionId = session?.id
 
-  const sessionIdRef = useRef<string>(session?.id || nanoid())
+  const sessionIdRef = useRef<string>(session?.id || generateUUID())
   const [expandingToolCalls, setExpandingToolCalls] = useState<string[]>([])
 
   const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -346,7 +355,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   const onClickNewChat = () => {
     const newSession: Session = {
-      id: nanoid(),
+      id: generateUUID(),
       title: t('chat:newChat'),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -366,7 +375,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       // Create a new session if none exists
       let currentSessionId = sessionId
       if (!currentSessionId) {
-        currentSessionId = nanoid()
+        currentSessionId = generateUUID()
         const newSession: Session = {
           id: currentSessionId,
           title: typeof data[0]?.content === 'string' ? data[0].content.substring(0, 50) : 'New Chat',

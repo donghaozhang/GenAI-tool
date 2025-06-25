@@ -15,7 +15,11 @@
       "Bash(rm:*)",
       "Bash(npm run:*)",
       "Bash(grep:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(supabase status:*)",
+      "Bash(supabase functions:*)",
+      "Bash(supabase db:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

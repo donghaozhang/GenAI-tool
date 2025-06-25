@@ -32,7 +32,12 @@ interface ChatResponse {
 // Initialize Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+})
 
 // Database service for chat
 class ChatDatabaseService {
@@ -41,28 +46,40 @@ class ChatDatabaseService {
     model: string, 
     provider: string, 
     canvasId?: string, 
-    title?: string
+    title?: string,
+    userId?: string
   ) {
-    const { error } = await supabase
+    // For development, allow null userId for anonymous sessions
+    const finalUserId = userId || null
+    
+    console.log('💾 Creating chat session:', { sessionId, model, provider, canvasId, title, userId: finalUserId })
+    
+    const { data, error } = await supabase
       .from('chat_sessions')
       .insert({
-        id: sessionId,
+        id: sessionId, // Expecting a UUID string
         model,
         provider,
         canvas_id: canvasId,
+        user_id: finalUserId,
         title: title || 'New Chat',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
+      .select()
     
     if (error) {
-      console.error('Error creating chat session:', error)
+      console.error('❌ Error creating chat session:', error)
       throw error
     }
+    
+    console.log('✅ Chat session created:', data)
   }
 
   async createMessage(sessionId: string, role: string, content: string) {
-    const { error } = await supabase
+    console.log('💾 Creating message:', { sessionId, role, content })
+    
+    const { data, error } = await supabase
       .from('chat_messages')
       .insert({
         session_id: sessionId,
@@ -70,11 +87,14 @@ class ChatDatabaseService {
         content,
         created_at: new Date().toISOString()
       })
+      .select()
     
     if (error) {
-      console.error('Error creating message:', error)
+      console.error('❌ Error creating message:', error)
       throw error
     }
+    
+    console.log('✅ Message created:', data)
   }
 
   async getSessionMessages(sessionId: string) {
@@ -196,16 +216,33 @@ serve(async (req) => {
     
     if (routePath === '/api/chat' && req.method === 'POST') {
       const data: ChatRequest = await req.json()
-      const chatService = new ChatService()
+      console.log('📥 Received chat request:', data)
       
-      const messages = await chatService.handleChat(data)
-      
-      return new Response(JSON.stringify(messages), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        }
-      })
+      try {
+        const chatService = new ChatService()
+        
+        const messages = await chatService.handleChat(data)
+        
+        return new Response(JSON.stringify(messages), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          }
+        })
+      } catch (error) {
+        console.error('💥 Chat service error:', error)
+        return new Response(JSON.stringify({ 
+          error: 'Chat processing failed', 
+          details: error.message,
+          stack: error.stack 
+        }), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          }
+        })
+      }
     }
     
     if (routePath.startsWith('/api/chat_session/') && req.method === 'GET') {

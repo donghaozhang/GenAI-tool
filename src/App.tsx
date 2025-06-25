@@ -20,7 +20,8 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import { AIDesigner } from "./pages/designer/AIDesigner";
 import AgentStudio from "./components/agent_studio/AgentStudio";
 import CanvasList from "./components/designer/CanvasList";
-import Settings from "./components/settings/CommonSetting";
+import SettingsDialog from "./components/settings/dialog";
+import Settings from "./pages/Settings";
 import "@/utils/env-check"; // Initialize environment variable check
 
 const queryClient = new QueryClient();
@@ -55,6 +56,9 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          
+          {/* Settings Dialog - Available from anywhere */}
+          <SettingsDialog />
             </BrowserRouter>
           </CanvasProvider>
         </ConfigsProvider>

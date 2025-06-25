@@ -15,6 +15,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useParams } from 'react-router-dom';
 import { nanoid } from 'nanoid';
+import { useConfigs } from '@/contexts/ConfigsContext';
 
 export const AIDesigner: React.FC = () => {
   const [chatCollapsed, setChatCollapsed] = React.useState(false);
@@ -22,6 +23,7 @@ export const AIDesigner: React.FC = () => {
   const [sessionList, setSessionList] = React.useState<Session[]>([]);
   const { canvasId: routeCanvasId } = useParams();
   const canvasId = routeCanvasId || nanoid();
+  const { setShowSettingsDialog } = useConfigs();
 
   const toggleChat = () => {
     setChatCollapsed(!chatCollapsed);
@@ -67,7 +69,7 @@ export const AIDesigner: React.FC = () => {
             <Layout className="w-4 h-4" /> {canvasCollapsed ? 'Show Canvas' : 'Hide Canvas'}
           </Button>
           <Separator orientation="vertical" className="h-6" />
-          <Button variant="outline" size="sm" onClick={() => (window.location.href = '/settings')}> <Settings className="w-4 h-4" /> </Button>
+          <Button variant="outline" size="sm" onClick={() => setShowSettingsDialog(true)}> <Settings className="w-4 h-4" /> </Button>
         </div>
       </header>
 

@@ -95,7 +95,7 @@ class ChatDatabaseService {
 
 // Chat service
 class ChatService {
-  private dbService = new ChatDatabaseService()
+  public dbService = new ChatDatabaseService()
 
   async handleChat(data: ChatRequest): Promise<void> {
     const { messages, session_id, canvas_id, text_model, image_model, system_prompt } = data
@@ -178,6 +178,20 @@ serve(async (req) => {
       await chatService.handleChat(data)
       
       return new Response(JSON.stringify({ status: 'done' }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        }
+      })
+    }
+    
+    if (pathname.startsWith('/api/chat_session/') && req.method === 'GET') {
+      const sessionId = pathname.split('/').pop()
+      const chatService = new ChatService()
+      
+      const messages = await chatService.dbService.getSessionMessages(sessionId!)
+      
+      return new Response(JSON.stringify(messages), {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',

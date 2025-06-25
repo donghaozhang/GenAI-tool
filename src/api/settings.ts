@@ -8,6 +8,11 @@
  * - 代理连接测试
  */
 
+import { config } from '@/config/env'
+
+// Use Supabase Edge Functions instead of relative paths
+const API_BASE_URL = config.supabase.functionsUrl
+
 /**
  * 检查设置文件是否存在
  *
@@ -20,7 +25,7 @@
  * }
  */
 export async function getSettingsFileExists(): Promise<{ exists: boolean }> {
-  const response = await fetch('/api/settings/exists')
+  const response = await fetch(`${API_BASE_URL}/jaaz-settings/api/settings/exists`)
   return await response.json()
 }
 
@@ -36,7 +41,7 @@ export async function getSettingsFileExists(): Promise<{ exists: boolean }> {
  * const systemPrompt = settings.system_prompt;
  */
 export async function getSettings(): Promise<Record<string, unknown>> {
-  const response = await fetch('/api/settings')
+  const response = await fetch(`${API_BASE_URL}/jaaz-settings/api/settings/system`)
   return await response.json()
 }
 
@@ -62,7 +67,7 @@ export async function updateSettings(
   status: string
   message: string
 }> {
-  const response = await fetch('/api/settings', {
+  const response = await fetch(`${API_BASE_URL}/jaaz-settings/api/settings/system`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -86,7 +91,7 @@ export async function updateSettings(
  * // 'http://proxy.example.com:8080' - 使用指定代理
  */
 export async function getProxySettings(): Promise<Record<string, unknown>> {
-  const response = await fetch('/api/settings/proxy')
+  const response = await fetch(`${API_BASE_URL}/jaaz-settings/api/settings/system/proxy`)
   return await response.json()
 }
 
@@ -118,7 +123,7 @@ export async function updateProxySettings(
   status: string
   message: string
 }> {
-  const response = await fetch('/api/settings/proxy', {
+  const response = await fetch(`${API_BASE_URL}/jaaz-settings/api/settings/system/proxy`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

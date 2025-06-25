@@ -14,7 +14,7 @@
 ├── PrivacyPolicy.tsx / TermsOfService.tsx  # Legal pages
 ├── NotFound.tsx                  # 404 error page
 └── designer/
-    └── AIDesigner.tsx            # Main Jaaz designer interface
+    └── AIDesigner.tsx            # Main Jaaz designer interface (✅ Updated with CanvasExcali)
 ```
 
 #### Core UI Components (`src/components/ui/`)
@@ -25,6 +25,24 @@
 - Data display: `table.tsx`, `badge.tsx`, `avatar.tsx`, `progress.tsx`
 - Feedback: `toast.tsx`, `alert.tsx`, `skeleton.tsx`
 - Specialized: `google-icon.tsx` for OAuth integration
+
+#### Common Components (`src/components/common/`) - ✅ New Jaaz Integration
+```
+├── Blur.tsx                      # Backdrop blur effects
+├── NotificationPanel.tsx         # ✅ Real-time notifications (Jaaz)
+└── LanguageSwitcher.tsx          # ✅ I18n language selection (Jaaz)
+```
+
+#### Home Components (`src/components/home/`) - ✅ New Jaaz Integration
+```
+└── HomeHeader.tsx                # ✅ Agent Studio header (Jaaz)
+```
+
+#### Sidebar Components (`src/components/sidebar/`) - ✅ Jaaz Integration
+```
+├── LeftSidebar.tsx               # ✅ Main navigation sidebar (Jaaz)
+└── FileList.tsx                  # ✅ File management interface (Jaaz)
+```
 
 ### Marketplace Components (`src/components/marketplace/`)
 
@@ -109,8 +127,20 @@
 │       └── WritePlanToolcall.tsx # Plan writing tool
 ```
 
-#### Canvas Management
+#### Canvas System (✅ Complete Jaaz Integration)
 ```
+├── canvas/
+│   ├── Canvas.tsx                # Original canvas component
+│   ├── CanvasExcali.tsx          # ✅ Excalidraw integration (Jaaz)
+│   ├── CanvasHeader.tsx          # ✅ Canvas toolbar (Jaaz)
+│   ├── CanvasExport.tsx          # ✅ Export functionality (Jaaz)
+│   ├── menu/                     # ✅ Canvas tool menus (Jaaz)
+│   │   ├── CanvasMenuButton.tsx
+│   │   ├── CanvasMenuIcon.tsx
+│   │   ├── CanvasToolMenu.tsx
+│   │   └── CanvasViewMenu.tsx
+│   └── pop-bar/                  # ✅ Context menus (Jaaz)
+│       └── CanvasPopbar.tsx
 ├── CanvasCard.tsx                # Canvas preview card
 ├── CanvasDeleteDialog.tsx        # Canvas deletion confirmation
 └── CanvasList.tsx                # Canvas list display

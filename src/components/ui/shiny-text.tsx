@@ -30,9 +30,7 @@ const ShinyText: React.FC<ShinyTextProps> = ({
           className="shine"
           aria-hidden="true"
           style={{ animationDuration }}
-        >
-          {text}
-        </span>
+        />
       )}
     </div>
   )

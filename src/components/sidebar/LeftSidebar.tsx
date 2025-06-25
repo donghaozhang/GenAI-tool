@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { ChatSession } from '@/types/types'
 import { XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { config } from '@/config/env'
 import FileList from './FileList'
 
 export default function LeftSidebar({
@@ -21,7 +22,7 @@ export default function LeftSidebar({
   const [type, setType] = useState<'chat' | 'space'>('chat')
   useEffect(() => {
     const fetchChatSessions = async () => {
-      const sessions = await fetch('/api/list_chat_sessions', {
+      const sessions = await fetch(`${config.supabase.functionsUrl}/jaaz-chat/api/chat_sessions`, {
         headers: {
           'Content-Type': 'application/json',
         },

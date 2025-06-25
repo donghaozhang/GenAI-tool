@@ -10,7 +10,7 @@ const CanvasList: React.FC = () => {
   const { data: canvases, refetch } = useQuery({
     queryKey: ['canvases'],
     queryFn: listCanvases,
-    enabled: false, // Disable API call for now
+    enabled: true, // Enable API call now that backend is ready
   })
 
   const navigate = useNavigate()

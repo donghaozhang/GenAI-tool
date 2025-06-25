@@ -18,7 +18,7 @@ export default function JaazSetting({
   onConfigChange,
 }: JaazSettingProps) {
   const { t } = useTranslation()
-  const { authStatus } = useAuth()
+  const { user, loading } = useAuth()
   const { setShowLoginDialog } = useConfigs()
 
   const handleModelsChange = (
@@ -52,7 +52,7 @@ export default function JaazSetting({
         </div>
 
         {/* Show login button if not logged in */}
-        {!authStatus.is_logged_in && (
+        {!user && !loading && (
           <Button
             variant="outline"
             size="sm"
@@ -64,7 +64,7 @@ export default function JaazSetting({
       </div>
 
       {/* Only show configuration when logged in */}
-      {authStatus.is_logged_in && (
+      {user && (
         <>
           {/* Models Configuration */}
           <div className="space-y-2">

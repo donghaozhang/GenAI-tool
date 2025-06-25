@@ -1,6 +1,7 @@
 import React from 'react';
 import Chat from '@/components/designer/chat/Chat';
-import { Canvas } from '@/components/designer/canvas/Canvas';
+import CanvasExcali from '@/components/designer/canvas/CanvasExcali';
+import CanvasHeader from '@/components/designer/canvas/CanvasHeader';
 import { Session } from '@/types/types';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -12,12 +13,15 @@ import {
   Home
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useParams } from 'react-router-dom';
+import { nanoid } from 'nanoid';
 
 export const AIDesigner: React.FC = () => {
   const [chatCollapsed, setChatCollapsed] = React.useState(false);
   const [canvasCollapsed, setCanvasCollapsed] = React.useState(false);
   const [sessionList, setSessionList] = React.useState<Session[]>([]);
-  const canvasId = 'default-canvas';
+  const { canvasId: routeCanvasId } = useParams();
+  const canvasId = routeCanvasId || nanoid();
 
   const toggleChat = () => {
     setChatCollapsed(!chatCollapsed);
@@ -50,6 +54,8 @@ export const AIDesigner: React.FC = () => {
           <nav className="flex items-center gap-2">
             <Button variant="ghost" size="sm" className="gap-2" onClick={() => (window.location.href = '/')}> <Home className="w-4 h-4" /> Home </Button>
             <Button variant="ghost" size="sm" className="gap-2" onClick={() => (window.location.href = '/ai-marketplace')}> <Layout className="w-4 h-4" /> Marketplace </Button>
+            <Button variant="ghost" size="sm" className="gap-2" onClick={() => (window.location.href = '/canvas')}> <Palette className="w-4 h-4" /> Canvas </Button>
+            <Button variant="ghost" size="sm" className="gap-2" onClick={() => (window.location.href = '/agent-studio')}> <Settings className="w-4 h-4" /> Agents </Button>
           </nav>
         </div>
 
@@ -61,7 +67,7 @@ export const AIDesigner: React.FC = () => {
             <Layout className="w-4 h-4" /> {canvasCollapsed ? 'Show Canvas' : 'Hide Canvas'}
           </Button>
           <Separator orientation="vertical" className="h-6" />
-          <Button variant="outline" size="sm"> <Settings className="w-4 h-4" /> </Button>
+          <Button variant="outline" size="sm" onClick={() => (window.location.href = '/settings')}> <Settings className="w-4 h-4" /> </Button>
         </div>
       </header>
 
@@ -72,7 +78,21 @@ export const AIDesigner: React.FC = () => {
         {/* Resize Handle */}
         {!chatCollapsed && !canvasCollapsed && <div className="w-1 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 cursor-col-resize transition-colors" />}
         {/* Canvas Panel */}
-        <div className={cn('flex-1 transition-all duration-300', canvasCollapsed && 'w-0 overflow-hidden')}>{!canvasCollapsed && (<div className="h-full p-4"> <Canvas /> </div>)}</div>
+        <div className={cn('flex-1 transition-all duration-300 flex flex-col', canvasCollapsed && 'w-0 overflow-hidden')}>
+          {!canvasCollapsed && (
+            <>
+              <CanvasHeader 
+                canvasId={canvasId} 
+                canvasName="AI Canvas"
+                onNameChange={() => {}}
+                onNameSave={() => {}}
+              />
+              <div className="flex-1">
+                <CanvasExcali canvasId={canvasId} />
+              </div>
+            </>
+          )}
+        </div>
         {/* Placeholder when both panels collapsed */}
         {chatCollapsed && canvasCollapsed && (
           <div className="flex-1 flex items-center justify-center">

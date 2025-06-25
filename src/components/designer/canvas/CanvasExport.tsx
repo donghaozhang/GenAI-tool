@@ -4,7 +4,7 @@ import JSZip from 'jszip'
 import { ImageDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 
 const CanvasExport = () => {
   const { excalidrawAPI } = useCanvas()

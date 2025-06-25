@@ -156,5 +156,5 @@ export class SocketIOManager {
 }
 
 export const socketManager = new SocketIOManager({
-  serverUrl: 'http://localhost:57988',
+  serverUrl: process.env.VITE_JAAZ_BACKEND_URL || 'http://localhost:8000',
 })

@@ -315,7 +315,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     sessionIdRef.current = sessionId
 
-    const resp = await fetch('/api/chat_session/' + sessionId)
+    const resp = await fetch((import.meta.env.VITE_JAAZ_BACKEND_URL || 'http://localhost:8000') + '/api/chat_session/' + sessionId)
     const data = await resp.json()
     const msgs = data?.length ? data : []
     setMessages(msgs)

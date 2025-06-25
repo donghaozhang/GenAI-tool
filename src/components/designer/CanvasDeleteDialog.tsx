@@ -1,7 +1,7 @@
-import CommonDialogContent from '@/components/common/DialogContent'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -40,7 +40,7 @@ const CanvasDeleteDialog: React.FC<CanvasDeleteDialogProps> = ({
         )}
       </DialogTrigger>
 
-      <CommonDialogContent open={show}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('canvas:deleteDialog.title')}</DialogTitle>
         </DialogHeader>
@@ -57,7 +57,7 @@ const CanvasDeleteDialog: React.FC<CanvasDeleteDialogProps> = ({
             {t('canvas:deleteDialog.delete')}
           </Button>
         </DialogFooter>
-      </CommonDialogContent>
+      </DialogContent>
     </Dialog>
   )
 }

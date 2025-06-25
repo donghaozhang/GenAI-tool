@@ -1,5 +1,8 @@
 import type { LLMConfig, ToolCallFunctionName } from '@/types/types'
 
+// Logo Configuration  
+export const LOGO_URL = 'https://raw.githubusercontent.com/11cafe/jaaz/refs/heads/main/assets/icons/jaaz.png'
+
 // API Configuration
 export const BASE_API_URL = import.meta.env.DEV
   ? `http://localhost:${import.meta.env.VITE_BACKEND_PORT || 57988}`
@@ -143,9 +146,6 @@ export const TOOL_CALL_NAME_MAPPING: { [key in ToolCallFunctionName]: string } =
     write_plan: 'Write Plan',
     finish: 'Finish',
   }
-
-export const LOGO_URL =
-  'https://raw.githubusercontent.com/11cafe/jaaz/refs/heads/main/assets/icons/jaaz.png'
 
 export const DEFAULT_SYSTEM_PROMPT = `You are a professional art design agent. You can write very professional image prompts to generate aesthetically pleasing images that best fulfilling and matching the user's request.
 Step 1. write a design strategy plan. Write in the same language as the user's inital first prompt.

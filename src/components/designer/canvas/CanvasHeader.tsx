@@ -1,16 +1,13 @@
-import LanguageSwitcher from '@/components/common/LanguageSwitcher'
-import { NotificationPanel } from '@/components/common/NotificationPanel'
 import ThemeButton from '@/components/theme/ThemeButton'
 import { Input } from '@/components/ui/input'
-import { LOGO_URL } from '@/constants'
-import { useConfigs } from '@/contexts/ConfigsContext'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, SettingsIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 import CanvasExport from './CanvasExport'
+import { LOGO_URL } from '@/constants'
 
 type CanvasHeaderProps = {
   canvasName: string
@@ -29,7 +26,6 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
   const [isLogoHovered, setIsLogoHovered] = useState(false)
 
   const navigate = useNavigate()
-  const { setShowSettingsDialog } = useConfigs()
 
   return (
     <motion.div
@@ -42,7 +38,7 @@ const CanvasHeader: React.FC<CanvasHeaderProps> = ({
         className="flex items-center gap-2 cursor-pointer group"
         onHoverStart={() => setIsLogoHovered(true)}
         onHoverEnd={() => setIsLogoHovered(false)}
-        onClick={() => navigate({ to: '/' })}
+        onClick={() => navigate('/')}
       >
         <ChevronLeft className="size-5 group-hover:-translate-x-0.5 transition-transform duration-300" />
         <img src={LOGO_URL} alt="logo" className="size-8" draggable={false} />

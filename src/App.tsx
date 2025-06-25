@@ -18,6 +18,9 @@ import PricingPlans from "./components/marketplace/PricingPlans";
 import Payment from "./pages/Payment";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import { AIDesigner } from "./pages/designer/AIDesigner";
+import AgentStudio from "./components/agent_studio/AgentStudio";
+import CanvasList from "./components/designer/CanvasList";
+import Settings from "./components/settings/CommonSetting";
 import "@/utils/env-check"; // Initialize environment variable check
 
 const queryClient = new QueryClient();
@@ -38,6 +41,10 @@ const App = () => (
             <Route path="/ai-marketplace" element={<AIModelMarketplace />} />
             <Route path="/designer" element={<AIDesigner />} />
             <Route path="/ai-designer" element={<AIDesigner />} />
+            <Route path="/canvas/:canvasId" element={<AIDesigner />} />
+            <Route path="/canvas" element={<CanvasList />} />
+            <Route path="/agent-studio" element={<AgentStudio />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/pricing" element={<PricingPlans />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/payment/success" element={<PaymentSuccess />} />

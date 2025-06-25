@@ -1,7 +1,7 @@
 import { saveCanvas } from '@/api/canvas'
 import { useCanvas } from '@/contexts/CanvasContext'
-import useDebounce from '@/hooks/use-debounce'
-import { useTheme } from '@/hooks/use-theme'
+import useDebounce from '@/hooks/jaaz/use-debounce'
+import { useTheme } from '@/hooks/jaaz/use-theme'
 import { eventBus } from '@/lib/event'
 import * as ISocket from '@/types/socket'
 import { CanvasData } from '@/types/types'
@@ -21,7 +21,7 @@ import {
 import { useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import '@/assets/style/canvas.css'
+// import '@/assets/style/canvas.css' // TODO: Copy canvas styles
 
 type LastImagePosition = {
   x: number

@@ -1,5 +1,5 @@
 import { listCanvases } from '@/api/canvas'
-import CanvasCard from '@/components/home/CanvasCard'
+import CanvasCard from './CanvasCard'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'

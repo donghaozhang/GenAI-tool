@@ -14,7 +14,7 @@ import debounce from 'lodash.debounce'
 import '@xyflow/react/dist/style.css'
 import HomeHeader from '../home/HomeHeader'
 import AgentNode from './AgentNode'
-import { Textarea } from '../ui/textarea'
+import { Textarea } from '@/components/ui/textarea'
 
 const LOCAL_STORAGE_KEY = 'agent-studio-graph'
 

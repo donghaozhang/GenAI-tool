@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { useTheme } from '@/hooks/use-theme'
+import { useTheme } from '@/hooks/jaaz/use-theme'
 import { MoonIcon, SunIcon } from 'lucide-react'
 
 const ThemeButton: React.FC = () => {

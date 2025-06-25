@@ -1,4 +1,5 @@
 import type { LLMConfig, ToolCallFunctionName } from '@/types/types'
+import { config } from '@/config/env'
 
 // Logo Configuration  
 export const LOGO_URL = 'https://raw.githubusercontent.com/11cafe/jaaz/refs/heads/main/assets/icons/jaaz.png'
@@ -69,8 +70,8 @@ export const DEFAULT_PROVIDERS_CONFIG: { [key: string]: LLMConfig } = {
       'recraft-ai/recraft-v3': { type: 'image' },
       'stability-ai/sdxl': { type: 'image' },
     },
-    url: 'https://api.replicate.com/v1/',
-    api_key: '',
+    url: config.api.replicate.baseUrl,
+    api_key: config.api.replicate.apiKey || '',
     max_tokens: 8192,
   },
   jaaz: {

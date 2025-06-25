@@ -37,6 +37,10 @@ export const config = {
       baseUrl: import.meta.env.VITE_FAL_API_BASE_URL || 'https://fal.run',
       apiKey: import.meta.env.VITE_FAL_API_KEY,
     },
+    replicate: {
+      baseUrl: import.meta.env.VITE_REPLICATE_API_BASE_URL || 'https://api.replicate.com/v1',
+      apiKey: import.meta.env.VITE_REPLICATE_API_TOKEN,
+    },
     elevenlabs: {
       baseUrl: import.meta.env.VITE_ELEVENLABS_API_BASE_URL || 'https://api.elevenlabs.io',
     },
@@ -83,6 +87,8 @@ if (import.meta.env.DEV) {
     console.log(`📡 Supabase URL: ${config.supabase.url}`);
     console.log(`🔧 Functions URL: ${config.supabase.functionsUrl}`);
     console.log(`💳 Stripe Available: ${config.stripe.publishableKey ? '✅' : '❌'}`);
+    console.log(`🎯 FAL API Available: ${config.api.fal.apiKey ? '✅' : '❌'}`);
+    console.log(`🔄 Replicate API Available: ${config.api.replicate.apiKey ? '✅' : '❌'}`);
   } catch (error) {
     console.warn('Environment validation warning:', error);
   }

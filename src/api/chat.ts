@@ -59,7 +59,15 @@ export const sendMessages = async (payload: {
     })
     
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+      try {
+        const errorData = await response.json()
+        console.error('🔍 Server error details:', errorData)
+        errorMessage = errorData.details || errorData.error || errorMessage
+      } catch (e) {
+        // If we can't parse the error response, use the original message
+      }
+      throw new Error(errorMessage)
     }
     
     const data = await response.json()

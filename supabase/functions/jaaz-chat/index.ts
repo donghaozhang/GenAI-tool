@@ -234,7 +234,8 @@ serve(async (req) => {
         return new Response(JSON.stringify({ 
           error: 'Chat processing failed', 
           details: error.message,
-          stack: error.stack 
+          stack: error.stack,
+          received_data: data
         }), {
           status: 500,
           headers: {

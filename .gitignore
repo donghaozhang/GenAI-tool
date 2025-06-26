@@ -32,5 +32,16 @@ dist-ssr
 
 .vercel
 
-# Exclude jaaz-source folder
-jaaz-source/
+# Jaaz-source specific ignores
+jaaz-source/server/jaaz-backend-venv/
+jaaz-source/server/user_data/
+jaaz-source/server/__pycache__/
+jaaz-source/server/**/__pycache__/
+jaaz-source/server/.env
+jaaz-source/server/*.log
+jaaz-source/server/logs/
+jaaz-source/server/temp/
+jaaz-source/server/files/
+jaaz-source/server/database.db
+jaaz-source/server/*.db
+jaaz-source/server/uploads/

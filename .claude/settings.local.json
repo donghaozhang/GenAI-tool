@@ -34,13 +34,14 @@
       "Bash(sudo apt install:*)",
       "Bash(pip3:*)",
       "Bash(source:*)",
-              "Bash(python:*)",
-        "Bash(pip install:*)",
-        "Bash(python main.py:*)",
-        "Bash(python main_full.py:*)",
-        "Bash(uvicorn:*)",
-        "Bash(conda:*)",
-        "Bash(activate:*)"
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(python main.py:*)",
+      "Bash(python main_full.py:*)",
+      "Bash(uvicorn:*)",
+      "Bash(conda:*)",
+      "Bash(activate:*)",
+      "/permission"
     ],
     "deny": []
   }

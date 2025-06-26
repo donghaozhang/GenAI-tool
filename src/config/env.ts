@@ -26,6 +26,9 @@ export const config = {
     isLocal,
     isRemote: !isLocal,
   },
+  jaaz: {
+    backendUrl: import.meta.env.VITE_JAAZ_BACKEND_URL || 'http://localhost:57988',
+  },
   supabase: {
     url: supabaseConfig.url,
     anonKey: supabaseConfig.anonKey,

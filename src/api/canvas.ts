@@ -1,8 +1,8 @@
 import { CanvasData, Message, Session } from '@/types/types'
 import { config } from '@/config/env'
 
-// Use Supabase Edge Functions instead of relative paths
-const API_BASE_URL = config.supabase.functionsUrl
+// Use local API for canvas operations
+const API_BASE_URL = '/api'
 
 export type ListCanvasesResponse = {
   id: string
@@ -13,7 +13,7 @@ export type ListCanvasesResponse = {
 }
 
 export async function listCanvases(): Promise<ListCanvasesResponse[]> {
-  const response = await fetch(`${API_BASE_URL}/jaaz-canvas/api/canvases`)
+  const response = await fetch(`${API_BASE_URL}/canvas/list`)
   return await response.json()
 }
 
@@ -34,7 +34,7 @@ export async function createCanvas(data: {
   }
   system_prompt: string
 }): Promise<{ id: string }> {
-  const response = await fetch(`${API_BASE_URL}/jaaz-canvas/api/canvas`, {
+  const response = await fetch(`${API_BASE_URL}/canvas/create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
@@ -45,7 +45,7 @@ export async function createCanvas(data: {
 export async function getCanvas(
   id: string
 ): Promise<{ data: CanvasData; name: string; sessions: Session[] }> {
-  const response = await fetch(`${API_BASE_URL}/jaaz-canvas/api/canvas/${id}`)
+  const response = await fetch(`${API_BASE_URL}/canvas/${id}`)
   return await response.json()
 }
 
@@ -56,8 +56,8 @@ export async function saveCanvas(
     thumbnail: string
   }
 ): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/jaaz-canvas/api/canvas/${id}`, {
-    method: 'PUT',
+  const response = await fetch(`${API_BASE_URL}/canvas/${id}/save`, {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   })
@@ -65,16 +65,16 @@ export async function saveCanvas(
 }
 
 export async function renameCanvas(id: string, name: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/jaaz-canvas/api/canvas/${id}`, {
-    method: 'PUT',
+  const response = await fetch(`${API_BASE_URL}/canvas/${id}/rename`, {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title: name }),
+    body: JSON.stringify({ name: name }),
   })
   return await response.json()
 }
 
 export async function deleteCanvas(id: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/jaaz-canvas/api/canvas/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/canvas/${id}/delete`, {
     method: 'DELETE',
   })
   return await response.json()

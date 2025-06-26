@@ -1,18 +1,17 @@
 import { Message, Model } from '@/types/types'
 import { config } from '@/config/env'
 
-// Use Supabase Edge Functions instead of direct backend
-const API_BASE_URL = config.supabase.functionsUrl
+// Use local Jaaz backend instead of Supabase Edge Functions
+const API_BASE_URL = config.jaaz.backendUrl
 
 export const getChatSession = async (sessionId: string) => {
   try {
     console.log(`🔍 Loading chat session: ${sessionId}`)
-    console.log(`📡 API URL: ${API_BASE_URL}/jaaz-chat/api/chat_session/${sessionId}`)
+    console.log(`📡 API URL: ${API_BASE_URL}/api/chat_session/${sessionId}`)
     
-    const response = await fetch(`${API_BASE_URL}/jaaz-chat/api/chat_session/${sessionId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/chat_session/${sessionId}`, {
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.supabase.anonKey}`,
       },
     })
     
@@ -39,14 +38,13 @@ export const sendMessages = async (payload: {
 }) => {
   try {
     console.log(`💬 Sending messages to session: ${payload.sessionId}`)
-    console.log(`📡 API URL: ${API_BASE_URL}/jaaz-chat/api/chat`)
+    console.log(`📡 API URL: ${API_BASE_URL}/api/chat`)
     console.log(`📝 Payload:`, payload)
     
-    const response = await fetch(`${API_BASE_URL}/jaaz-chat/api/chat`, {
+    const response = await fetch(`${API_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.supabase.anonKey}`,
       },
       body: JSON.stringify({
         messages: payload.newMessages,
@@ -83,11 +81,10 @@ export const cancelChat = async (sessionId: string) => {
   try {
     console.log(`🛑 Canceling chat session: ${sessionId}`)
     
-    const response = await fetch(`${API_BASE_URL}/jaaz-chat/api/cancel/${sessionId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/cancel/${sessionId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.supabase.anonKey}`,
       },
     })
     

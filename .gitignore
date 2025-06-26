@@ -31,3 +31,6 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Exclude jaaz-source folder
+jaaz-source/

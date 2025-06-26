@@ -45,3 +45,10 @@ jaaz-source/server/files/
 jaaz-source/server/database.db
 jaaz-source/server/*.db
 jaaz-source/server/uploads/
+
+# Test artifacts and temporary files
+tests/**/*.log
+tests/**/test-results/
+tests/**/coverage/
+tests/**/.nyc_output/
+tests/**/node_modules/

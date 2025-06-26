@@ -34,9 +34,13 @@
       "Bash(sudo apt install:*)",
       "Bash(pip3:*)",
       "Bash(source:*)",
-      "Bash(python:*)",
-      "Bash(pip install:*)",
-      "Bash(OPENROUTER_API_KEY=ce1a4a62-4ceb-4faa-989f-2ed52adb7f7d:6b16e77cf71a9c9ed70149237587f95e ANTHROPIC_API_KEY=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 FAL_API_KEY=ce1a4a62-4ceb-4faa-989f-2ed52adb7f7d:6b16e77cf71a9c9ed70149237587f95e python main_full.py --port 57988)"
+              "Bash(python:*)",
+        "Bash(pip install:*)",
+        "Bash(python main.py:*)",
+        "Bash(python main_full.py:*)",
+        "Bash(uvicorn:*)",
+        "Bash(conda:*)",
+        "Bash(activate:*)"
     ],
     "deny": []
   }
